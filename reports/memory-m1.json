@@ -1,0 +1,41 @@
+{
+  "kind": "memory_m0_baseline",
+  "dataset": {
+    "conversations": 11,
+    "questions": 11,
+    "seed": 1337
+  },
+  "model": "/home/omnichat/models/ollama-archive/blobs/sha256-3e4cb14174460404e7a233e531675303b2fbf7749c02f91864fe311ab6344e4f",
+  "config": {
+    "embed_backend": "bge",
+    "embed_model": "/home/omnichat/.cache/modelscope/models/BAAI--bge-small-zh-v1.5/snapshots/master",
+    "learned_scorer": "/mnt/f/FIP-Transformer/memory_arch/scorer_weights.json",
+    "n_gpu_layers": 0
+  },
+  "results": [
+    {
+      "method": "naive_rag",
+      "accuracy": 1.0,
+      "category_accuracy": {
+        "single_session_recall": 1.0,
+        "knowledge_update": 1.0,
+        "temporal_reasoning": 1.0
+      },
+      "memory_items": 89,
+      "n_writes": 89,
+      "elapsed_seconds": 168.6810040473938
+    },
+    {
+      "method": "igm",
+      "accuracy": 0.6363636363636364,
+      "category_accuracy": {
+        "single_session_recall": 0.6,
+        "knowledge_update": 0.3333333333333333,
+        "temporal_reasoning": 1.0
+      },
+      "memory_items": 19,
+      "n_writes": 33,
+      "elapsed_seconds": 55.12062358856201
+    }
+  ]
+}

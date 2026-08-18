@@ -1,0 +1,1111 @@
+{
+  "environment": {
+    "cuda_device": "NVIDIA GeForce RTX 5070",
+    "device": "cuda",
+    "torch": "2.11.0+cu128"
+  },
+  "fairness": {
+    "d_blocked_without_explicit_noncomparable_override": true,
+    "same_batch_size": 8,
+    "same_current_token_budget": true,
+    "same_learning_rate": 0.0003,
+    "same_seed_list": [
+      1337
+    ],
+    "same_steps_per_task": 2,
+    "same_task_order": true,
+    "same_weight_decay": 0.1
+  },
+  "kind": "fip_phase0",
+  "preflight": {
+    "device": "cuda",
+    "groups": [
+      "A",
+      "B",
+      "C",
+      "E",
+      "F"
+    ],
+    "parameter_parity_groups": [
+      "A",
+      "B",
+      "C",
+      "E",
+      "F"
+    ],
+    "seeds": [
+      1337
+    ],
+    "steps_per_group_per_seed": 12,
+    "tasks": [
+      "facts",
+      "conflict",
+      "modular",
+      "string",
+      "shared",
+      "unrelated"
+    ],
+    "tokens_per_group_per_seed": 384
+  },
+  "protocol": "docs/FIP_RESEARCH_PROTOCOL.md",
+  "results": [
+    {
+      "average_retention_forgetting": 0.025,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 384,
+      "elapsed_seconds": 0.9535818179999751,
+      "ewc_state_mb": 0.0,
+      "final_accuracy": {
+        "conflict": 0.0,
+        "facts": 0.0,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "group": "A",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 138.34619140625,
+      "per_task_forgetting": {
+        "conflict": 0.125,
+        "facts": null,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.25
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.094162464141846,
+          "replay_examples": 0,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 4.99184513092041,
+          "replay_examples": 0,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.588614463806152,
+          "replay_examples": 0,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.873055458068848,
+          "replay_examples": 0,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.442348957061768,
+          "replay_examples": 0,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0,
+            "unrelated": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.064083576202393,
+          "replay_examples": 0,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 402.6922417684038,
+      "tokens_trained": 384,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    },
+    {
+      "average_retention_forgetting": 0.025,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 384,
+      "elapsed_seconds": 0.24979856299995618,
+      "ewc_state_mb": 48.525390625,
+      "final_accuracy": {
+        "conflict": 0.0,
+        "facts": 0.0,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "group": "B",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 223.8994140625,
+      "per_task_forgetting": {
+        "conflict": 0.125,
+        "facts": null,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.25
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.094162464141846,
+          "replay_examples": 0,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 4.992234230041504,
+          "replay_examples": 0,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.5888848304748535,
+          "replay_examples": 0,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.873316764831543,
+          "replay_examples": 0,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.4426140785217285,
+          "replay_examples": 0,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0,
+            "unrelated": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.064261436462402,
+          "replay_examples": 0,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 1537.2386269494568,
+      "tokens_trained": 384,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    },
+    {
+      "average_retention_forgetting": 0.025,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 384,
+      "elapsed_seconds": 0.16425277299998697,
+      "ewc_state_mb": 0.0,
+      "final_accuracy": {
+        "conflict": 0.0,
+        "facts": 0.0,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "group": "C",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 138.34619140625,
+      "per_task_forgetting": {
+        "conflict": 0.125,
+        "facts": null,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.003662109375,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.25
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.094162464141846,
+          "replay_examples": 0,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 4.99184513092041,
+          "replay_examples": 0,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.588614463806152,
+          "replay_examples": 0,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.873055458068848,
+          "replay_examples": 0,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.442348957061768,
+          "replay_examples": 0,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0,
+            "unrelated": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 5.064083576202393,
+          "replay_examples": 0,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 2337.8600737537045,
+      "tokens_trained": 384,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    },
+    {
+      "average_retention_forgetting": 0.0,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 384,
+      "elapsed_seconds": 0.4149198299999739,
+      "ewc_state_mb": 0.0,
+      "final_accuracy": {
+        "conflict": 0.125,
+        "facts": 0.0,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "group": "E",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 165.58642578125,
+      "per_task_forgetting": {
+        "conflict": 0.0,
+        "facts": null,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.25
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": {
+            "0": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "2": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "3": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "4": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "5": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "final_train_loss": 5.19400691986084,
+          "replay_examples": 0,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": {
+            "0": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "2": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "3": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "4": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "5": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "final_train_loss": 4.930284023284912,
+          "replay_examples": 0,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": {
+            "0": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "2": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "3": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "4": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "5": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "final_train_loss": 5.674249649047852,
+          "replay_examples": 0,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": {
+            "0": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "2": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "3": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "4": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "5": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "final_train_loss": 5.799091339111328,
+          "replay_examples": 0,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": {
+            "0": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "2": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "3": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "4": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "5": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "final_train_loss": 5.5497050285339355,
+          "replay_examples": 0,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0,
+            "unrelated": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": {
+            "0": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "2": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "3": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "4": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            },
+            "5": {
+              "free": 205,
+              "plastic": 819,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "final_train_loss": 4.926654815673828,
+          "replay_examples": 0,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 925.4799897127697,
+      "tokens_trained": 384,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    },
+    {
+      "average_retention_forgetting": 0.0,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 384,
+      "elapsed_seconds": 0.42804624500001864,
+      "ewc_state_mb": 0.0,
+      "feature_jaccard": {
+        "conflict__modular": 0.4176847004072135,
+        "conflict__shared": 0.26704545454545453,
+        "conflict__string": 0.34172661870503596,
+        "conflict__unrelated": 0.2316933638443936,
+        "facts__conflict": 0.37006145741878843,
+        "facts__modular": 0.2255700325732899,
+        "facts__shared": 0.16743023740108287,
+        "facts__string": 0.18507588532883643,
+        "facts__unrelated": 0.1458596048759983,
+        "modular__shared": 0.37686809616634176,
+        "modular__string": 0.45286885245901637,
+        "modular__unrelated": 0.30395913154533843,
+        "shared__unrelated": 0.5253532834580216,
+        "string__shared": 0.47919876733436056,
+        "string__unrelated": 0.41009946442234124
+      },
+      "final_accuracy": {
+        "conflict": 0.125,
+        "facts": 0.0,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "group": "F",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 223.30322265625,
+      "per_task_forgetting": {
+        "conflict": 0.0,
+        "facts": null,
+        "modular": 0.0,
+        "shared": 0.0,
+        "string": 0.0,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.25
+          },
+          "active_feature_count": 1847,
+          "changed_feature_ratio": 1.0,
+          "feature_states": {
+            "0": {
+              "free": 136,
+              "plastic": 658,
+              "shared": 0,
+              "stable": 230
+            },
+            "1": {
+              "free": 156,
+              "plastic": 694,
+              "shared": 0,
+              "stable": 174
+            },
+            "2": {
+              "free": 158,
+              "plastic": 719,
+              "shared": 0,
+              "stable": 147
+            },
+            "3": {
+              "free": 156,
+              "plastic": 725,
+              "shared": 0,
+              "stable": 143
+            },
+            "4": {
+              "free": 159,
+              "plastic": 729,
+              "shared": 0,
+              "stable": 136
+            },
+            "5": {
+              "free": 175,
+              "plastic": 754,
+              "shared": 0,
+              "stable": 95
+            }
+          },
+          "final_train_loss": 5.19400691986084,
+          "replay_examples": 0,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0
+          },
+          "active_feature_count": 1274,
+          "changed_feature_ratio": 0.8494466145833334,
+          "feature_states": {
+            "0": {
+              "free": 119,
+              "plastic": 539,
+              "shared": 314,
+              "stable": 52
+            },
+            "1": {
+              "free": 145,
+              "plastic": 629,
+              "shared": 156,
+              "stable": 94
+            },
+            "2": {
+              "free": 145,
+              "plastic": 665,
+              "shared": 125,
+              "stable": 89
+            },
+            "3": {
+              "free": 139,
+              "plastic": 673,
+              "shared": 100,
+              "stable": 112
+            },
+            "4": {
+              "free": 149,
+              "plastic": 678,
+              "shared": 89,
+              "stable": 108
+            },
+            "5": {
+              "free": 159,
+              "plastic": 721,
+              "shared": 59,
+              "stable": 85
+            }
+          },
+          "final_train_loss": 4.936459541320801,
+          "replay_examples": 0,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0
+          },
+          "active_feature_count": 1163,
+          "changed_feature_ratio": 0.912109375,
+          "feature_states": {
+            "0": {
+              "free": 92,
+              "plastic": 474,
+              "shared": 401,
+              "stable": 57
+            },
+            "1": {
+              "free": 141,
+              "plastic": 585,
+              "shared": 215,
+              "stable": 83
+            },
+            "2": {
+              "free": 143,
+              "plastic": 633,
+              "shared": 173,
+              "stable": 75
+            },
+            "3": {
+              "free": 136,
+              "plastic": 643,
+              "shared": 160,
+              "stable": 85
+            },
+            "4": {
+              "free": 144,
+              "plastic": 649,
+              "shared": 147,
+              "stable": 84
+            },
+            "5": {
+              "free": 155,
+              "plastic": 696,
+              "shared": 103,
+              "stable": 70
+            }
+          },
+          "final_train_loss": 5.6803083419799805,
+          "replay_examples": 0,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 964,
+          "changed_feature_ratio": 0.9261067708333334,
+          "feature_states": {
+            "0": {
+              "free": 73,
+              "plastic": 406,
+              "shared": 491,
+              "stable": 54
+            },
+            "1": {
+              "free": 136,
+              "plastic": 560,
+              "shared": 251,
+              "stable": 77
+            },
+            "2": {
+              "free": 139,
+              "plastic": 619,
+              "shared": 190,
+              "stable": 76
+            },
+            "3": {
+              "free": 133,
+              "plastic": 625,
+              "shared": 189,
+              "stable": 77
+            },
+            "4": {
+              "free": 142,
+              "plastic": 634,
+              "shared": 168,
+              "stable": 80
+            },
+            "5": {
+              "free": 152,
+              "plastic": 675,
+              "shared": 128,
+              "stable": 69
+            }
+          },
+          "final_train_loss": 5.778003692626953,
+          "replay_examples": 0,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0
+          },
+          "active_feature_count": 956,
+          "changed_feature_ratio": 0.9295247395833334,
+          "feature_states": {
+            "0": {
+              "free": 65,
+              "plastic": 361,
+              "shared": 559,
+              "stable": 39
+            },
+            "1": {
+              "free": 129,
+              "plastic": 547,
+              "shared": 273,
+              "stable": 75
+            },
+            "2": {
+              "free": 137,
+              "plastic": 606,
+              "shared": 212,
+              "stable": 69
+            },
+            "3": {
+              "free": 129,
+              "plastic": 613,
+              "shared": 207,
+              "stable": 75
+            },
+            "4": {
+              "free": 140,
+              "plastic": 616,
+              "shared": 188,
+              "stable": 80
+            },
+            "5": {
+              "free": 149,
+              "plastic": 662,
+              "shared": 147,
+              "stable": 66
+            }
+          },
+          "final_train_loss": 5.569190979003906,
+          "replay_examples": 0,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "shared": 0.0,
+            "string": 0.0,
+            "unrelated": 0.0
+          },
+          "active_feature_count": 879,
+          "changed_feature_ratio": 0.9342447916666666,
+          "feature_states": {
+            "0": {
+              "free": 59,
+              "plastic": 326,
+              "shared": 604,
+              "stable": 35
+            },
+            "1": {
+              "free": 125,
+              "plastic": 534,
+              "shared": 293,
+              "stable": 72
+            },
+            "2": {
+              "free": 134,
+              "plastic": 584,
+              "shared": 236,
+              "stable": 70
+            },
+            "3": {
+              "free": 123,
+              "plastic": 594,
+              "shared": 238,
+              "stable": 69
+            },
+            "4": {
+              "free": 136,
+              "plastic": 603,
+              "shared": 204,
+              "stable": 81
+            },
+            "5": {
+              "free": 146,
+              "plastic": 650,
+              "shared": 162,
+              "stable": 66
+            }
+          },
+          "final_train_loss": 4.911955833435059,
+          "replay_examples": 0,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 897.0993309379066,
+      "tokens_trained": 384,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    }
+  ],
+  "source_hashes": {
+    "data/synthetic_tasks.py": "cf262b7116124c86c2ed88bb3f4b0657f4bb47b08ba20e83489f28173d0a23f2",
+    "experiments/baselines.py": "360be28bd076be7b5ceea3c4318b92a223c367016d7c0e8a08ac03529e72fabd",
+    "experiments/phase0.py": "9b532ce43f3636606150e069cea6741f99b33b94c1e541d6a13d090f7c4b1679",
+    "fip/model.py": "08a379e08dca1e169c4e8de750252fc03974171a3ece328b177f7dc19dc800e1",
+    "fip/optimizer.py": "7530182f082539903ad46f03b4a077518cd352597b90138b1d87eb5b4dccbcf3"
+  }
+}

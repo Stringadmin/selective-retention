@@ -1,0 +1,23 @@
+{
+  "kind": "memory_m0_baseline",
+  "dataset": {
+    "conversations": 11,
+    "questions": 11,
+    "seed": 1337
+  },
+  "model": "/home/omnichat/models/ollama-archive/blobs/sha256-3e4cb14174460404e7a233e531675303b2fbf7749c02f91864fe311ab6344e4f",
+  "results": [
+    {
+      "method": "igm",
+      "accuracy": 0.6363636363636364,
+      "category_accuracy": {
+        "single_session_recall": 0.8,
+        "knowledge_update": 1.0,
+        "temporal_reasoning": 0.0
+      },
+      "memory_items": 9,
+      "n_writes": 13,
+      "elapsed_seconds": 68.5171205997467
+    }
+  ]
+}

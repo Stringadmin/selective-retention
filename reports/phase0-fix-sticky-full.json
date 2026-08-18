@@ -1,0 +1,19 @@
+{
+  "per_task_budget": 0.2,
+  "forgetting": 0.4438,
+  "per_task_forgetting": {
+    "conflict": 0.694,
+    "modular": 0.281,
+    "string": 0.923,
+    "shared": 0.321,
+    "unrelated": 0.0
+  },
+  "final_accuracy": {
+    "facts": 0.14,
+    "conflict": 0.306,
+    "modular": 0.675,
+    "string": 0.077,
+    "shared": 0.635,
+    "unrelated": 1.0
+  }
+}

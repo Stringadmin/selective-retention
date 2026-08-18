@@ -1,0 +1,39 @@
+{
+  "group": "freeze",
+  "accs": [
+    {
+      "facts": 1.0
+    },
+    {
+      "facts": 0.0,
+      "conflict": 1.0
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.933,
+      "modular": 0.381
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.933,
+      "modular": 0.056,
+      "string": 1.0
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.933,
+      "modular": 0.371,
+      "string": 0.0,
+      "shared": 0.577
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.933,
+      "modular": 0.371,
+      "string": 0.0,
+      "shared": 0.577,
+      "unrelated": 0.0
+    }
+  ],
+  "partial": true
+}

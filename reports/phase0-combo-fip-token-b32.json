@@ -1,0 +1,21 @@
+{
+  "combo": "FIP + sticky non-FFN + token ownership",
+  "per_task_budget": 0.2,
+  "batch_size": 32,
+  "forgetting": 0.4548,
+  "per_task_forgetting": {
+    "conflict": 0.375,
+    "modular": 0.301,
+    "string": 1.0,
+    "shared": 0.598,
+    "unrelated": 0.0
+  },
+  "final_accuracy": {
+    "facts": 0.0,
+    "conflict": 0.625,
+    "modular": 0.519,
+    "string": 0.0,
+    "shared": 0.402,
+    "unrelated": 1.0
+  }
+}

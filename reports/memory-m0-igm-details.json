@@ -1,0 +1,90 @@
+[
+  {
+    "conv": "recall-0",
+    "category": "single_session_recall",
+    "question": "我的最喜欢的颜色是什么？",
+    "gold": "蓝色",
+    "pred": "Okay, let's see. The user has given a few memories. The first one says, \"我想告诉你，我的最喜欢的颜色是蓝色。\" which translates to \"I want to tell you, my favorite color is blue.\" Then there's an update: \"更新一下，我的最喜欢的食物现在",
+    "correct": true
+  },
+  {
+    "conv": "recall-1",
+    "category": "single_session_recall",
+    "question": "我的宠物是什么？",
+    "gold": "一只猫",
+    "pred": "Okay, let's see. The user asked, \"我的宠物是什么？\" which translates to \"What's my pet?\" in English.\n\nFirst, I need to check the memories provided. The memories are:\n\n1. user: 更新一下，我的最喜欢的食物现在是寿司了。\n   -",
+    "correct": false
+  },
+  {
+    "conv": "recall-2",
+    "category": "single_session_recall",
+    "question": "我的家乡是什么？",
+    "gold": "杭州",
+    "pred": "Okay, let's see. The user is asking about their hometown. I need to check the memories provided.\n\nFirst, the memories list shows several entries. The user mentioned \"我的家乡是杭州\" which translates to \"My hometown is Hangzhou.\" Then there's an update about their favorite food being",
+    "correct": true
+  },
+  {
+    "conv": "recall-3",
+    "category": "single_session_recall",
+    "question": "我的职业是什么？",
+    "gold": "软件工程师",
+    "pred": "Okay, let's see. The user has given a few memories here. The question is asking what their job is.\n\nFirst, I need to check the memories. The user says: \"我想告诉你，我的职业是软件工程师。\" which translates to \"I want to tell you, my profession",
+    "correct": true
+  },
+  {
+    "conv": "recall-4",
+    "category": "single_session_recall",
+    "question": "我的爱好是什么？",
+    "gold": "摄影",
+    "pred": "Okay, let's see. The user is asking about their hobby. I need to check the memories provided.\n\nFirst, the memories list:\n\n- user: 我想告诉你，我的宠物是一只猫。 (Translation: I want to tell you, my pet is a cat.)\n- user:",
+    "correct": false
+  },
+  {
+    "conv": "update-0",
+    "category": "knowledge_update",
+    "question": "我现在的住址是什么？",
+    "gold": "深圳",
+    "pred": "Okay, let's see. The user asked about their current address. I need to check the memories.\n\nFirst, the memories list shows several updates. The user mentioned updating their favorite food to sushi, then their pet is a cat, they traveled to Shanghai in July, updated their address to Shenzhen",
+    "correct": false
+  },
+  {
+    "conv": "update-1",
+    "category": "knowledge_update",
+    "question": "我现在的工作是什么？",
+    "gold": "医生",
+    "pred": "Okay, let's see. The user has given me a few memories to check. The question is asking what their current job is.\n\nFirst, I need to look at the memories provided. The user has updated their favorite food to sushi, then their job to doctor, but then they said their profession",
+    "correct": false
+  },
+  {
+    "conv": "update-2",
+    "category": "knowledge_update",
+    "question": "我现在的最喜欢的食物是什么？",
+    "gold": "寿司",
+    "pred": "Okay, let's see. The user asked about their current favorite food. I need to check the memories.\n\nFirst, the memories list shows a few updates. The first memory says \"更新一下，我的最喜欢的食物现在是寿司了。\" which translates to \"Update: My favorite food is",
+    "correct": true
+  },
+  {
+    "conv": "temporal-0",
+    "category": "temporal_reasoning",
+    "question": "我最近一次出行是去哪里？",
+    "gold": "上海",
+    "pred": "Okay, let's see. The user is asking about their most recent trip. I need to check the memories provided.\n\nFirst, the memories list:\n\n- user: 我七月份去了上海旅游。 (I traveled to Shanghai in July)\n- user: 更新一下，我的最喜欢的食物现在是",
+    "correct": true
+  },
+  {
+    "conv": "temporal-1",
+    "category": "temporal_reasoning",
+    "question": "我最近一次出行是去哪里？",
+    "gold": "上海",
+    "pred": "Okay, let's see. The user is asking about their most recent trip. I need to check the memories provided.\n\nFirst, the memories list:\n\n- user: 我七月份去了上海旅游。 (I traveled to Shanghai in July)\n- user: 更新一下，我的最喜欢的食物现在是",
+    "correct": true
+  },
+  {
+    "conv": "temporal-2",
+    "category": "temporal_reasoning",
+    "question": "我最近一次出行是去哪里？",
+    "gold": "上海",
+    "pred": "Okay, let's see. The user is asking about their most recent trip. I need to check the memories provided.\n\nFirst, the memories list:\n\n- user: 我七月份去了上海旅游。 (I traveled to Shanghai in July)\n- user: 更新一下，我的最喜欢的食物现在是",
+    "correct": true
+  }
+]

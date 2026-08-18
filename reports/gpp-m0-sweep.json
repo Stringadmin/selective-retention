@@ -1,0 +1,86 @@
+[
+  {
+    "protected_scale": 0.05,
+    "per_task_budget": 0.2,
+    "forgetting": 0.259,
+    "per_task_forgetting": {
+      "conflict": 0.137,
+      "modular": 0.103,
+      "string": 1.0,
+      "shared": 0.055,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.066,
+      "conflict": 0.863,
+      "modular": 0.897,
+      "string": 0.0,
+      "shared": 0.945,
+      "unrelated": 1.0
+    },
+    "immediate": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "protected_scale": 0.1,
+    "per_task_budget": 0.3,
+    "forgetting": 0.3188,
+    "per_task_forgetting": {
+      "conflict": 0.366,
+      "modular": 0.101,
+      "string": 1.0,
+      "shared": 0.127,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.0,
+      "conflict": 0.634,
+      "modular": 0.894,
+      "string": 0.0,
+      "shared": 0.873,
+      "unrelated": 1.0
+    },
+    "immediate": [
+      1.0,
+      1.0,
+      0.994,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "protected_scale": 0.0,
+    "per_task_budget": 0.2,
+    "forgetting": 0.204,
+    "per_task_forgetting": {
+      "conflict": 0.056,
+      "modular": 0.097,
+      "string": 0.791,
+      "shared": 0.076,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.0,
+      "conflict": 0.944,
+      "modular": 0.903,
+      "string": 0.209,
+      "shared": 0.924,
+      "unrelated": 1.0
+    },
+    "immediate": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  }
+]

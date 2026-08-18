@@ -1,0 +1,493 @@
+{
+  "environment": {
+    "cuda_device": "NVIDIA GeForce RTX 5070",
+    "device": "cuda",
+    "torch": "2.11.0+cu128"
+  },
+  "fairness": {
+    "d_blocked_without_explicit_noncomparable_override": true,
+    "g_is_diagnostic_non_comparable": true,
+    "h_is_diagnostic_non_comparable": true,
+    "same_batch_size": 32,
+    "same_current_token_budget": true,
+    "same_learning_rate": 0.0003,
+    "same_seed_list": [
+      1337
+    ],
+    "same_steps_per_task": 2000,
+    "same_task_order": true,
+    "same_weight_decay": 0.1
+  },
+  "kind": "fip_phase0",
+  "preflight": {
+    "device": "cuda",
+    "diagnostic_groups": [
+      "H"
+    ],
+    "fip_registry": {
+      "free_activate_quantile": 0.25,
+      "free_ratio": 0.2,
+      "importance_ema": 0.99,
+      "shared_min_tasks": 2,
+      "stable_quantile": 0.5,
+      "task_sig_quantile": 0.75
+    },
+    "groups": [
+      "H"
+    ],
+    "non_ffn_protection": {
+      "protected_scale": 0.1,
+      "protection_quantile": 0.4
+    },
+    "parameter_parity_groups": [
+      "A",
+      "B",
+      "C",
+      "E",
+      "F"
+    ],
+    "seeds": [
+      1337
+    ],
+    "steps_per_group_per_seed": 12000,
+    "tasks": [
+      "facts",
+      "conflict",
+      "modular",
+      "string",
+      "shared",
+      "unrelated"
+    ],
+    "tokens_per_group_per_seed": 1536000
+  },
+  "protocol": "docs/FIP_RESEARCH_PROTOCOL.md",
+  "results": [
+    {
+      "average_retention_forgetting": 0.3541015625,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 1536000,
+      "elapsed_seconds": 252.94419619099995,
+      "ewc_state_mb": 0.0,
+      "feature_jaccard": {
+        "conflict__modular": 0.11396702230843841,
+        "conflict__shared": 0.06580427446569179,
+        "conflict__string": 0.05307262569832402,
+        "conflict__unrelated": 0.07794981313400962,
+        "facts__conflict": 0.33705583756345175,
+        "facts__modular": 0.07292093404342483,
+        "facts__shared": 0.05071090047393365,
+        "facts__string": 0.04399243140964995,
+        "facts__unrelated": 0.05545536519386835,
+        "modular__shared": 0.4329268292682927,
+        "modular__string": 0.39344262295081966,
+        "modular__unrelated": 0.4013986013986014,
+        "shared__unrelated": 0.5675146771037182,
+        "string__shared": 0.5921908893709328,
+        "string__unrelated": 0.5426356589147286
+      },
+      "final_accuracy": {
+        "conflict": 0.42529296875,
+        "facts": 0.06787109375,
+        "modular": 0.876953125,
+        "shared": 0.92724609375,
+        "string": 0.0,
+        "unrelated": 1.0
+      },
+      "group": "H",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 190.2978515625,
+      "per_task_forgetting": {
+        "conflict": 0.57470703125,
+        "facts": null,
+        "modular": 0.123046875,
+        "shared": 0.07275390625,
+        "string": 1.0,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 1.0
+          },
+          "active_feature_count": 1478,
+          "changed_feature_ratio": 1.0,
+          "feature_states": {
+            "0": {
+              "free": 67,
+              "plastic": 479,
+              "shared": 0,
+              "stable": 478
+            },
+            "1": {
+              "free": 56,
+              "plastic": 469,
+              "shared": 0,
+              "stable": 499
+            },
+            "2": {
+              "free": 55,
+              "plastic": 474,
+              "shared": 0,
+              "stable": 495
+            },
+            "3": {
+              "free": 53,
+              "plastic": 472,
+              "shared": 0,
+              "stable": 499
+            },
+            "4": {
+              "free": 56,
+              "plastic": 474,
+              "shared": 0,
+              "stable": 494
+            },
+            "5": {
+              "free": 66,
+              "plastic": 471,
+              "shared": 0,
+              "stable": 487
+            }
+          },
+          "final_train_loss": 0.00023467274149879813,
+          "module_drift": {
+            "attention": 3.933826257828998,
+            "embedding_head": 5.9314100655924085,
+            "ffn_plastic_free": 6.105548050280628,
+            "ffn_shared": 0.0,
+            "ffn_stable": 0.0,
+            "norms": 3.190375987039724
+          },
+          "non_ffn_protected_fraction": 0.6009457236842105,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.24055989583333334,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 1.0,
+            "facts": 0.0
+          },
+          "active_feature_count": 1156,
+          "changed_feature_ratio": 0.51953125,
+          "feature_states": {
+            "0": {
+              "free": 45,
+              "plastic": 307,
+              "shared": 118,
+              "stable": 554
+            },
+            "1": {
+              "free": 36,
+              "plastic": 289,
+              "shared": 105,
+              "stable": 594
+            },
+            "2": {
+              "free": 34,
+              "plastic": 323,
+              "shared": 122,
+              "stable": 545
+            },
+            "3": {
+              "free": 34,
+              "plastic": 324,
+              "shared": 106,
+              "stable": 560
+            },
+            "4": {
+              "free": 35,
+              "plastic": 361,
+              "shared": 114,
+              "stable": 514
+            },
+            "5": {
+              "free": 44,
+              "plastic": 377,
+              "shared": 99,
+              "stable": 504
+            }
+          },
+          "final_train_loss": 0.00019835177226923406,
+          "module_drift": {
+            "attention": 10.413301667611197,
+            "embedding_head": 1.0052118976641828,
+            "ffn_plastic_free": 9.553402406447677,
+            "ffn_shared": 0.0,
+            "ffn_stable": 0.0,
+            "norms": 2.0036911430686306
+          },
+          "non_ffn_protected_fraction": 0.6009457236842105,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.18815104166666666,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.18505859375,
+            "facts": 0.0,
+            "modular": 1.0
+          },
+          "active_feature_count": 1141,
+          "changed_feature_ratio": 0.4676106770833333,
+          "feature_states": {
+            "0": {
+              "free": 18,
+              "plastic": 251,
+              "shared": 155,
+              "stable": 600
+            },
+            "1": {
+              "free": 13,
+              "plastic": 216,
+              "shared": 146,
+              "stable": 649
+            },
+            "2": {
+              "free": 13,
+              "plastic": 228,
+              "shared": 145,
+              "stable": 638
+            },
+            "3": {
+              "free": 13,
+              "plastic": 219,
+              "shared": 133,
+              "stable": 659
+            },
+            "4": {
+              "free": 13,
+              "plastic": 236,
+              "shared": 139,
+              "stable": 636
+            },
+            "5": {
+              "free": 23,
+              "plastic": 248,
+              "shared": 121,
+              "stable": 632
+            }
+          },
+          "final_train_loss": 0.0031303141731768847,
+          "module_drift": {
+            "attention": 13.717213903119923,
+            "embedding_head": 9.461104022197814,
+            "ffn_plastic_free": 16.51485902567285,
+            "ffn_shared": 1.243255824607761,
+            "ffn_stable": 0.0,
+            "norms": 3.1700663883270144
+          },
+          "non_ffn_protected_fraction": 0.6009457236842105,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.18570963541666666,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.1884765625,
+            "facts": 0.0,
+            "modular": 0.90234375,
+            "string": 1.0
+          },
+          "active_feature_count": 729,
+          "changed_feature_ratio": 0.3792317708333333,
+          "feature_states": {
+            "0": {
+              "free": 18,
+              "plastic": 242,
+              "shared": 210,
+              "stable": 554
+            },
+            "1": {
+              "free": 11,
+              "plastic": 195,
+              "shared": 216,
+              "stable": 602
+            },
+            "2": {
+              "free": 12,
+              "plastic": 210,
+              "shared": 231,
+              "stable": 571
+            },
+            "3": {
+              "free": 8,
+              "plastic": 179,
+              "shared": 225,
+              "stable": 612
+            },
+            "4": {
+              "free": 8,
+              "plastic": 192,
+              "shared": 234,
+              "stable": 590
+            },
+            "5": {
+              "free": 21,
+              "plastic": 206,
+              "shared": 202,
+              "stable": 595
+            }
+          },
+          "final_train_loss": 0.0012734110932797194,
+          "module_drift": {
+            "attention": 10.485018925001668,
+            "embedding_head": 8.48606807894149,
+            "ffn_plastic_free": 7.890353989432187,
+            "ffn_shared": 1.2261105968406398,
+            "ffn_stable": 0.0,
+            "norms": 2.6670500372943957
+          },
+          "non_ffn_protected_fraction": 0.6009457236842105,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.11865234375,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0,
+            "facts": 0.0,
+            "modular": 1.0,
+            "shared": 1.0,
+            "string": 0.0625
+          },
+          "active_feature_count": 739,
+          "changed_feature_ratio": 0.4264322916666667,
+          "feature_states": {
+            "0": {
+              "free": 17,
+              "plastic": 238,
+              "shared": 236,
+              "stable": 533
+            },
+            "1": {
+              "free": 11,
+              "plastic": 194,
+              "shared": 248,
+              "stable": 571
+            },
+            "2": {
+              "free": 11,
+              "plastic": 205,
+              "shared": 252,
+              "stable": 556
+            },
+            "3": {
+              "free": 8,
+              "plastic": 174,
+              "shared": 256,
+              "stable": 586
+            },
+            "4": {
+              "free": 8,
+              "plastic": 189,
+              "shared": 267,
+              "stable": 560
+            },
+            "5": {
+              "free": 21,
+              "plastic": 206,
+              "shared": 229,
+              "stable": 568
+            }
+          },
+          "final_train_loss": 0.0005501230480149388,
+          "module_drift": {
+            "attention": 8.464004376405349,
+            "embedding_head": 1.597833152621109,
+            "ffn_plastic_free": 2.2572356538192584,
+            "ffn_shared": 1.3287153138247463,
+            "ffn_stable": 0.0,
+            "norms": 1.9967144413546416
+          },
+          "non_ffn_protected_fraction": 0.6009457236842105,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.12027994791666667,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.42529296875,
+            "facts": 0.06787109375,
+            "modular": 0.876953125,
+            "shared": 0.92724609375,
+            "string": 0.0,
+            "unrelated": 1.0
+          },
+          "active_feature_count": 863,
+          "changed_feature_ratio": 0.4508463541666667,
+          "feature_states": {
+            "0": {
+              "free": 1,
+              "plastic": 251,
+              "shared": 241,
+              "stable": 531
+            },
+            "1": {
+              "free": 11,
+              "plastic": 189,
+              "shared": 268,
+              "stable": 556
+            },
+            "2": {
+              "free": 11,
+              "plastic": 199,
+              "shared": 274,
+              "stable": 540
+            },
+            "3": {
+              "free": 8,
+              "plastic": 174,
+              "shared": 280,
+              "stable": 562
+            },
+            "4": {
+              "free": 8,
+              "plastic": 186,
+              "shared": 302,
+              "stable": 528
+            },
+            "5": {
+              "free": 21,
+              "plastic": 206,
+              "shared": 259,
+              "stable": 538
+            }
+          },
+          "final_train_loss": 3.79672710550949e-05,
+          "module_drift": {
+            "attention": 10.806603207395009,
+            "embedding_head": 2.5846311836624394,
+            "ffn_plastic_free": 3.5916911146431953,
+            "ffn_shared": 2.4369513340422064,
+            "ffn_stable": 0.0,
+            "norms": 1.7639496881247527
+          },
+          "non_ffn_protected_fraction": 0.6009457236842105,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.14046223958333334,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 6072.485643592928,
+      "tokens_trained": 1536000,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    }
+  ],
+  "source_hashes": {
+    "data/synthetic_tasks.py": "cf262b7116124c86c2ed88bb3f4b0657f4bb47b08ba20e83489f28173d0a23f2",
+    "experiments/baselines.py": "86967991c5ddbfca6e98316fbb657589aebf5621fcf6d4c46c34fca42632be18",
+    "experiments/phase0.py": "5306427f6838ff392c167d34d9b73b72a464cc6e4b317c12e049c8d8737d46f2",
+    "fip/feature_registry.py": "28de4d1839d115cdf452ae7d78786c1dff7ec444d3818e2ffc8be8f9dc5d61ae",
+    "fip/model.py": "89690aa6db56bdd812a06883b90f4f582dda1c052162929cbf90ecd0461aa7a3",
+    "fip/non_ffn_protection.py": "460094b8b6d510a9d6ce801a7f33dcd3a3043ea5990195f9cec484d6489bbdec",
+    "fip/optimizer.py": "3ccfc766deab5233206d842a521041b8452127b48dd8c651967eda7c3b19fd2e",
+    "fip/rollback.py": "29464ed5e6bde385351f8e5ecbb4f1f173651837483d51f1f560c9ea55b2389f"
+  }
+}

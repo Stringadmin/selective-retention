@@ -1,0 +1,56 @@
+[
+  {
+    "seed": 42,
+    "forgetting": 0.3548,
+    "per_task_forgetting": {
+      "conflict": 0.062,
+      "modular": 0.384,
+      "string": 1.0,
+      "shared": 0.328,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.0,
+      "conflict": 0.938,
+      "modular": 0.616,
+      "string": 0.0,
+      "shared": 0.672,
+      "unrelated": 1.0
+    },
+    "immediate": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "seed": 7,
+    "forgetting": 0.3244,
+    "per_task_forgetting": {
+      "conflict": 0.125,
+      "modular": 0.315,
+      "string": 1.0,
+      "shared": 0.182,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.0,
+      "conflict": 0.875,
+      "modular": 0.685,
+      "string": 0.0,
+      "shared": 0.818,
+      "unrelated": 1.0
+    },
+    "immediate": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  }
+]

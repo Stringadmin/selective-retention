@@ -1,0 +1,42 @@
+[
+  {
+    "allocation_mode": "importance",
+    "batch_size": 32,
+    "forgetting": 0.5038,
+    "per_task_forgetting": {
+      "conflict": 1.0,
+      "modular": 0.285,
+      "string": 1.0,
+      "shared": 0.234,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.0,
+      "conflict": 0.0,
+      "modular": 0.32,
+      "string": 0.0,
+      "shared": 0.415,
+      "unrelated": 1.0
+    }
+  },
+  {
+    "allocation_mode": "random",
+    "batch_size": 32,
+    "forgetting": 0.6782,
+    "per_task_forgetting": {
+      "conflict": 0.944,
+      "modular": 0.746,
+      "string": 1.0,
+      "shared": 0.701,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.06,
+      "conflict": 0.056,
+      "modular": 0.254,
+      "string": 0.0,
+      "shared": 0.299,
+      "unrelated": 1.0
+    }
+  }
+]

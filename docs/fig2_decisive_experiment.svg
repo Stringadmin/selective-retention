@@ -1,0 +1,32 @@
+<svg viewBox="0 0 680 400" width="680" height="400" xmlns="http://www.w3.org/2000/svg" font-family="SimHei, Microsoft YaHei, sans-serif">
+<title>决定性实验：连续更新场景下三种方法的准确率与记忆用量</title>
+<rect width="680" height="400" fill="#1a1a18"/>
+
+<text x="40" y="50" font-size="14" font-weight="500" fill="#E8E6DF">连续 5 次更新后问"当前值"：准确率对比</text>
+
+<line x1="70" y1="80" x2="70" y2="300" stroke="#5F5E5A" stroke-width="1"/>
+<line x1="70" y1="300" x2="650" y2="300" stroke="#5F5E5A" stroke-width="1"/>
+<text x="50" y="90" text-anchor="end" font-size="11" fill="#888780">100%</text>
+<text x="50" y="195" text-anchor="end" font-size="11" fill="#888780">50%</text>
+<text x="50" y="303" text-anchor="end" font-size="11" fill="#888780">0</text>
+<line x1="70" y1="86" x2="650" y2="86" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
+<line x1="70" y1="193" x2="650" y2="193" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
+
+<rect x="140" y="294" width="90" height="6" rx="2" fill="#A32D2D"/>
+<text x="185" y="282" text-anchor="middle" font-size="15" font-weight="500" fill="#F09595">0%</text>
+<text x="185" y="322" text-anchor="middle" font-size="12" fill="#B4B2A9">标准 RAG</text>
+<text x="185" y="340" text-anchor="middle" font-size="11" fill="#888780">信检索第一名</text>
+
+<rect x="330" y="171" width="90" height="129" fill="#BA7517"/>
+<text x="375" y="159" text-anchor="middle" font-size="15" font-weight="500" fill="#FAC775">60%</text>
+<text x="375" y="322" text-anchor="middle" font-size="12" fill="#B4B2A9">RAG + 时间排序</text>
+<text x="375" y="340" text-anchor="middle" font-size="11" fill="#888780">公平补救版</text>
+
+<rect x="520" y="86" width="90" height="214" fill="#0F6E56"/>
+<text x="565" y="74" text-anchor="middle" font-size="15" font-weight="500" fill="#5DCAA5">100%</text>
+<text x="565" y="322" text-anchor="middle" font-size="12" fill="#B4B2A9">RAG + IGM 写入层</text>
+<text x="565" y="340" text-anchor="middle" font-size="11" fill="#888780">slot 覆盖</text>
+
+<rect x="40" y="352" width="600" height="40" rx="10" fill="#1C1C1A" stroke="#444441" stroke-width="0.5"/>
+<text x="60" y="376" font-size="12" fill="#B4B2A9">记忆用量：标准 RAG 28 条 / RAG+时间排序 28 条 / <tspan fill="#5DCAA5" font-weight="500">IGM 仅 4 条</tspan>　·　越少越准，因为根本不存旧值</text>
+</svg>

@@ -1,0 +1,39 @@
+{
+  "q": 0.3,
+  "accs": [
+    {
+      "facts": 1.0
+    },
+    {
+      "facts": 0.0,
+      "conflict": 1.0
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.121,
+      "modular": 0.062
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.296,
+      "modular": 0.0,
+      "string": 1.0
+    },
+    {
+      "facts": 0.0,
+      "conflict": 0.0,
+      "modular": 0.058,
+      "string": 0.054,
+      "shared": 0.087
+    },
+    {
+      "facts": 0.131,
+      "conflict": 0.502,
+      "modular": 0.0,
+      "string": 0.0,
+      "shared": 0.0,
+      "unrelated": 1.0
+    }
+  ],
+  "partial": true
+}

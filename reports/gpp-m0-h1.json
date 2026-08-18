@@ -1,0 +1,29 @@
+[
+  {
+    "group": "A-dense",
+    "forgetting": 0.3984,
+    "per_task_forgetting": {
+      "conflict": 0.864,
+      "modular": 0.064,
+      "string": 1.0,
+      "shared": 0.064,
+      "unrelated": 0.0
+    },
+    "final_accuracy": {
+      "facts": 0.054,
+      "conflict": 0.136,
+      "modular": 0.0,
+      "string": 0.0,
+      "shared": 0.0,
+      "unrelated": 1.0
+    },
+    "immediate": [
+      1.0,
+      1.0,
+      0.061,
+      1.0,
+      0.064,
+      1.0
+    ]
+  }
+]

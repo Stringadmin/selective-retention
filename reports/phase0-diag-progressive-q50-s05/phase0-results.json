@@ -1,0 +1,493 @@
+{
+  "environment": {
+    "cuda_device": "NVIDIA GeForce RTX 5070",
+    "device": "cuda",
+    "torch": "2.11.0+cu128"
+  },
+  "fairness": {
+    "d_blocked_without_explicit_noncomparable_override": true,
+    "g_is_diagnostic_non_comparable": true,
+    "h_is_diagnostic_non_comparable": true,
+    "same_batch_size": 32,
+    "same_current_token_budget": true,
+    "same_learning_rate": 0.0003,
+    "same_seed_list": [
+      1337
+    ],
+    "same_steps_per_task": 2000,
+    "same_task_order": true,
+    "same_weight_decay": 0.1
+  },
+  "kind": "fip_phase0",
+  "preflight": {
+    "device": "cuda",
+    "diagnostic_groups": [
+      "H"
+    ],
+    "fip_registry": {
+      "free_activate_quantile": 0.25,
+      "free_ratio": 0.2,
+      "importance_ema": 0.99,
+      "shared_min_tasks": 2,
+      "stable_quantile": 0.5,
+      "task_sig_quantile": 0.75
+    },
+    "groups": [
+      "H"
+    ],
+    "non_ffn_protection": {
+      "protected_scale": 0.05,
+      "protection_quantile": 0.5
+    },
+    "parameter_parity_groups": [
+      "A",
+      "B",
+      "C",
+      "E",
+      "F"
+    ],
+    "seeds": [
+      1337
+    ],
+    "steps_per_group_per_seed": 12000,
+    "tasks": [
+      "facts",
+      "conflict",
+      "modular",
+      "string",
+      "shared",
+      "unrelated"
+    ],
+    "tokens_per_group_per_seed": 1536000
+  },
+  "protocol": "docs/FIP_RESEARCH_PROTOCOL.md",
+  "results": [
+    {
+      "average_retention_forgetting": 0.33876953125,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 1536000,
+      "elapsed_seconds": 254.5844705689999,
+      "ewc_state_mb": 0.0,
+      "feature_jaccard": {
+        "conflict__modular": 0.11212266411116435,
+        "conflict__shared": 0.05438225976768744,
+        "conflict__string": 0.06289308176100629,
+        "conflict__unrelated": 0.06813524590163934,
+        "facts__conflict": 0.3487075519513431,
+        "facts__modular": 0.07037643207855974,
+        "facts__shared": 0.047053449063499314,
+        "facts__string": 0.05160706201901313,
+        "facts__unrelated": 0.045234958278436536,
+        "modular__shared": 0.4523809523809524,
+        "modular__string": 0.39451476793248946,
+        "modular__unrelated": 0.3896457765667575,
+        "shared__unrelated": 0.5459459459459459,
+        "string__shared": 0.5769961977186312,
+        "string__unrelated": 0.5086355785837651
+      },
+      "final_accuracy": {
+        "conflict": 0.224609375,
+        "facts": 0.0517578125,
+        "modular": 0.966796875,
+        "shared": 0.99169921875,
+        "string": 0.123046875,
+        "unrelated": 1.0
+      },
+      "group": "H",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 190.2978515625,
+      "per_task_forgetting": {
+        "conflict": 0.775390625,
+        "facts": null,
+        "modular": 0.033203125,
+        "shared": 0.00830078125,
+        "string": 0.876953125,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 1.0
+          },
+          "active_feature_count": 1478,
+          "changed_feature_ratio": 1.0,
+          "feature_states": {
+            "0": {
+              "free": 67,
+              "plastic": 479,
+              "shared": 0,
+              "stable": 478
+            },
+            "1": {
+              "free": 56,
+              "plastic": 469,
+              "shared": 0,
+              "stable": 499
+            },
+            "2": {
+              "free": 55,
+              "plastic": 474,
+              "shared": 0,
+              "stable": 495
+            },
+            "3": {
+              "free": 53,
+              "plastic": 472,
+              "shared": 0,
+              "stable": 499
+            },
+            "4": {
+              "free": 56,
+              "plastic": 474,
+              "shared": 0,
+              "stable": 494
+            },
+            "5": {
+              "free": 66,
+              "plastic": 471,
+              "shared": 0,
+              "stable": 487
+            }
+          },
+          "final_train_loss": 0.00023467274149879813,
+          "module_drift": {
+            "attention": 3.933826257828998,
+            "embedding_head": 5.9314100655924085,
+            "ffn_plastic_free": 6.105548050280628,
+            "ffn_shared": 0.0,
+            "ffn_stable": 0.0,
+            "norms": 3.190375987039724
+          },
+          "non_ffn_protected_fraction": 0.5,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.24055989583333334,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 1.0,
+            "facts": 0.0
+          },
+          "active_feature_count": 1183,
+          "changed_feature_ratio": 0.51953125,
+          "feature_states": {
+            "0": {
+              "free": 42,
+              "plastic": 292,
+              "shared": 126,
+              "stable": 564
+            },
+            "1": {
+              "free": 39,
+              "plastic": 280,
+              "shared": 112,
+              "stable": 593
+            },
+            "2": {
+              "free": 35,
+              "plastic": 319,
+              "shared": 124,
+              "stable": 546
+            },
+            "3": {
+              "free": 38,
+              "plastic": 331,
+              "shared": 109,
+              "stable": 546
+            },
+            "4": {
+              "free": 37,
+              "plastic": 358,
+              "shared": 114,
+              "stable": 515
+            },
+            "5": {
+              "free": 44,
+              "plastic": 374,
+              "shared": 103,
+              "stable": 503
+            }
+          },
+          "final_train_loss": 0.00021841563284397125,
+          "module_drift": {
+            "attention": 11.820528349887951,
+            "embedding_head": 1.167012617498995,
+            "ffn_plastic_free": 9.619058174515768,
+            "ffn_shared": 0.0,
+            "ffn_stable": 0.0,
+            "norms": 2.2337252599181867
+          },
+          "non_ffn_protected_fraction": 0.5,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.19254557291666666,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.1171875,
+            "facts": 0.0,
+            "modular": 1.0
+          },
+          "active_feature_count": 1138,
+          "changed_feature_ratio": 0.46826171875,
+          "feature_states": {
+            "0": {
+              "free": 26,
+              "plastic": 224,
+              "shared": 162,
+              "stable": 612
+            },
+            "1": {
+              "free": 15,
+              "plastic": 204,
+              "shared": 151,
+              "stable": 654
+            },
+            "2": {
+              "free": 14,
+              "plastic": 220,
+              "shared": 148,
+              "stable": 642
+            },
+            "3": {
+              "free": 16,
+              "plastic": 236,
+              "shared": 141,
+              "stable": 631
+            },
+            "4": {
+              "free": 16,
+              "plastic": 254,
+              "shared": 143,
+              "stable": 611
+            },
+            "5": {
+              "free": 20,
+              "plastic": 257,
+              "shared": 133,
+              "stable": 614
+            }
+          },
+          "final_train_loss": 0.005445478484034538,
+          "module_drift": {
+            "attention": 14.088422136158137,
+            "embedding_head": 10.161241261509804,
+            "ffn_plastic_free": 15.907996495862061,
+            "ffn_shared": 1.1630586241390473,
+            "ffn_stable": 0.0,
+            "norms": 4.008537563375537
+          },
+          "non_ffn_protected_fraction": 0.5,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.18522135416666666,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.18603515625,
+            "facts": 0.0,
+            "modular": 0.8251953125,
+            "string": 1.0
+          },
+          "active_feature_count": 845,
+          "changed_feature_ratio": 0.3873697916666667,
+          "feature_states": {
+            "0": {
+              "free": 25,
+              "plastic": 213,
+              "shared": 216,
+              "stable": 570
+            },
+            "1": {
+              "free": 13,
+              "plastic": 175,
+              "shared": 234,
+              "stable": 602
+            },
+            "2": {
+              "free": 14,
+              "plastic": 187,
+              "shared": 240,
+              "stable": 583
+            },
+            "3": {
+              "free": 10,
+              "plastic": 188,
+              "shared": 243,
+              "stable": 583
+            },
+            "4": {
+              "free": 10,
+              "plastic": 204,
+              "shared": 241,
+              "stable": 569
+            },
+            "5": {
+              "free": 14,
+              "plastic": 197,
+              "shared": 227,
+              "stable": 586
+            }
+          },
+          "final_train_loss": 0.00183162372559309,
+          "module_drift": {
+            "attention": 11.45714675423699,
+            "embedding_head": 9.089743029631066,
+            "ffn_plastic_free": 8.14230217927014,
+            "ffn_shared": 1.0590901002976636,
+            "ffn_stable": 0.0,
+            "norms": 3.348475908957177
+          },
+          "non_ffn_protected_fraction": 0.5,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.13753255208333334,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.05908203125,
+            "facts": 0.0,
+            "modular": 0.9951171875,
+            "shared": 1.0,
+            "string": 0.3662109375
+          },
+          "active_feature_count": 814,
+          "changed_feature_ratio": 0.4314778645833333,
+          "feature_states": {
+            "0": {
+              "free": 25,
+              "plastic": 211,
+              "shared": 249,
+              "stable": 539
+            },
+            "1": {
+              "free": 13,
+              "plastic": 173,
+              "shared": 275,
+              "stable": 563
+            },
+            "2": {
+              "free": 14,
+              "plastic": 185,
+              "shared": 266,
+              "stable": 559
+            },
+            "3": {
+              "free": 10,
+              "plastic": 180,
+              "shared": 293,
+              "stable": 541
+            },
+            "4": {
+              "free": 10,
+              "plastic": 200,
+              "shared": 278,
+              "stable": 536
+            },
+            "5": {
+              "free": 13,
+              "plastic": 195,
+              "shared": 253,
+              "stable": 563
+            }
+          },
+          "final_train_loss": 0.000747883808799088,
+          "module_drift": {
+            "attention": 8.170891339707143,
+            "embedding_head": 1.4838959573431145,
+            "ffn_plastic_free": 2.950275110695336,
+            "ffn_shared": 1.665311952081892,
+            "ffn_stable": 0.0,
+            "norms": 2.1851551737832127
+          },
+          "non_ffn_protected_fraction": 0.5,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.13248697916666666,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.224609375,
+            "facts": 0.0517578125,
+            "modular": 0.966796875,
+            "shared": 0.99169921875,
+            "string": 0.123046875,
+            "unrelated": 1.0
+          },
+          "active_feature_count": 902,
+          "changed_feature_ratio": 0.4627278645833333,
+          "feature_states": {
+            "0": {
+              "free": 3,
+              "plastic": 228,
+              "shared": 257,
+              "stable": 536
+            },
+            "1": {
+              "free": 12,
+              "plastic": 165,
+              "shared": 293,
+              "stable": 554
+            },
+            "2": {
+              "free": 14,
+              "plastic": 178,
+              "shared": 294,
+              "stable": 538
+            },
+            "3": {
+              "free": 10,
+              "plastic": 173,
+              "shared": 319,
+              "stable": 522
+            },
+            "4": {
+              "free": 10,
+              "plastic": 196,
+              "shared": 307,
+              "stable": 511
+            },
+            "5": {
+              "free": 13,
+              "plastic": 192,
+              "shared": 282,
+              "stable": 537
+            }
+          },
+          "final_train_loss": 1.721434819046408e-05,
+          "module_drift": {
+            "attention": 10.976232275288734,
+            "embedding_head": 1.8949563090337922,
+            "ffn_plastic_free": 5.554862389178743,
+            "ffn_shared": 1.771832483444223,
+            "ffn_stable": 0.0,
+            "norms": 1.972364815816534
+          },
+          "non_ffn_protected_fraction": 0.5,
+          "replay_examples": 0,
+          "significant_feature_fraction": 0.14680989583333334,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 6033.3609374013195,
+      "tokens_trained": 1536000,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    }
+  ],
+  "source_hashes": {
+    "data/synthetic_tasks.py": "cf262b7116124c86c2ed88bb3f4b0657f4bb47b08ba20e83489f28173d0a23f2",
+    "experiments/baselines.py": "86967991c5ddbfca6e98316fbb657589aebf5621fcf6d4c46c34fca42632be18",
+    "experiments/phase0.py": "5306427f6838ff392c167d34d9b73b72a464cc6e4b317c12e049c8d8737d46f2",
+    "fip/feature_registry.py": "28de4d1839d115cdf452ae7d78786c1dff7ec444d3818e2ffc8be8f9dc5d61ae",
+    "fip/model.py": "89690aa6db56bdd812a06883b90f4f582dda1c052162929cbf90ecd0461aa7a3",
+    "fip/non_ffn_protection.py": "460094b8b6d510a9d6ce801a7f33dcd3a3043ea5990195f9cec484d6489bbdec",
+    "fip/optimizer.py": "3ccfc766deab5233206d842a521041b8452127b48dd8c651967eda7c3b19fd2e",
+    "fip/rollback.py": "29464ed5e6bde385351f8e5ecbb4f1f173651837483d51f1f560c9ea55b2389f"
+  }
+}

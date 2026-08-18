@@ -1,0 +1,64 @@
+# FIP Phase 0 configuration
+# Frozen per docs/FIP_RESEARCH_PROTOCOL.md and docs/FIP_ARCHITECTURE_V0.md
+
+experiment:
+  name: phase0-mechanism
+  seed: 1337
+  seeds: [1337, 42, 7, 2024, 314159]   # 5 seeds for the full gate run
+  device: cuda          # falls back to cpu automatically
+  dtype: float32        # Phase 0 uses fp32 for exact gradient checks
+  log_dir: reports/phase0
+
+model:
+  vocab_size: 8192      # synthetic tokenizer
+  n_layer: 6
+  d_model: 256
+  d_ff: 1024
+  n_head: 4
+  context: 256
+  top_k: 64
+  free_ratio: 0.2
+  use_fip: true
+
+# FIP feature-plasticity hyperparameters
+plasticity:
+  importance_ema: 0.99
+  stable_quantile: 0.5      # top-50% importance -> stable at end_task
+  shared_min_tasks: 2      # used in >=2 tasks -> shared
+  free_activate_quantile: 0.25
+  shared_grad_scale: 0.1   # lr_shared relative scale
+  task_sig_quantile: 0.75  # per-task contribution quantile for significant use
+
+# Synthetic task suite (Phase 0 data is generated, not downloaded)
+tasks:
+  - {id: facts,       type: associative_recall}
+  - {id: conflict,    type: conflict_update}
+  - {id: modular,     type: modular_arithmetic}
+  - {id: string,      type: string_transform}
+  - {id: shared,      type: shared_rule}
+  - {id: unrelated,   type: irrelevant}
+
+train:
+  steps_per_task: 2000
+  batch_size: 32
+  seq_len: 256
+  lr: 3.0e-4
+  weight_decay: 0.1
+  grad_clip: 1.0
+
+# Phase 0 gate criteria (must pass before Phase 1)
+gates:
+  stable_grad_leakage: 1.0e-7      # max |grad| on stable features
+  rollback_recovery: 1.0e-6        # max |logits| recovery error
+  dead_feature_ratio: 0.2          # max fraction dead
+  forgetting_reduction: 0.5        # vs sparse full-FT (group E)
+  new_task_learning: 0.9           # vs plain FT (group A)
+
+# Experiment groups (full first-stage matrix)
+groups:
+  A: {arch: dense,  method: full_ft}
+  B: {arch: dense,  method: ewc}
+  C: {arch: dense,  method: replay_5pct}
+  D: {arch: dense,  method: lora_merged}
+  E: {arch: sparse, method: full_ft}
+  F: {arch: fip,    method: fip}

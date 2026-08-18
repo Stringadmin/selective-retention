@@ -1,0 +1,174 @@
+{
+  "environment": {
+    "cuda_device": "NVIDIA GeForce RTX 5070",
+    "device": "cuda",
+    "torch": "2.11.0+cu128"
+  },
+  "fairness": {
+    "d_blocked_without_explicit_noncomparable_override": true,
+    "same_batch_size": 32,
+    "same_current_token_budget": true,
+    "same_learning_rate": 0.0003,
+    "same_seed_list": [
+      1337
+    ],
+    "same_steps_per_task": 10,
+    "same_task_order": true,
+    "same_weight_decay": 0.1
+  },
+  "kind": "fip_phase0",
+  "preflight": {
+    "device": "cuda",
+    "groups": [
+      "B"
+    ],
+    "parameter_parity_groups": [
+      "A",
+      "B",
+      "C",
+      "E",
+      "F"
+    ],
+    "seeds": [
+      1337
+    ],
+    "steps_per_group_per_seed": 60,
+    "tasks": [
+      "facts",
+      "conflict",
+      "modular",
+      "string",
+      "shared",
+      "unrelated"
+    ],
+    "tokens_per_group_per_seed": 7680
+  },
+  "protocol": "docs/FIP_RESEARCH_PROTOCOL.md",
+  "results": [
+    {
+      "average_retention_forgetting": 0.0875,
+      "base_parameter_count": 6360320,
+      "current_task_tokens": 7680,
+      "elapsed_seconds": 1.730594189000044,
+      "ewc_state_mb": 48.525390625,
+      "final_accuracy": {
+        "conflict": 0.71875,
+        "facts": 0.0,
+        "modular": 0.03125,
+        "shared": 0.09375,
+        "string": 0.0,
+        "unrelated": 0.375
+      },
+      "group": "B",
+      "obsolete_tasks": [
+        "facts"
+      ],
+      "peak_memory_mb": 215.2294921875,
+      "per_task_forgetting": {
+        "conflict": 0.28125,
+        "facts": null,
+        "modular": 0.03125,
+        "shared": 0.0,
+        "string": 0.125,
+        "unrelated": 0.0
+      },
+      "replay_state_mb": 0.0,
+      "replay_tokens": 0,
+      "task_history": [
+        {
+          "accuracy_after_task": {
+            "facts": 1.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 1.9155665636062622,
+          "replay_examples": 0,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 1.0,
+            "facts": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 1.5996390581130981,
+          "replay_examples": 0,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.8125,
+            "facts": 0.0,
+            "modular": 0.0625
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 4.246604919433594,
+          "replay_examples": 0,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.78125,
+            "facts": 0.0,
+            "modular": 0.0,
+            "string": 0.125
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 4.1227946281433105,
+          "replay_examples": 0,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.40625,
+            "facts": 0.0,
+            "modular": 0.03125,
+            "shared": 0.09375,
+            "string": 0.0
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 3.5641822814941406,
+          "replay_examples": 0,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.71875,
+            "facts": 0.0,
+            "modular": 0.03125,
+            "shared": 0.09375,
+            "string": 0.0,
+            "unrelated": 0.375
+          },
+          "active_feature_count": 0,
+          "changed_feature_ratio": null,
+          "feature_states": null,
+          "final_train_loss": 2.9717159271240234,
+          "replay_examples": 0,
+          "trained_task": "unrelated"
+        }
+      ],
+      "temporary_adapter_parameter_count": 0,
+      "tokens_per_second": 4437.782149515703,
+      "tokens_trained": 7680,
+      "total_parameter_count": 6360320,
+      "trainable_parameter_count": 6360320
+    }
+  ],
+  "source_hashes": {
+    "data/synthetic_tasks.py": "cf262b7116124c86c2ed88bb3f4b0657f4bb47b08ba20e83489f28173d0a23f2",
+    "experiments/baselines.py": "86967991c5ddbfca6e98316fbb657589aebf5621fcf6d4c46c34fca42632be18",
+    "experiments/phase0.py": "1af2650ff2d98250c8cac6fae211e017236823dee252a99c6fb4635bd20cb662",
+    "fip/model.py": "08a379e08dca1e169c4e8de750252fc03974171a3ece328b177f7dc19dc800e1",
+    "fip/optimizer.py": "7530182f082539903ad46f03b4a077518cd352597b90138b1d87eb5b4dccbcf3"
+  }
+}

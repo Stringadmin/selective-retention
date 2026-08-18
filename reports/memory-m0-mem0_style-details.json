@@ -1,0 +1,90 @@
+[
+  {
+    "conv": "recall-0",
+    "category": "single_session_recall",
+    "question": "我的最喜欢的颜色是什么？",
+    "gold": "蓝色",
+    "pred": "Okay, let's see. The user is asking, \"我的最喜欢的颜色是什么？\" which translates to \"What's my favorite color?\" But I need to check the facts provided.\n\nFirst, the facts given are: The assistant mentioned that they were organizing their room and found a lot of old things. There's a note that the assistant's reply was a bit messy, possibly a typo. Then in the conversation history, the user said they were sorting their room and found a lot of old stuff. The assistant previously replied about a new coffee shop downstairs.\n\nWait, the user's current question is about their favorite color. But the facts provided don't mention anything about colors. The assistant's previous responses were about the coffee shop and the old stuff. The key here is that the user is asking for their favorite color, but the stored facts don't have any information related to colors. The facts are about old items and a coffee shop. So there's no fact here that answers the user's",
+    "correct": false
+  },
+  {
+    "conv": "recall-1",
+    "category": "single_session_recall",
+    "question": "我的宠物是什么？",
+    "gold": "一只猫",
+    "pred": "首先，用户的问题是：“我的宠物是什么？” 但根据上下文，用户是在要求我从整个对话中提取关键事实。然而，在提供的对话中，只有助理的回复：\"周末打算去超市买点东西。\" 没有用户之前的任何消息。\n\n回顾用户的消息：用户说“Facts: Assistant回复：\"周末打算去超市买点东西。\"” 然后用户要求我提取关键事实。用户指定了“从整个对话中提取关键事实”，但在这个场景中，整个对话似乎只有助理的这条消息。\n\n用户说：“我需要从整个对话中提取关键事实。” 但在这个消息中，用户没有提供完整的对话历史；用户只提供了“Facts: Assistant回复：\"周末打算去超市买点东西。\"” 这可能意味着用户在描述一个场景，其中助理回复了这句话。\n\n关键点是：用户要求我提取关键事实，这些事实是用户或助理提到的、可能",
+    "correct": false
+  },
+  {
+    "conv": "recall-2",
+    "category": "single_session_recall",
+    "question": "我的家乡是什么？",
+    "gold": "杭州",
+    "pred": "首先，用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'。\n\n回顾对话历史：\n- 用户说：\"这几天在整理房间，发现了不少旧东西。\"\n- Assistant回复：\"楼下新开了一家咖啡店，改天去试试。\"\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\"\n\nQuestion: \"我的家乡是什么？\"\n\n我需要检查对话历史中是否有提到\"我的家乡\"。在对话中：\n- 用户提到\"我的最喜欢的颜色是蓝色\"，但没有提到家乡。\n- Assistant的回复是关于咖啡店的，也没有提到家乡。\n- 之前的用户消息是关于整理房间的，也没有提到家乡。\n\n关键点：用户问\"我的家乡是什么？\"，但对话历史中没有提供任何关于家乡的信息。用户只说\"我的最喜欢的颜色是蓝色\"，但没有说家乡。\n\n所以，对于\"我的家乡是什么？\"这个问题",
+    "correct": false
+  },
+  {
+    "conv": "recall-3",
+    "category": "single_session_recall",
+    "question": "我的职业是什么？",
+    "gold": "软件工程师",
+    "pred": "Okay, let's see. The user is asking for my profession. But the facts provided here are about a dish recipe being simple. The user mentioned that the recipe is simple, but it's not specific to a dish. The key point here is that the user wants me to extract long-term key facts from the given facts.\n\nWait, the facts listed are numbered 1, 4, but the user's question is about their profession. Wait, no. Wait, the problem says: \"Facts: 1. ... 4. ...\" So the user provided some facts, and they want me to extract key facts that are long-term. But the user's current question is \"我的职业是什么？\" which translates to \"What's your profession?\".\n\nWait, the problem says: \"用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'.\"\n\nWait, the user's current query is \"我的",
+    "correct": false
+  },
+  {
+    "conv": "recall-4",
+    "category": "single_session_recall",
+    "question": "我的爱好是什么？",
+    "gold": "摄影",
+    "pred": "首先，用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'。\n\n回顾对话历史：\n- Assistant回复：\"楼下新开了一家咖啡店，改天去试试。\"\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\"\n\nQuestion: \"我的爱好是什么？\"\n\n我需要从用户的话中提取关键事实。用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\" 这里，用户提到了\"我的最喜欢的颜色是蓝色\"，但问题问的是\"我的爱好是什么？\"。\n\n关键点：\n- 用户在说\"我的最喜欢的颜色是蓝色\"，这指的是颜色偏好，而不是爱好。爱好通常指兴趣、活动等，比如运动、音乐等。\n- 在中文中，\"爱好\" 意思是 hobbies，而\"颜色\" 是 color。所以，用户没有直接说爱好，而是说最喜欢的颜色。\n\n用户之前说：\"这几天",
+    "correct": false
+  },
+  {
+    "conv": "update-0",
+    "category": "knowledge_update",
+    "question": "我现在的住址是什么？",
+    "gold": "深圳",
+    "pred": "Okay, let's see. The user is asking, \"我现在的住址是什么？\" which translates to \"What's my current address?\" But I need to check the facts provided.\n\nFirst, the user's previous message was: \"这几天在整理房间，发现了不少旧东西。\" which means \"Lately, I've been tidying up my room and found a lot of old stuff.\" Then the assistant replied with \"工作上最近项目比较多，有点忙。\" (Recently, work projects are a bit busy.)\n\nBut the current question is about the user's current address. The facts given here are the ones the assistant has stored. Wait, the problem says: \"I need to identify key facts that are worth remembering long-term.\" So the user wants me to look at the stored facts (the ones provided in the context) and pick out key facts that are relevant, persistent, and useful for future.\n\nWait, the user's instruction says: \"Facts: I need to",
+    "correct": false
+  },
+  {
+    "conv": "update-1",
+    "category": "knowledge_update",
+    "question": "我现在的工作是什么？",
+    "gold": "医生",
+    "pred": "首先，用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'。\n\n回顾对话历史：\n- 用户说：\"这几天在整理房间，发现了不少旧东西。\"\n- Assistant回复：\"楼下新开了一家咖啡店，改天去试试。\"\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\"\n\nQuestion: 我现在的工作是什么？\n\n我需要从对话历史中提取关键事实，这些事实需要长期记住。用户问的是\"我现在的工作是什么？\"，但对话历史中没有提到用户的工作。用户只提到了他们喜欢的颜色是蓝色，以及他们整理房间发现旧东西，但没有说工作。\n\n关键点：\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\" 这表明用户喜欢蓝色，但没有说工作。\n- Assistant回复了关于咖啡店的事，但那是assistant的回复，不是用户的事实。\n- 用户之前说：\"",
+    "correct": false
+  },
+  {
+    "conv": "update-2",
+    "category": "knowledge_update",
+    "question": "我现在的最喜欢的食物是什么？",
+    "gold": "寿司",
+    "pred": "Okay, let's see. The user is asking, \"我现在的最喜欢的食物是什么？\" which translates to \"What's my current favorite food?\" But I need to check the facts provided.\n\nThe facts given are: \"这几天在整理房间，发现了不少旧东西。\" (In the past few days, I've been cleaning my room and found a lot of old things.) \n\nThe assistant's previous response was about a new coffee shop downstairs. But the user's current question is about their favorite food. \n\nWait, the task says to extract key facts that need to be remembered long-term. The user wants a short bullet list or 'NONE' if there's nothing.\n\nLooking at the facts provided: the original statement is about finding old things while cleaning. There's no mention of food preferences here. The assistant's previous reply was about a coffee shop, but the user's current question is about their favorite food. However, the facts stored are only the initial sentence about cleaning and old",
+    "correct": false
+  },
+  {
+    "conv": "temporal-0",
+    "category": "temporal_reasoning",
+    "question": "我最近一次出行是去哪里？",
+    "gold": "上海",
+    "pred": "首先，用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'。\n\n回顾对话历史：\n- 用户说：\"这几天在整理房间，发现了不少旧东西。\"\n- Assistant回复：\"楼下新开了一家咖啡店，改天去试试。\"\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\"\n\nQuestion: 我最近一次出行是去哪里？\n\n我需要分析对话历史，找出关键事实，特别是与\"最近一次出行\"相关的信息。\n\n在对话中：\n- 用户提到\"这几天在整理房间，发现了不少旧东西\"，这暗示用户可能最近在整理房间，但没有具体说出行。\n- Assistant回复说\"楼下新开了一家咖啡店，改天去试试\"，这表示Assistant在建议去咖啡店，但不是用户自己出行。\n- 用户说\"我的最喜欢的颜色是蓝色\"，这与出行无关。\n\n关键点：Question是\"",
+    "correct": false
+  },
+  {
+    "conv": "temporal-1",
+    "category": "temporal_reasoning",
+    "question": "我最近一次出行是去哪里？",
+    "gold": "上海",
+    "pred": "首先，用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'。\n\n回顾对话历史：\n- 用户说：\"这几天在整理房间，发现了不少旧东西。\"\n- Assistant回复：\"楼下新开了一家咖啡店，改天去试试。\"\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\"\n\nQuestion: 我最近一次出行是去哪里？\n\n我需要分析这个question：用户问的是“我最近一次出行是去哪里？”。但在这个对话中，用户没有提到任何出行。用户说“这几天在整理房间”，但没有说出行。Assistant提到“楼下新开了一家咖啡店”，但这是Assistant的回复，不是用户的出行。\n\n关键点：\n- 用户在对话中没有提到任何出行。用户说“整理房间”，但没有说出行。\n- Assistant的回复是关于咖啡店的，但这是Assistant在建议，不是用户的出行。\n- 用户最后",
+    "correct": false
+  },
+  {
+    "conv": "temporal-2",
+    "category": "temporal_reasoning",
+    "question": "我最近一次出行是去哪里？",
+    "gold": "上海",
+    "pred": "首先，用户要求我提取关键事实，这些事实需要长期记住。输出应该是一个短的bullet list，如果没有，就输出'NONE'。\n\n回顾对话历史：\n- 用户说：\"这几天在整理房间，发现了不少旧东西。\"\n- Assistant回复：\"楼下新开了一家咖啡店，改天去试试。\"\n- 用户说：\"我想告诉你，我的最喜欢的颜色是蓝色。\"\n\nQuestion: 我最近一次出行是去哪里？\n\n我需要分析这个question：用户问的是“我最近一次出行是去哪里？”。但在这个对话中，用户没有提到任何出行。用户说“这几天在整理房间”，但没有说出行。Assistant提到“楼下新开了一家咖啡店”，但这是Assistant的回复，不是用户的出行。\n\n关键点：\n- 用户在对话中没有提到任何出行。用户说“整理房间”，但没有说出行。\n- Assistant的回复是关于咖啡店的，但这是Assistant在建议，不是用户的出行。\n- 用户最后",
+    "correct": false
+  }
+]

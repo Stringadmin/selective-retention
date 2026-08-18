@@ -1,0 +1,47 @@
+{
+  "kind": "memory_m0_baseline",
+  "dataset": {
+    "conversations": 11,
+    "questions": 11,
+    "seed": 1337
+  },
+  "model": "/home/omnichat/models/ollama-archive/blobs/sha256-3e4cb14174460404e7a233e531675303b2fbf7749c02f91864fe311ab6344e4f",
+  "results": [
+    {
+      "method": "naive_rag",
+      "accuracy": 0.09090909090909091,
+      "category_accuracy": {
+        "single_session_recall": 0.2,
+        "knowledge_update": 0.0,
+        "temporal_reasoning": 0.0
+      },
+      "memory_items": 89,
+      "n_writes": 89,
+      "elapsed_seconds": 188.19278168678284
+    },
+    {
+      "method": "mem0_style",
+      "accuracy": 0.0,
+      "category_accuracy": {
+        "single_session_recall": 0.0,
+        "knowledge_update": 0.0,
+        "temporal_reasoning": 0.0
+      },
+      "memory_items": 168,
+      "n_writes": 168,
+      "elapsed_seconds": 478.92572259902954
+    },
+    {
+      "method": "igm",
+      "accuracy": 0.36363636363636365,
+      "category_accuracy": {
+        "single_session_recall": 0.8,
+        "knowledge_update": 0.0,
+        "temporal_reasoning": 0.0
+      },
+      "memory_items": 12,
+      "n_writes": 13,
+      "elapsed_seconds": 197.7243688106537
+    }
+  ]
+}

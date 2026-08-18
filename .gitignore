@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual envs
+venv/
+.venv/
+*-venv/
+
+# Test / tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Data / model artifacts (large binaries not for git)
+data/mnist/*.gz
+*.gguf
+*.safetensors
+*.bin
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Local scratch
+reports/_*.json
+
+# WorkBuddy agent workspace (not for public repo)
+.workbuddy/

@@ -1,0 +1,448 @@
+{
+  "cuda_device": "NVIDIA GeForce RTX 5070",
+  "device": "cuda",
+  "fairness": {
+    "same_batch_size": 16,
+    "same_initial_seed": 1337,
+    "same_learning_rate": 0.0003,
+    "same_steps_per_task": 12,
+    "same_task_order": true,
+    "same_tokens_per_group": 4608,
+    "same_weight_decay": 0.1
+  },
+  "groups": [
+    {
+      "average_forgetting": 0.20052083333333334,
+      "elapsed_seconds": 0.9668445270000063,
+      "final_accuracy": {
+        "conflict": 0.078125,
+        "facts": 0.0703125,
+        "modular": 0.078125,
+        "shared": 0.09375,
+        "string": 0.0625,
+        "unrelated": 0.0859375
+      },
+      "group": "A",
+      "history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.734375
+          },
+          "feature_states": null,
+          "last_train_loss": 4.799104690551758,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.109375,
+            "facts": 0.3671875
+          },
+          "feature_states": null,
+          "last_train_loss": 4.735532283782959,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.265625,
+            "facts": 0.1328125,
+            "modular": 0.109375
+          },
+          "feature_states": null,
+          "last_train_loss": 5.235633850097656,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.421875,
+            "facts": 0.1328125,
+            "modular": 0.078125,
+            "string": 0.2265625
+          },
+          "feature_states": null,
+          "last_train_loss": 5.29563045501709,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.078125,
+            "facts": 0.0703125,
+            "modular": 0.09375,
+            "shared": 0.0546875,
+            "string": 0.15625
+          },
+          "feature_states": null,
+          "last_train_loss": 4.87056303024292,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.078125,
+            "facts": 0.0703125,
+            "modular": 0.078125,
+            "shared": 0.09375,
+            "string": 0.0625,
+            "unrelated": 0.0859375
+          },
+          "feature_states": null,
+          "last_train_loss": 4.455395698547363,
+          "trained_task": "unrelated"
+        }
+      ],
+      "parameter_count": 147776,
+      "per_task_forgetting": {
+        "conflict": 0.34375,
+        "facts": 0.6640625,
+        "modular": 0.03125,
+        "shared": 0.0,
+        "string": 0.1640625,
+        "unrelated": 0.0
+      },
+      "tokens_trained": 4608
+    },
+    {
+      "average_forgetting": 0.11328125,
+      "elapsed_seconds": 0.8415987269999903,
+      "final_accuracy": {
+        "conflict": 0.0234375,
+        "facts": 0.0703125,
+        "modular": 0.0859375,
+        "shared": 0.0859375,
+        "string": 0.0,
+        "unrelated": 0.0859375
+      },
+      "group": "E",
+      "history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.46875
+          },
+          "feature_states": {
+            "0": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "last_train_loss": 4.853552341461182,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.109375,
+            "facts": 0.2578125
+          },
+          "feature_states": {
+            "0": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "last_train_loss": 4.776302337646484,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.078125,
+            "facts": 0.0703125,
+            "modular": 0.0859375
+          },
+          "feature_states": {
+            "0": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "last_train_loss": 5.252255439758301,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.140625,
+            "facts": 0.0703125,
+            "modular": 0.078125,
+            "string": 0.15625
+          },
+          "feature_states": {
+            "0": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "last_train_loss": 5.306222438812256,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.078125,
+            "facts": 0.0703125,
+            "modular": 0.09375,
+            "shared": 0.046875,
+            "string": 0.15625
+          },
+          "feature_states": {
+            "0": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "last_train_loss": 4.879976272583008,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0234375,
+            "facts": 0.0703125,
+            "modular": 0.0859375,
+            "shared": 0.0859375,
+            "string": 0.0,
+            "unrelated": 0.0859375
+          },
+          "feature_states": {
+            "0": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            },
+            "1": {
+              "free": 51,
+              "plastic": 205,
+              "shared": 0,
+              "stable": 0
+            }
+          },
+          "last_train_loss": 4.47675895690918,
+          "trained_task": "unrelated"
+        }
+      ],
+      "parameter_count": 147776,
+      "per_task_forgetting": {
+        "conflict": 0.1171875,
+        "facts": 0.3984375,
+        "modular": 0.0078125,
+        "shared": 0.0,
+        "string": 0.15625,
+        "unrelated": 0.0
+      },
+      "tokens_trained": 4608
+    },
+    {
+      "average_forgetting": 0.09244791666666667,
+      "elapsed_seconds": 0.8245005310000124,
+      "final_accuracy": {
+        "conflict": 0.0234375,
+        "facts": 0.0703125,
+        "modular": 0.078125,
+        "shared": 0.0546875,
+        "string": 0.0625,
+        "unrelated": 0.0859375
+      },
+      "group": "F",
+      "history": [
+        {
+          "accuracy_after_task": {
+            "facts": 0.46875
+          },
+          "feature_states": {
+            "0": {
+              "free": 12,
+              "plastic": 122,
+              "shared": 0,
+              "stable": 122
+            },
+            "1": {
+              "free": 24,
+              "plastic": 154,
+              "shared": 0,
+              "stable": 78
+            }
+          },
+          "last_train_loss": 4.853552341461182,
+          "trained_task": "facts"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0234375,
+            "facts": 0.2578125
+          },
+          "feature_states": {
+            "0": {
+              "free": 4,
+              "plastic": 23,
+              "shared": 228,
+              "stable": 1
+            },
+            "1": {
+              "free": 19,
+              "plastic": 98,
+              "shared": 117,
+              "stable": 22
+            }
+          },
+          "last_train_loss": 4.797332763671875,
+          "trained_task": "conflict"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0234375,
+            "facts": 0.0703125,
+            "modular": 0.0859375
+          },
+          "feature_states": {
+            "0": {
+              "free": 1,
+              "plastic": 11,
+              "shared": 244,
+              "stable": 0
+            },
+            "1": {
+              "free": 5,
+              "plastic": 65,
+              "shared": 172,
+              "stable": 14
+            }
+          },
+          "last_train_loss": 5.2583417892456055,
+          "trained_task": "modular"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.078125,
+            "facts": 0.0703125,
+            "modular": 0.078125,
+            "string": 0.15625
+          },
+          "feature_states": {
+            "0": {
+              "free": 0,
+              "plastic": 3,
+              "shared": 253,
+              "stable": 0
+            },
+            "1": {
+              "free": 4,
+              "plastic": 50,
+              "shared": 196,
+              "stable": 6
+            }
+          },
+          "last_train_loss": 5.32366943359375,
+          "trained_task": "string"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0234375,
+            "facts": 0.0703125,
+            "modular": 0.078125,
+            "shared": 0.0546875,
+            "string": 0.15625
+          },
+          "feature_states": {
+            "0": {
+              "free": 0,
+              "plastic": 1,
+              "shared": 255,
+              "stable": 0
+            },
+            "1": {
+              "free": 2,
+              "plastic": 33,
+              "shared": 218,
+              "stable": 3
+            }
+          },
+          "last_train_loss": 4.891040325164795,
+          "trained_task": "shared"
+        },
+        {
+          "accuracy_after_task": {
+            "conflict": 0.0234375,
+            "facts": 0.0703125,
+            "modular": 0.078125,
+            "shared": 0.0546875,
+            "string": 0.0625,
+            "unrelated": 0.0859375
+          },
+          "feature_states": {
+            "0": {
+              "free": 0,
+              "plastic": 0,
+              "shared": 256,
+              "stable": 0
+            },
+            "1": {
+              "free": 2,
+              "plastic": 32,
+              "shared": 219,
+              "stable": 3
+            }
+          },
+          "last_train_loss": 4.490148067474365,
+          "trained_task": "unrelated"
+        }
+      ],
+      "parameter_count": 147776,
+      "per_task_forgetting": {
+        "conflict": 0.0546875,
+        "facts": 0.3984375,
+        "modular": 0.0078125,
+        "shared": 0.0,
+        "string": 0.09375,
+        "unrelated": 0.0
+      },
+      "tokens_trained": 4608
+    }
+  ],
+  "kind": "phase0_pipeline_smoke",
+  "reason": "small configuration and partial A/E/F matrix; not the frozen five-seed Phase 0",
+  "scientific_result": false,
+  "seed": 1337,
+  "tasks": [
+    "facts",
+    "conflict",
+    "modular",
+    "string",
+    "shared",
+    "unrelated"
+  ],
+  "torch": "2.11.0+cu128"
+}

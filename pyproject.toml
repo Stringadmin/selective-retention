@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fip-transformer"
+version = "0.1.0"
+description = "Feature Isolation for Plasticity: continual-learning Transformer"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "numpy",
+    "pyyaml",
+    "einops",
+    "safetensors",
+    "pytest",
+]
+
+[tool.setuptools.packages.find]
+include = ["fip*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
