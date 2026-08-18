@@ -265,4 +265,4 @@ python -m memory_arch.train_scorer
 
 ---
 
-*附：文中所有实验的完整代码、数据生成器、评估脚本和原始结果 JSON 均在项目仓库中，可完整复现。*
+*附：文中所有实验的完整代码、数据生成器、评估脚本和原始结果 JSON 均在 GitHub 仓库 **[Stringadmin/selective-retention](https://github.com/Stringadmin/selective-retention)** 中，MIT 许可证，可完整复现。欢迎 clone 下来跑一遍，也欢迎打脸。*
