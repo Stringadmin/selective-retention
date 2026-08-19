@@ -1,6 +1,6 @@
 # Selective Retention
 
-关于"重要性驱动的选择性保留"的研究代码和实验：从持续学习的参数保护，到 Agent 记忆的写入层。
+关于"重要性驱动的选择性保留"的研究代码和实验：从持续学习的参数保护，到 Agent 记忆的写入层（IGM，Importance-Gated Memory / 重要性门控记忆）。
 
 **配套长文**：[《我试图让 AI 学会"不遗忘"，撞了三次墙后搞明白的三件事》](docs/ARTICLE_DRAFT.md)
 
