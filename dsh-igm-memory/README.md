@@ -33,8 +33,19 @@ dsh web                           # restart to activate
 | Service | Signature | Purpose |
 |---|---|---|
 | `igm.memory.write` | `(text) -> {kept, item?, score}` | route a candidate memory through the gate |
-| `igm.memory.query` | `(text) -> items` | slot-aware retrieval (top-3) |
+| `igm.memory.query` | `(text) -> items` | slot-aware retrieval (top-3), tracks reuse |
 | `igm.memory.stats` | `() -> {stored, items}` | inspect current memory |
+| `igm.memory.consolidate` | `(maxAgeDays?, minScore?) -> {removed, remaining}` | forget old, never-reused, low-value memories |
+
+## Tests
+
+```sh
+# from this directory, with dsh installed (for @deepseek-ai/dsh-tools resolution)
+node test/test_igm_plugin.mjs
+```
+
+15 cases: slot extraction edges, gate, supersede, length guards, persistence,
+corrupt-file tolerance, injection budget, consolidation.
 
 ## Config
 
