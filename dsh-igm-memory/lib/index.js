@@ -97,14 +97,16 @@ export class IgmStore {
     }
   }
 
-  add(text, threshold = 0.6, maxSlotLen = 6) {
+  add(text, threshold = 0.6, maxSlotLen = 6, maxFactLen = 200) {
+    if (!text || typeof text !== 'string') return { kept: false, reason: 'invalid', score: 0 }
+    if (text.length > maxFactLen) return { kept: false, reason: 'too_long', score: 0 }
     const score = importanceScore(text)
     if (score < threshold) return { kept: false, reason: 'gate', score }
     const slot = extractSlot(text, maxSlotLen)
     if (slot !== null) {
       this.items = this.items.filter((it) => it.slot !== slot) // supersede
     }
-    const item = { text, slot, score, ts: Date.now() }
+    const item = { text, slot, score, ts: Date.now(), reuseCount: 0 }
     this.items.push(item)
     this.save()
     return { kept: true, item, score }
@@ -118,7 +120,30 @@ export class IgmStore {
       return { ...it, s }
     })
     scored.sort((a, b) => b.s - a.s)
-    return scored.slice(0, topK)
+    const top = scored.slice(0, topK)
+    // Retrieval = use: bump reuse so consolidation keeps recently-used facts.
+    for (const hit of top) {
+      const orig = this.items.find((it) => it === hit)
+      if (orig) orig.reuseCount = (orig.reuseCount || 0) + 1
+    }
+    return top
+  }
+
+  // Consolidation: drop memories that are old AND were never reused.
+  // Older entries that were recalled stay; stale unused ones fade out.
+  consolidate(maxAgeDays = 30, minScore = 0.5) {
+    const now = Date.now()
+    const cutoff = now - maxAgeDays * 24 * 3600 * 1000
+    const before = this.items.length
+    this.items = this.items.filter((it) => {
+      const ts = it.ts || 0
+      if (ts >= cutoff) return true        // recent: keep
+      if (it.reuseCount > 0) return true   // reused: keep
+      return (it.score || 0) >= minScore   // old + never used + low value: drop
+    })
+    const removed = before - this.items.length
+    if (removed > 0) this.save()
+    return removed
   }
 
   get size() {
@@ -134,6 +159,8 @@ export const Config = z.object({
   enabled: z.boolean().default(true),
   writeThreshold: z.number().default(0.6),
   slotMaxLen: z.number().default(6),
+  maxFactLen: z.number().default(200),
+  maxInjectionBytes: z.number().default(2048),
 })
 
 export const inject = ['tools', 'systemPrompt'] // model-facing tool + prompt injection
@@ -155,6 +182,8 @@ export function apply(ctx, config) {
   const enabled = config.enabled ?? true
   const threshold = config.writeThreshold ?? 0.6
   const slotMaxLen = config.slotMaxLen ?? 6
+  const maxFactLen = config.maxFactLen ?? 200
+  const maxInjectionBytes = config.maxInjectionBytes ?? 2048
   const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
   const store = new IgmStore(path.join(dshHome, 'storages', 'igm-memory.json'))
   console.log(`[igm-memory] store file: ${store.file} (${store.size} persisted)`)
@@ -175,7 +204,7 @@ export function apply(ctx, config) {
   // Memory-write guard: expose a service so other plugins / the agent loop
   // can route memory candidates through the IGM gate.
   ctx.provide('igm.memory.write', (text) => {
-    const res = store.add(text, threshold, slotMaxLen)
+    const res = store.add(text, threshold, slotMaxLen, maxFactLen)
     log(res.kept ? `kept [${res.item.slot || 'none'}] ${text.slice(0, 40)}` : `filtered: ${text.slice(0, 40)}`)
     return res
   })
@@ -184,8 +213,14 @@ export function apply(ctx, config) {
 
   ctx.provide('igm.memory.stats', () => ({
     stored: store.size,
-    items: store.items.map((it) => ({ text: it.text, slot: it.slot })),
+    items: store.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
   }))
+
+  ctx.provide('igm.memory.consolidate', (maxAgeDays = 30, minScore = 0.5) => {
+    const removed = store.consolidate(maxAgeDays, minScore)
+    log(`consolidate removed ${removed} (${store.size} remain)`)
+    return { removed, remaining: store.size }
+  })
 
   // Model-facing tool: lets the agent persist facts through the IGM gate.
   ctx.tools.register(defineTool({
@@ -217,7 +252,7 @@ export function apply(ctx, config) {
       },
     },
     async execute(args) {
-      const res = store.add(args.fact, threshold, slotMaxLen)
+      const res = store.add(args.fact, threshold, slotMaxLen, maxFactLen)
       const memory = store.items.map((it) => ({ text: it.text, slot: it.slot }))
       if (res.kept) {
         log(`tool kept [${res.item.slot || 'none'}] ${args.fact.slice(0, 50)}`)
@@ -261,7 +296,9 @@ export function apply(ctx, config) {
       },
     },
     async execute() {
-      const memory = store.items.map((it) => ({ text: it.text, slot: it.slot }))
+      // Retrieve via query() so reused facts are tracked for consolidation.
+      const hits = store.query('', store.size, slotMaxLen)
+      const memory = hits.map((it) => ({ text: it.text, slot: it.slot }))
       log(`recall -> ${memory.length} facts`)
       return { memory }
     },
@@ -277,15 +314,26 @@ export function apply(ctx, config) {
     const sectionName = 'igm-memory'
     const sections = Array.isArray(assembled?.sections) ? assembled.sections : []
     const filtered = sections.filter((s) => s?.name !== sectionName)
-    const lines = store.items.map((it) => `- ${it.text}`).join('\n')
+    // Build the fact list newest-first, cutting once the byte budget is hit,
+    // so a large memory never blows up the agent's context window.
+    const ordered = [...store.items].sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    const lines = []
+    let budget = maxInjectionBytes
+    for (const it of ordered) {
+      const line = `- ${it.text}`
+      if (line.length > budget) break
+      lines.push(line)
+      budget -= line.length
+    }
+    if (lines.length === 0) return assembled
     filtered.push({
       name: sectionName,
-      text: `The following durable facts about the user were remembered in previous sessions (slot supersede keeps only current values):\n${lines}`,
+      text: `The following durable facts about the user were remembered in previous sessions (slot supersede keeps only current values):\n${lines.join('\n')}`,
       order: 5,
     })
     return { ...assembled, sections: filtered }
   })
-  log('system-prompt injection armed')
+  log(`system-prompt injection armed (budget ${maxInjectionBytes}B)`)
 
   log('services registered: igm.memory.write / igm.memory.query / igm.memory.stats')
 }
