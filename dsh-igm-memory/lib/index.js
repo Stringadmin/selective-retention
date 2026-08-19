@@ -136,7 +136,7 @@ export const Config = z.object({
   slotMaxLen: z.number().default(6),
 })
 
-export const inject = ['tools'] // register a model-facing tool via ctx.tools
+export const inject = ['tools', 'systemPrompt'] // model-facing tool + prompt injection
 
 const TOOL_NAME = 'remember_fact'
 const TOOL_DESCRIPTION =
@@ -144,6 +144,12 @@ const TOOL_DESCRIPTION =
   'Call this when the user states a persistent preference, address, role, or decision. ' +
   'Facts about the SAME attribute are automatically replaced by the newest value, ' +
   'so stale/contradictory entries never accumulate. Non-facts (questions, chit-chat) are rejected.'
+
+const RECALL_NAME = 'recall_fact'
+const RECALL_DESCRIPTION =
+  'Retrieve the durable facts currently stored about the user or project. ' +
+  'Call this when asked about a preference, address, role, or decision that may have ' +
+  'been stated in a previous session. Returns the current memory (updated values only).'
 
 export function apply(ctx, config) {
   const enabled = config.enabled ?? true
@@ -233,5 +239,53 @@ export function apply(ctx, config) {
   }))
 
   log(`tool registered: ${TOOL_NAME}`)
+
+  // Model-facing read tool: lets the agent retrieve stored facts.
+  ctx.tools.register(defineTool({
+    name: RECALL_NAME,
+    description: RECALL_DESCRIPTION,
+    parameters: {},
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          memory: {
+            type: 'array',
+            items: { type: 'object', additionalProperties: true },
+          },
+        },
+      },
+      render(args, value) {
+        return [{ type: 'text', text: JSON.stringify(value) }]
+      },
+    },
+    async execute() {
+      const memory = store.items.map((it) => ({ text: it.text, slot: it.slot }))
+      log(`recall -> ${memory.length} facts`)
+      return { memory }
+    },
+  }))
+  log(`tool registered: ${RECALL_NAME}`)
+
+  // Session-start injection: make persisted facts visible to the agent from
+  // the first turn, so a new session inherits previous-session memory.
+  ctx.on('system-prompt/assemble', async (assembly, context, next) => {
+    const assembled = await next()
+    if (!enabled) return assembled
+    if (store.size === 0) return assembled
+    const sectionName = 'igm-memory'
+    const sections = Array.isArray(assembled?.sections) ? assembled.sections : []
+    const filtered = sections.filter((s) => s?.name !== sectionName)
+    const lines = store.items.map((it) => `- ${it.text}`).join('\n')
+    filtered.push({
+      name: sectionName,
+      text: `The following durable facts about the user were remembered in previous sessions (slot supersede keeps only current values):\n${lines}`,
+      order: 5,
+    })
+    return { ...assembled, sections: filtered }
+  })
+  log('system-prompt injection armed')
+
   log('services registered: igm.memory.write / igm.memory.query / igm.memory.stats')
 }

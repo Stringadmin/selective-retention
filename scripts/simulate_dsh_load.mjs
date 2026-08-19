@@ -18,15 +18,17 @@ console.log('Config parse ok:', JSON.stringify(parsed))
 // Apply with a minimal fake ctx + config (cordis passes config as 2nd arg).
 const services = {}
 const tools = []
+const events = {}
 const fakeCtx = {
   config: parsed,
   provide(name, fn) { services[name] = fn },
   tools: { register(def) { tools.push(def) } },
-  on() {},
+  on(evt, fn) { events[evt] = fn },
   effect() {},
 }
 mod.apply(fakeCtx, parsed)
 console.log('tools registered:', tools.map((t) => t.name).join(', '))
+console.log('events:', Object.keys(events).join(', '))
 
 // Exercise the tool exactly as the agent loop would (via defineTool execute).
 console.log('\n-- remember_fact tool --')
@@ -51,6 +53,21 @@ const stored = services['igm.memory.stats']().stored
 const hasOld = services['igm.memory.stats']().items.some((i) => i.text.includes('北京'))
 const slotOk = services['igm.memory.stats']().items.every((i) => i.slot !== '住址' || i.text.includes('深圳'))
 console.log('\nverify: stored=%d, old_value_present=%s, current_value_ok=%s', stored, hasOld, slotOk)
-if (stored >= 1 && !hasOld && slotOk) console.log('\nPLUGIN LOAD + TOOL OK')
-else { console.error('FAIL'); process.exit(1) }
+
+// recall_fact tool: agent can read current memory.
+const recall = tools.find((t) => t.name === 'recall_fact')
+const recallOut = await recall.execute({})
+console.log('recall_fact:', JSON.stringify(recallOut))
+
+// system-prompt injection: a new session sees the persisted facts.
+const assemble = events['system-prompt/assemble']
+const assembled = await assemble({}, { agent: { session: {} } }, async () => ({ sections: [] }))
+const injected = (assembled.sections || []).find((s) => s.name === 'igm-memory')
+console.log('injected section:', injected ? injected.text.slice(0, 80) + '...' : 'MISSING')
+const hasShenzhen = injected && injected.text.includes('深圳')
+console.log('injection has current value:', hasShenzhen)
+
+if (stored >= 1 && !hasOld && slotOk && recallOut.memory.length === 1 && hasShenzhen) {
+  console.log('\nPLUGIN LOAD + TOOLS + INJECTION OK')
+} else { console.error('FAIL'); process.exit(1) }
 
