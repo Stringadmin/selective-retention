@@ -60,6 +60,22 @@ mem.query_texts("我现在的住址是什么？")         # -> 只有深圳，�
 
 详见 [igm/README.md](igm/README.md)。
 
+## 作为 DeepSeek Harness 插件使用（dsh-igm-memory）
+
+同一套写入层做成了 **DeepSeek Harness 插件**，给 agent 加"闸门 + 覆盖 + 跨会话记忆"：
+
+- `remember_fact` 工具：agent 记事实走 IGM 闸门，同属性新值覆盖旧值
+- `recall_fact` 工具 + 会话启动注入：新会话开局看到此前记住的事实
+- JSON 持久化 + consolidate 遗忘
+
+```sh
+dsh plugin --profile web add ./dsh-igm-memory
+dsh web   # 重启加载
+# 会话里：记住我的住址是北京 → 改记住是深圳 → 新会话问"我住址是哪" → 答深圳
+```
+
+代码在 `dsh-igm-memory/`，详见 [dsh-igm-memory/README.md](dsh-igm-memory/README.md)。
+
 ## 仓库结构
 
 ```
@@ -69,6 +85,10 @@ igm/                    # 可安装的 RAG 写入层库（零依赖核心）
   store.py              #   MemoryStore：slot 覆盖 + 遗忘生命周期
   embedders.py          #   可插拔嵌入（hash / BGE / 自定义 callable）
   test_igm.py           #   17 个单元测试
+dsh-igm-memory/         # DeepSeek Harness 插件（cordis bundle）
+  lib/index.js          #   remember_fact / recall_fact / 注入 / 持久化 / 遗忘
+  cordis.patch.yml      #   插件注册层
+  test 脚本              #   scripts/test_igm_plugin.mjs（15 项）
 memory_arch/            # Agent 记忆研究代码（IGM 的实验原型）
   scorer.py             #   可学习的 importance 打分器
   run_decisive.py       #   决定性实验：RAG vs RAG+IGM

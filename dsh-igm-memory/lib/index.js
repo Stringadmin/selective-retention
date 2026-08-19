@@ -161,6 +161,9 @@ export const Config = z.object({
   slotMaxLen: z.number().default(6),
   maxFactLen: z.number().default(200),
   maxInjectionBytes: z.number().default(2048),
+  // Optional explicit store file. Profiles can set this in their patch layer
+  // to isolate memories per profile (e.g. web vs headless).
+  storeFile: z.string().default(''),
 })
 
 export const inject = ['tools', 'systemPrompt'] // model-facing tool + prompt injection
@@ -185,7 +188,10 @@ export function apply(ctx, config) {
   const maxFactLen = config.maxFactLen ?? 200
   const maxInjectionBytes = config.maxInjectionBytes ?? 2048
   const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
-  const store = new IgmStore(path.join(dshHome, 'storages', 'igm-memory.json'))
+  const storeFile = config.storeFile
+    ? path.resolve(config.storeFile)
+    : path.join(dshHome, 'storages', 'igm-memory.json')
+  const store = new IgmStore(storeFile)
   console.log(`[igm-memory] store file: ${store.file} (${store.size} persisted)`)
 
   const log = (msg) => {

@@ -47,7 +47,31 @@ Set in `cordis.patch.yml` (or a profile patch layer):
     enabled: true
     writeThreshold: 0.6
     slotMaxLen: 6
+    storeFile: /absolute/path/to/memory.json   # optional per-profile isolation
 ```
+
+## Multi-profile isolation
+
+By default all profiles share `$DSH_HOME/storages/igm-memory.json`. To keep
+memories separate per profile (e.g. web vs headless), set a distinct
+`storeFile` in each profile's patch layer — the same plugin instance then
+reads/writes only its own memory file.
+
+## End-to-end verification
+
+In a dsh session:
+
+```
+> 记住我的住址是北京
+> 改记住是深圳
+> (start a NEW session)
+> 我住址是哪
+你的住址现在是深圳
+```
+
+The new session sees the persisted, superseded value (Shenzhen only) via
+session-start injection — the "knowledge update" case from the research
+write-up, working in a real agent harness.
 
 ## License
 
