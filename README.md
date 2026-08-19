@@ -45,21 +45,39 @@ python -m memory_arch.run_m0 --methods naive_rag igm --embed-backend bge
 
 嵌入模型 [BGE-small-zh](https://modelscope.cn/models/BAAI/bge-small-zh-v1.5) 需单独下载（HuggingFace 网络受限时可用 ModelScope）。可选的本地 LLM 基线用 [qwen3:4b](https://ollama.com/library/qwen3)（GGUF）。
 
+## 作为一个库使用（igm）
+
+`igm/` 是一个可 `pip install` 的零依赖写入层，可直接接进你的 RAG 系统：
+
+```python
+from igm import Memory
+
+mem = Memory()
+mem.add("我的住址是北京。")
+mem.add("更新一下，我的住址现在是深圳了。")   # slot 覆盖旧值
+mem.query_texts("我现在的住址是什么？")         # -> 只有深圳，不含北京
+```
+
+详见 [igm/README.md](igm/README.md)。
+
 ## 仓库结构
 
 ```
-memory_arch/            # Agent 记忆：IGM 写入层（本文主角）
-  __init__.py           #   记忆流水线 + 4 种方法 + slot 覆盖记忆库
-  scorer.py             #   可学习的 importance 打分器（logistic，numpy 实现）
-  train_scorer.py       #   打分器训练（弱监督合成标签）
+igm/                    # 可安装的 RAG 写入层库（零依赖核心）
+  memory.py             #   Memory 门面：add / query / consolidate
+  gate.py               #   WriteGate：重要性闸门 + slot 提取
+  store.py              #   MemoryStore：slot 覆盖 + 遗忘生命周期
+  embedders.py          #   可插拔嵌入（hash / BGE / 自定义 callable）
+  test_igm.py           #   17 个单元测试
+memory_arch/            # Agent 记忆研究代码（IGM 的实验原型）
+  scorer.py             #   可学习的 importance 打分器
   run_decisive.py       #   决定性实验：RAG vs RAG+IGM
   run_m0.py             #   M0 基线评估 runner
-  synth_data.py         #   受控合成多会话数据集
 fip/                    # 持续学习：FIP / GPP 参数保护（第一、二幕）
   optimizer.py          #   FeatureMaskedAdamW：优化器层 delta 投影
   non_ffn_protection.py #   NonFFNProtector：逐行重要性保护
-  feature_registry.py   #   特征状态机（stable/shared/plastic/free）
 experiments/            # 持续学习实验 runner（phase0 等）
+examples/               # quickstart.py 等示例
 docs/                   # 文章、研究报告、配图（PNG/SVG）
 reports/                # 原始实验结果 JSON（可审计）
 ```

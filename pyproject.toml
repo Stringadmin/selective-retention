@@ -3,23 +3,26 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fip-transformer"
+name = "selective-retention"
 version = "0.1.0"
-description = "Feature Isolation for Plasticity: continual-learning Transformer"
+description = "Importance-driven selective retention: a write layer for RAG memory (IGM) and continual-learning parameter protection (FIP/GPP)"
+readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.10"
-dependencies = [
-    "torch>=2.0",
-    "numpy",
-    "pyyaml",
-    "einops",
-    "safetensors",
-    "pytest",
-]
+# Core (igm) has zero required dependencies.
+dependencies = []
+
+[project.optional-dependencies]
+# Real embeddings for production use of igm.
+embed = ["sentence-transformers>=2.2"]
+# Continual-learning stack (fip / experiments).
+fip = ["torch>=2.0", "numpy", "pyyaml", "einops", "safetensors"]
+dev = ["pytest"]
 
 [tool.setuptools.packages.find]
-include = ["fip*"]
+include = ["igm*", "fip*", "memory_arch*", "data*", "experiments*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "igm"]
 python_files = ["test_*.py"]
 addopts = "-v"
