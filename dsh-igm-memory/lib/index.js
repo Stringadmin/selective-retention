@@ -97,12 +97,20 @@ export class IgmStore {
 }
 
 // ---------------------------------------------------------------- dsh plugin
+import z from 'schemastery'
+
+export const Config = z.object({
+  enabled: z.boolean().default(true),
+  writeThreshold: z.number().default(0.6),
+  slotMaxLen: z.number().default(6),
+})
+
 export const inject = [] // no required services; works standalone
 
-export function apply(ctx) {
-  const cfg = ctx.config || {}
-  const threshold = typeof cfg.writeThreshold === 'number' ? cfg.writeThreshold : 0.6
-  const slotMaxLen = typeof cfg.slotMaxLen === 'number' ? cfg.slotMaxLen : 6
+export function apply(ctx, config) {
+  const enabled = config.enabled ?? true
+  const threshold = config.writeThreshold ?? 0.6
+  const slotMaxLen = config.slotMaxLen ?? 6
   const store = new IgmStore()
   ctx.state.igmStore = store
 
@@ -112,6 +120,11 @@ export function apply(ctx) {
     } catch {
       /* logger may be absent in minimal contexts */
     }
+  }
+
+  if (!enabled) {
+    log('disabled by config')
+    return
   }
 
   log(`enabled (threshold=${threshold}, slotMaxLen=${slotMaxLen})`)
