@@ -61,11 +61,40 @@ export function importanceScore(text, maxSimToStore = 0) {
   return 0.6 * f + 0.3 * surprise + 0.1 * density
 }
 
-// A minimal slot-aware memory store (in-memory).  In a production plugin this
-// would persist to disk; the shape is kept so the store can be swapped.
+// A minimal slot-aware memory store with JSON-file persistence.
+// Persistence lives on the store so the shape stays swappable; the file path
+// is injected by the plugin (defaults under $DSH_HOME/storages).
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+
 export class IgmStore {
-  constructor() {
-    this.items = [] // { text, slot, ts }
+  constructor(filePath = null) {
+    this.items = [] // { text, slot, score, ts }
+    this.file = filePath
+    if (filePath) this.load()
+  }
+
+  load() {
+    try {
+      const raw = fs.readFileSync(this.file, 'utf8')
+      const data = JSON.parse(raw)
+      if (Array.isArray(data.items)) this.items = data.items
+    } catch {
+      this.items = [] // missing/corrupt file -> start fresh
+    }
+  }
+
+  save() {
+    if (!this.file) return
+    try {
+      fs.mkdirSync(path.dirname(this.file), { recursive: true })
+      const tmp = this.file + '.tmp'
+      fs.writeFileSync(tmp, JSON.stringify({ items: this.items }, null, 2))
+      fs.renameSync(tmp, this.file)
+    } catch (e) {
+      console.log(`[igm-memory] persist failed: ${e.message}`)
+    }
   }
 
   add(text, threshold = 0.6, maxSlotLen = 6) {
@@ -77,6 +106,7 @@ export class IgmStore {
     }
     const item = { text, slot, score, ts: Date.now() }
     this.items.push(item)
+    this.save()
     return { kept: true, item, score }
   }
 
@@ -119,7 +149,9 @@ export function apply(ctx, config) {
   const enabled = config.enabled ?? true
   const threshold = config.writeThreshold ?? 0.6
   const slotMaxLen = config.slotMaxLen ?? 6
-  const store = new IgmStore()
+  const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
+  const store = new IgmStore(path.join(dshHome, 'storages', 'igm-memory.json'))
+  console.log(`[igm-memory] store file: ${store.file} (${store.size} persisted)`)
 
   const log = (msg) => {
     // console.log is used deliberately: ctx.logger may not be injectable
