@@ -112,14 +112,11 @@ export function apply(ctx, config) {
   const threshold = config.writeThreshold ?? 0.6
   const slotMaxLen = config.slotMaxLen ?? 6
   const store = new IgmStore()
-  ctx.state.igmStore = store
 
   const log = (msg) => {
-    try {
-      ctx.logger?.info?.(`[igm-memory] ${msg}`)
-    } catch {
-      /* logger may be absent in minimal contexts */
-    }
+    // console.log is used deliberately: ctx.logger may not be injectable
+    // without declaring it, and we must not risk another load failure.
+    console.log(`[igm-memory] ${msg}`)
   }
 
   if (!enabled) {

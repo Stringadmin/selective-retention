@@ -19,9 +19,8 @@ console.log('Config parse ok:', JSON.stringify(parsed))
 const services = {}
 const fakeCtx = {
   config: parsed,
-  state: {},
   provide(name, fn) { services[name] = fn },
-  logger: { info: (...a) => console.log('[log]', ...a) },
+
   on() {},
   effect() {},
 }
