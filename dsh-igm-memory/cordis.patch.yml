@@ -1,0 +1,8 @@
+# Standard DSH bundle layer for dsh-igm-memory.
+- insert:
+    - id: dsh-igm-memory
+      name: dsh-igm-memory
+      config:
+        enabled: true
+        writeThreshold: 0.6
+        slotMaxLen: 6

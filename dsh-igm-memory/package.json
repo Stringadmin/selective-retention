@@ -1,0 +1,33 @@
+{
+  "name": "dsh-igm-memory",
+  "version": "0.1.0",
+  "description": "IGM write layer for DeepSeek Harness: importance-gated memory writes with slot supersede, so agent memories never accumulate stale/contradictory facts",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "agent",
+    "memory",
+    "igm",
+    "rag"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT"
+}
