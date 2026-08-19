@@ -17,28 +17,40 @@ console.log('Config parse ok:', JSON.stringify(parsed))
 
 // Apply with a minimal fake ctx + config (cordis passes config as 2nd arg).
 const services = {}
+const tools = []
 const fakeCtx = {
   config: parsed,
   provide(name, fn) { services[name] = fn },
-
+  tools: { register(def) { tools.push(def) } },
   on() {},
   effect() {},
 }
 mod.apply(fakeCtx, parsed)
+console.log('tools registered:', tools.map((t) => t.name).join(', '))
 
-// Exercise the services exactly as the agent loop would.
-console.log('\n-- write gate --')
-console.log('fact 住址:', JSON.stringify(services['igm.memory.write']('我的住址是北京。')))
-console.log('update 住址:', JSON.stringify(services['igm.memory.write']('我的住址现在是深圳了。')).slice(0, 120))
-console.log('filler:', JSON.stringify(services['igm.memory.write']('今天天气不错。')))
-console.log('question:', JSON.stringify(services['igm.memory.write']('我的爱好是什么？')).slice(0, 80))
-console.log('\n-- stats --')
-console.log(JSON.stringify(services['igm.memory.stats']()))
-console.log('\n-- query --')
-console.log(JSON.stringify(services['igm.memory.query']('我现在的住址是什么？')).slice(0, 200))
+// Exercise the tool exactly as the agent loop would (via defineTool execute).
+console.log('\n-- remember_fact tool --')
+const tool = tools.find((t) => t.name === 'remember_fact')
+async function runTool(fact) {
+  const out = await tool.execute({ fact })
+  return out
+}
+
+// Exercise the tool end-to-end: gate + slot supersede via the model-facing API.
+console.log('\n-- remember_fact tool --')
+const r1 = await runTool('我的住址是北京。')
+console.log('fact 住址:', JSON.stringify(r1))
+const r2 = await runTool('我的住址现在是深圳了。')
+console.log('update 住址:', JSON.stringify(r2))
+const r3 = await runTool('今天天气不错。')
+console.log('filler:', JSON.stringify(r3))
+const r4 = await runTool('我的爱好是什么？')
+console.log('question:', JSON.stringify(r4))
 
 const stored = services['igm.memory.stats']().stored
 const hasOld = services['igm.memory.stats']().items.some((i) => i.text.includes('北京'))
-console.log('\nverify: stored=%d, old_value_present=%s', stored, hasOld)
-if (stored >= 1 && !hasOld) console.log('\nPLUGIN LOAD + SERVICES OK')
+const slotOk = services['igm.memory.stats']().items.every((i) => i.slot !== '住址' || i.text.includes('深圳'))
+console.log('\nverify: stored=%d, old_value_present=%s, current_value_ok=%s', stored, hasOld, slotOk)
+if (stored >= 1 && !hasOld && slotOk) console.log('\nPLUGIN LOAD + TOOL OK')
 else { console.error('FAIL'); process.exit(1) }
+

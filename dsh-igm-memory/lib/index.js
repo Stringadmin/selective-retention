@@ -98,6 +98,7 @@ export class IgmStore {
 
 // ---------------------------------------------------------------- dsh plugin
 import z from 'schemastery'
+import { defineTool } from '@deepseek-ai/dsh-tools'
 
 export const Config = z.object({
   enabled: z.boolean().default(true),
@@ -105,7 +106,14 @@ export const Config = z.object({
   slotMaxLen: z.number().default(6),
 })
 
-export const inject = [] // no required services; works standalone
+export const inject = ['tools'] // register a model-facing tool via ctx.tools
+
+const TOOL_NAME = 'remember_fact'
+const TOOL_DESCRIPTION =
+  'Store a durable fact about the user or project (e.g. "我的住址是北京"). ' +
+  'Call this when the user states a persistent preference, address, role, or decision. ' +
+  'Facts about the SAME attribute are automatically replaced by the newest value, ' +
+  'so stale/contradictory entries never accumulate. Non-facts (questions, chit-chat) are rejected.'
 
 export function apply(ctx, config) {
   const enabled = config.enabled ?? true
@@ -141,5 +149,57 @@ export function apply(ctx, config) {
     items: store.items.map((it) => ({ text: it.text, slot: it.slot })),
   }))
 
+  // Model-facing tool: lets the agent persist facts through the IGM gate.
+  ctx.tools.register(defineTool({
+    name: TOOL_NAME,
+    description: TOOL_DESCRIPTION,
+    parameters: {
+      fact: {
+        type: 'string',
+        required: true,
+        description: 'The fact to remember, phrased as a self-referential statement (e.g. "我的住址是北京" / "我的住址现在是深圳").',
+      },
+    },
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          stored: { type: 'boolean' },
+          slot: { type: 'string' },
+          reason: { type: 'string' },
+          memory: {
+            type: 'array',
+            items: { type: 'object', additionalProperties: true },
+          },
+        },
+      },
+      render(args, value) {
+        return [{ type: 'text', text: JSON.stringify(value) }]
+      },
+    },
+    async execute(args) {
+      const res = store.add(args.fact, threshold, slotMaxLen)
+      const memory = store.items.map((it) => ({ text: it.text, slot: it.slot }))
+      if (res.kept) {
+        log(`tool kept [${res.item.slot || 'none'}] ${args.fact.slice(0, 50)}`)
+        return {
+          stored: true,
+          slot: res.item.slot || null,
+          reason: 'stored',
+          memory,
+        }
+      }
+      log(`tool filtered: ${args.fact.slice(0, 50)}`)
+      return {
+        stored: false,
+        slot: null,
+        reason: res.reason,
+        memory,
+      }
+    },
+  }))
+
+  log(`tool registered: ${TOOL_NAME}`)
   log('services registered: igm.memory.write / igm.memory.query / igm.memory.stats')
 }
