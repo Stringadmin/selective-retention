@@ -6,3 +6,5 @@
         enabled: true
         writeThreshold: 0.6
         slotMaxLen: 6
+        maxFactLen: 200
+        maxInjectionBytes: 2048

@@ -10,16 +10,16 @@
 
 1. **梯度 hook 冻不住参数。** AdamW 的解耦权重衰减和历史动量在梯度为零时照样移动参数（实测 drift 9.94e-5）。要在优化器层对实际 delta 做投影才能真冻住（drift = 0）。
 2. **同一套"重要性筛选 → 执行层强制保留/淘汰"的结构，参数空间（FIP/GPP）和信息空间（IGM）都适用。**
-3. **RAG 管读不管写。** 标准 RAG（强嵌入 + 全量存储）在矛盾解决场景准确率 0%；加个写入层（slot 覆盖）到 100%，记忆量还减到 1/7。
+3. **RAG 的更新语义不能只靠检索补。** 在 5 条受控连续更新链上，当前的 BGE + 全量存储 top-k 基线准确率为 0%，加 slot 覆盖后为 100%，记忆量降到 1/7。这个结果展示一种具体失败模式，不代表所有 RAG 系统都会得到 0%。
 
-## 决定性实验
+## 受控连续更新实验
 
 同一属性被连续更新 5 次（新旧值语义近似），问"当前值"：
 
 | 方法 | 准确率 | 记忆用量 |
 |---|---:|---:|
-| 标准 RAG（信检索第一名） | 0.00 | 28 条 |
-| 标准 RAG + 时间排序 | 0.60 | 28 条 |
+| 本实验的全量存储 top-1 基线 | 0.00 | 28 条 |
+| 本实验的全量存储 + top-3 内时间排序 | 0.60 | 28 条 |
 | **RAG + IGM 写入层（slot 覆盖）** | **1.00** | **4 条** |
 
 ![决定性实验](docs/fig2_decisive_experiment.png)
@@ -60,11 +60,13 @@ mem.query_texts("我现在的住址是什么？")         # -> 只有深圳
 
 ## 作为 DeepSeek Harness 插件用（dsh-igm-memory）
 
-同一套写入层做成了 DSH 插件，给 agent 加"闸门 + 覆盖 + 跨会话记忆"：
+同一套机制做成了 DSH 插件，给 agent 加"闸门 + 覆盖 + 分域持久记忆"：
 
 - `remember_fact`：agent 记事实走 IGM 闸门，同属性新值覆盖旧值
-- `recall_fact` + 会话启动注入：新会话开局能看到此前记住的事实
-- JSON 持久化 + consolidate 遗忘
+- `recall_fact` + 会话启动注入：新会话开局能看到此前记住的事实；每次召回都会更新复用计数
+- `fact / decision / experience` 显式分类；只有经验能按主题跨项目复用
+- 按工具调用自己的 session cwd 路由，跨进程重启仍能发现项目存储
+- JSON 持久化 + 基于最后使用时间的 consolidate 遗忘
 
 ```sh
 dsh plugin --profile web add ./dsh-igm-memory
@@ -86,7 +88,7 @@ igm/                    # 可安装的 RAG 写入层库（零依赖核心）
 dsh-igm-memory/         # DeepSeek Harness 插件（cordis bundle）
   lib/index.js          #   remember_fact / recall_fact / 注入 / 持久化 / 遗忘
   cordis.patch.yml      #   插件注册层
-  test 脚本              #   scripts/test_igm_plugin.mjs（15 项）
+  test/test_igm_plugin.mjs #  16 个隔离临时存储的插件回归测试（npm test）
 memory_arch/            # Agent 记忆研究代码（IGM 的实验原型）
   scorer.py             #   可学习的 importance 打分器
   run_decisive.py       #   决定性实验：RAG vs RAG+IGM
@@ -109,6 +111,7 @@ reports/                # 原始实验结果 JSON（可审计）
 ## 边界
 
 - 实验在受控合成数据上做的，记忆基线是 4B 本地模型。方向可信，绝对数字别当真。
+- 决定性实验只有 5 条手工控制的更新链，LongMemEval 尚未运行；结果不能外推成"标准 RAG 普遍为 0%"。
 - 标准 RAG 够用时别加这层。IGM 的价值只在"全量写入会崩"的场景：大规模、频繁更新、矛盾解决。
 - IGM 是 RAG 的增强件，不是替代品。
 

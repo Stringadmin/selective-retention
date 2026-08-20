@@ -1,55 +1,44 @@
 # dsh-igm-memory
 
-IGM write layer for DeepSeek Harness — an importance-gated memory write gate with slot supersede.
+Typed, importance-gated memory tools for DeepSeek Harness (DSH), with slot
+supersede and per-project isolation.
 
-> Community plugin for DeepSeek Harness (DSH). Not an official DeepSeek product.
+> Community plugin for DSH. Not an official DeepSeek product.
 
-## What it does
+## Behavior
 
-DSH agents accumulate durable memory/instructions over sessions. Without a write
-gate, memories pile up: questions get stored as facts, stale values survive
-updates, contradictions accumulate. `dsh-igm-memory` sits on the write path:
+The plugin registers `remember_fact` and `recall_fact` and injects rules that
+tell the agent when to use them.
 
-1. **Gate** — only memories scoring above a threshold are written. Questions
-   and chit-chat are rejected (score 0 for interrogatives).
-2. **Slot supersede** — a fact about the same attribute ("我的住址是北京" →
-   "我的住址现在是深圳") replaces the old value instead of appending.
+1. An importance gate rejects questions, chit-chat, and oversized candidates.
+2. Slot supersede replaces an older value for the same attribute.
+3. User memories are shared; project memories are isolated by session cwd.
+4. Every item is typed as `fact`, `decision`, or `experience`.
+5. Only project-scoped `experience` items can transfer to another project, and
+   only when the projects share a detected topic.
+6. Project discovery is persisted, so cross-project experience recall survives
+   a DSH restart.
+7. Both `recall_fact` and `igm.memory.query` record `reuseCount` and
+   `lastUsedAt`. A `recall_fact` response already includes the count from that
+   recall. Consolidation uses recent write/recall activity, so stale accepted
+   memories can actually expire.
 
-This is the DSH plugin port of the IGM mechanism from
-[selective-retention](https://github.com/Stringadmin/selective-retention)
-(see `docs/ARTICLE_DRAFT.md` for the research write-up and evidence).
+Old JSON files remain readable. Missing metadata is derived when loaded and is
+written back on the next mutation.
 
 ## Install
 
-```sh
-# from this directory (develop against the web profile)
-dsh plugin --profile web add ./dsh-igm-memory
-dsh --profile web --dump-config   # verify the row loaded
-dsh web                           # restart to activate
-```
-
-## Exposed services
-
-| Service | Signature | Purpose |
-|---|---|---|
-| `igm.memory.write` | `(text) -> {kept, item?, score}` | route a candidate memory through the gate |
-| `igm.memory.query` | `(text) -> items` | slot-aware retrieval (top-3), tracks reuse |
-| `igm.memory.stats` | `() -> {stored, items}` | inspect current memory |
-| `igm.memory.consolidate` | `(maxAgeDays?, minScore?) -> {removed, remaining}` | forget old, never-reused, low-value memories |
-
-## Tests
+From the plugin directory:
 
 ```sh
-# from this directory, with dsh installed (for @deepseek-ai/dsh-tools resolution)
-node test/test_igm_plugin.mjs
+dsh plugin --profile web add .
+dsh --profile web --dump-config
+dsh web
 ```
 
-15 cases: slot extraction edges, gate, supersede, length guards, persistence,
-corrupt-file tolerance, injection budget, consolidation.
+Restart the active DSH process after changing the plugin.
 
 ## Config
-
-Set in `cordis.patch.yml` (or a profile patch layer):
 
 ```yaml
 - id: dsh-igm-memory
@@ -58,31 +47,70 @@ Set in `cordis.patch.yml` (or a profile patch layer):
     enabled: true
     writeThreshold: 0.6
     slotMaxLen: 6
-    storeFile: /absolute/path/to/memory.json   # optional per-profile isolation
+    maxFactLen: 200
+    maxInjectionBytes: 2048
+    storeFile: /absolute/path/to/profile-user-memory.json
 ```
 
-## Multi-profile isolation
+`storeFile` changes the user-memory file only. Project stores remain under
+`$DSH_HOME/storages` so they can be discovered across sessions.
 
-By default all profiles share `$DSH_HOME/storages/igm-memory.json`. To keep
-memories separate per profile (e.g. web vs headless), set a distinct
-`storeFile` in each profile's patch layer — the same plugin instance then
-reads/writes only its own memory file.
+## Storage
 
-## End-to-end verification
+Default files under `$DSH_HOME/storages`:
 
-In a dsh session:
+| File | Contents |
+|---|---|
+| `igm-user.json` | User-scoped memories shared across projects |
+| `igm-project-<hash>.json` | Memories isolated to one project cwd |
+| `igm-projects.json` | Project hash-to-cwd discovery index |
+| `igm-project-unknown.json` | Project memories written without a cwd |
 
+Each item includes its text, slot, score, timestamp, topics, type, scope,
+project identity, provenance, reuse count, and last-used timestamp.
+
+## Services
+
+| Service | Signature |
+|---|---|
+| `igm.memory.write` | `(text, { cwd?, type?, provenance? })` |
+| `igm.memory.query` | `(text, cwd?)` |
+| `igm.memory.stats` | `(cwd?)` |
+| `igm.memory.list` | `(cwd?)` |
+| `igm.memory.consolidate` | `(maxAgeDays = 30, minScore = 1, cwd?)` |
+
+Service callers should always pass `cwd` for project-scoped operations. A
+project write without cwd is intentionally kept in the unknown-project store,
+never in the shared user store.
+
+## Tests
+
+Run from a DSH-linked checkout where the host provides
+`@deepseek-ai/dsh-tools`:
+
+```sh
+npm test
 ```
-> 记住我的住址是北京
-> 改记住是深圳
-> (start a NEW session)
-> 我住址是哪
-你的住址现在是深圳
-```
 
-The new session sees the persisted, superseded value (Shenzhen only) via
-session-start injection — the "knowledge update" case from the research
-write-up, working in a real agent harness.
+The 16-test suite uses unique temporary directories and never reads or writes
+the real `~/.dsh/storages`. It covers gating, supersede, persistence, corrupt
+files, typed migration, concurrent session routing, restart discovery,
+project-fact isolation, reuse persistence through both query and
+`recall_fact`, practical forgetting, `storeFile`, and prompt injection.
+
+## Boundaries and privacy
+
+This plugin is a guarded tool and service layer. It does not intercept a DSH
+memory path or another plugin that writes durable data without calling
+`remember_fact` or `igm.memory.write`.
+
+Memory and the project cwd registry are stored as plaintext JSON. Do not store
+secrets. Apply normal filesystem permissions and backup policy, and stop DSH
+before manually deleting or editing these files.
+
+The implementation demonstrates selective retention and controlled
+cross-project lesson reuse. It is not evidence that every standard RAG system
+has the same failure rate or that the approach is universally superior.
 
 ## License
 
