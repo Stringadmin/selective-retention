@@ -105,7 +105,8 @@ export class IgmStore {
     if (text.length > maxFactLen) return { kept: false, reason: 'too_long', score: 0 }
     const score = importanceScore(text)
     if (score < threshold) return { kept: false, reason: 'gate', score }
-    const slot = extractSlot(text, maxSlotLen)
+    let slot = extractSlot(text, maxSlotLen)
+    if (slot === null && isProjectFact(text)) slot = extractProjectSlot(text)
     if (slot !== null) {
       this.items = this.items.filter((it) => it.slot !== slot) // supersede
     }
@@ -190,6 +191,25 @@ const PROJECT_MARKERS = ['这个项目', '项目用', '项目是', '项目采用
 
 function isProjectFact(text) {
   return PROJECT_MARKERS.some((m) => text.includes(m))
+}
+
+// Fallback slot for facts that are not "我的X是Y" shaped. Project facts like
+// "这个项目使用 pnpm 作为包管理器" extract "包管理器" as their attribute.
+function extractProjectSlot(text) {
+  const m = text.match(/作为([\u4e00-\u9fa5A-Za-z0-9]{2,8})/)
+  if (m) return m[1]
+  const m2 = text.match(/项目(?:使用|采用|用|是)([\u4e00-\u9fa5A-Za-z0-9]{2,10})/)
+  if (m2) return m2[1]
+  return null
+}
+
+// Full slot resolution: user facts use 我的X是Y; project facts fall back to
+// the project-slot extractor so updates still supersede by attribute.
+function resolveSlot(text, maxLen) {
+  const userSlot = extractSlot(text, maxLen)
+  if (userSlot) return userSlot
+  if (isProjectFact(text)) return extractProjectSlot(text)
+  return null
 }
 
 export function apply(ctx, config) {
@@ -310,12 +330,12 @@ export function apply(ctx, config) {
     async execute(args) {
       const store = storeFor(args.fact, currentCwd)
       const res = store.add(args.fact, threshold, slotMaxLen, maxFactLen)
-      const memory = [...userStore().items, ...projectStore(currentCwd).items].map((it) => ({ text: it.text, slot: it.slot }))
+      const memory = [...userStore().items, ...projectStore(currentCwd).items].map((it) => ({ text: it.text, slot: it.slot || '' }))
       if (res.kept) {
         log(`tool kept [${res.item.slot || 'none'}] ${args.fact.slice(0, 50)}`)
         return {
           stored: true,
-          slot: res.item.slot || null,
+          slot: res.item.slot || '',
           reason: 'stored',
           memory,
         }
@@ -323,7 +343,7 @@ export function apply(ctx, config) {
       log(`tool filtered: ${args.fact.slice(0, 50)}`)
       return {
         stored: false,
-        slot: null,
+        slot: '',
         reason: res.reason,
         memory,
       }
@@ -356,7 +376,7 @@ export function apply(ctx, config) {
       // Retrieve both scopes so user + project facts are visible together.
       const u = userStore()
       const p = projectStore(currentCwd)
-      const memory = [...u.items, ...p.items].map((it) => ({ text: it.text, slot: it.slot }))
+      const memory = [...u.items, ...p.items].map((it) => ({ text: it.text, slot: it.slot || '' }))
       log(`recall -> ${memory.length} facts (${u.size} user, ${p.size} project)`)
       return { memory }
     },
