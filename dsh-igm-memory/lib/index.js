@@ -312,11 +312,11 @@ export function apply(ctx, config) {
   log(`tool registered: ${RECALL_NAME}`)
 
   // Session-start injection: make persisted facts visible to the agent from
-  // the first turn, so a new session inherits previous-session memory.
+  // the first turn, AND teach it to persist facts proactively. The rules are
+  // injected even with an empty store so a fresh profile still learns them.
   ctx.on('system-prompt/assemble', async (assembly, context, next) => {
     const assembled = await next()
     if (!enabled) return assembled
-    if (store.size === 0) return assembled
     const sectionName = 'igm-memory'
     const sections = Array.isArray(assembled?.sections) ? assembled.sections : []
     const filtered = sections.filter((s) => s?.name !== sectionName)
@@ -331,10 +331,21 @@ export function apply(ctx, config) {
       lines.push(line)
       budget -= line.length
     }
-    if (lines.length === 0) return assembled
+    const parts = []
+    parts.push(
+      'IGM memory rules (follow proactively, do not wait for the user to say "remember"):\n' +
+      '1. When the user states any durable fact about themselves or the project (address, preference, role, decision, stack choice, etc.), immediately call remember_fact with the fact phrased as "我的{attr}是{value}".\n' +
+      '2. When the user changes a previously known fact, immediately call remember_fact with the new value phrased as "我的{attr}现在是{value}" — the old value is automatically replaced.\n' +
+      '3. Do not store questions, chit-chat, or one-off requests; the gate rejects them anyway.'
+    )
+    if (lines.length > 0) {
+      parts.push(
+        'Durable facts remembered in previous sessions (only current values remain):\n' + lines.join('\n')
+      )
+    }
     filtered.push({
       name: sectionName,
-      text: `The following durable facts about the user were remembered in previous sessions (slot supersede keeps only current values):\n${lines.join('\n')}`,
+      text: parts.join('\n\n'),
       order: 5,
     })
     return { ...assembled, sections: filtered }
