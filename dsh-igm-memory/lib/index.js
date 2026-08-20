@@ -164,13 +164,9 @@ export const Config = z.object({
   slotMaxLen: z.number().default(6),
   maxFactLen: z.number().default(200),
   maxInjectionBytes: z.number().default(2048),
-  // Optional explicit store file. Profiles can set this in their patch layer
-  // to isolate memories per profile (e.g. web vs headless).
+  // Optional explicit store file for user facts. Profiles can set this in
+  // their patch layer to isolate memories per profile (e.g. web vs headless).
   storeFile: z.string().default(''),
-  // Per-project isolation: keep a separate memory file per working directory
-  // (keyed by session cwd), so project A's conventions never leak into
-  // project B. Default off (shared user memory).
-  perProject: z.boolean().default(false),
 })
 
 export const inject = ['tools', 'systemPrompt'] // model-facing tool + prompt injection
@@ -188,39 +184,50 @@ const RECALL_DESCRIPTION =
   'Call this when asked about a preference, address, role, or decision that may have ' +
   'been stated in a previous session. Returns the current memory (updated values only).'
 
+// Project-scope markers: facts about the codebase/conventions live in the
+// per-project store; everything else (user facts) lives in the shared store.
+const PROJECT_MARKERS = ['这个项目', '项目用', '项目是', '项目采用', '项目', '仓库', '代码', '依赖', '技术栈', '构建', '部署', '约定', '架构', '前端', '后端', '数据库', '接口', '路由', '组件', '测试', 'CI', '发布']
+
+function isProjectFact(text) {
+  return PROJECT_MARKERS.some((m) => text.includes(m))
+}
+
 export function apply(ctx, config) {
   const enabled = config.enabled ?? true
   const threshold = config.writeThreshold ?? 0.6
   const slotMaxLen = config.slotMaxLen ?? 6
   const maxFactLen = config.maxFactLen ?? 200
   const maxInjectionBytes = config.maxInjectionBytes ?? 2048
-  const perProject = config.perProject ?? false
   const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
 
-  // Store manager: one store per cwd when perProject, else one shared store.
-  const stores = new Map()          // cwd -> IgmStore (per-project mode)
-  let sharedStore = null            // single store (default mode)
+  // Store manager: project facts auto-route to a per-cwd store; user facts
+  // always go to the shared store. No configuration needed.
+  const stores = new Map()          // cwd -> IgmStore (project facts)
+  let sharedStore = null            // user facts (all projects)
   let currentCwd = null             // cwd of the most recent assembled session
 
-  const storePathFor = (cwd) => {
-    if (config.storeFile) return path.resolve(config.storeFile)
-    if (!perProject || !cwd) return path.join(dshHome, 'storages', 'igm-memory.json')
+  const projectStorePath = (cwd) => {
     const hash = crypto.createHash('sha256').update(cwd).digest('hex').slice(0, 12)
-    return path.join(dshHome, 'storages', `igm-memory-${hash}.json`)
+    return path.join(dshHome, 'storages', `igm-project-${hash}.json`)
   }
 
-  const storeFor = (cwd) => {
-    if (perProject) {
-      if (!cwd) cwd = currentCwd
-      if (!cwd) return sharedStore || (sharedStore = new IgmStore(storePathFor(null)))
-      let s = stores.get(cwd)
-      if (!s) {
-        s = new IgmStore(storePathFor(cwd))
-        stores.set(cwd, s)
-      }
-      return s
+  const userStore = () => sharedStore || (sharedStore = new IgmStore(path.join(dshHome, 'storages', 'igm-user.json')))
+
+  const projectStore = (cwd) => {
+    if (!cwd) cwd = currentCwd
+    if (!cwd) return userStore()
+    let s = stores.get(cwd)
+    if (!s) {
+      s = new IgmStore(projectStorePath(cwd))
+      stores.set(cwd, s)
     }
-    return sharedStore || (sharedStore = new IgmStore(storePathFor(null)))
+    return s
+  }
+
+  // Route a candidate fact to the right store by its scope.
+  const storeFor = (text, cwd) => {
+    if (isProjectFact(text)) return projectStore(cwd)
+    return userStore()
   }
 
   const log = (msg) => {
@@ -234,35 +241,41 @@ export function apply(ctx, config) {
     return
   }
 
-  log(`enabled (threshold=${threshold}, slotMaxLen=${slotMaxLen}, perProject=${perProject})`)
-  const bootStore = storeFor(null)
-  log(`store file: ${bootStore.file} (${bootStore.size} persisted)`)
+  log(`enabled (threshold=${threshold}, slotMaxLen=${slotMaxLen}, auto-scope routing)`)
+  log(`user store: ${userStore().file} (${userStore().size} persisted)`)
 
   // Memory-write guard: expose a service so other plugins / the agent loop
   // can route memory candidates through the IGM gate.
   ctx.provide('igm.memory.write', (text) => {
-    const store = storeFor(currentCwd)
+    const store = storeFor(text, currentCwd)
     const res = store.add(text, threshold, slotMaxLen, maxFactLen)
     log(res.kept ? `kept [${res.item.slot || 'none'}] ${text.slice(0, 40)}` : `filtered: ${text.slice(0, 40)}`)
     return res
   })
 
-  ctx.provide('igm.memory.query', (text) => storeFor(currentCwd).query(text, 3, slotMaxLen))
+  ctx.provide('igm.memory.query', (text) => {
+    // Query both scopes; slot-aware ranking decides.
+    const all = [...userStore().query(text, 3, slotMaxLen), ...projectStore(currentCwd).query(text, 3, slotMaxLen)]
+    return all.slice(0, 3)
+  })
 
   ctx.provide('igm.memory.stats', () => {
-    const store = storeFor(currentCwd)
+    const u = userStore()
+    const p = projectStore(currentCwd)
     return {
-      stored: store.size,
+      stored: u.size + p.size,
       cwd: currentCwd,
-      items: store.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
+      userItems: u.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
+      projectItems: p.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
     }
   })
 
   ctx.provide('igm.memory.consolidate', (maxAgeDays = 30, minScore = 0.5) => {
-    const store = storeFor(currentCwd)
-    const removed = store.consolidate(maxAgeDays, minScore)
-    log(`consolidate removed ${removed} (${store.size} remain)`)
-    return { removed, remaining: store.size }
+    const u = userStore()
+    const p = projectStore(currentCwd)
+    const removed = u.consolidate(maxAgeDays, minScore) + p.consolidate(maxAgeDays, minScore)
+    log(`consolidate removed ${removed} (${u.size + p.size} remain)`)
+    return { removed, remaining: u.size + p.size }
   })
 
   // Model-facing tool: lets the agent persist facts through the IGM gate.
@@ -295,9 +308,9 @@ export function apply(ctx, config) {
       },
     },
     async execute(args) {
-      const store = storeFor(currentCwd)
+      const store = storeFor(args.fact, currentCwd)
       const res = store.add(args.fact, threshold, slotMaxLen, maxFactLen)
-      const memory = store.items.map((it) => ({ text: it.text, slot: it.slot }))
+      const memory = [...userStore().items, ...projectStore(currentCwd).items].map((it) => ({ text: it.text, slot: it.slot }))
       if (res.kept) {
         log(`tool kept [${res.item.slot || 'none'}] ${args.fact.slice(0, 50)}`)
         return {
@@ -340,11 +353,11 @@ export function apply(ctx, config) {
       },
     },
     async execute() {
-      // Retrieve via query() so reused facts are tracked for consolidation.
-      const store = storeFor(currentCwd)
-      const hits = store.query('', store.size, slotMaxLen)
-      const memory = hits.map((it) => ({ text: it.text, slot: it.slot }))
-      log(`recall -> ${memory.length} facts`)
+      // Retrieve both scopes so user + project facts are visible together.
+      const u = userStore()
+      const p = projectStore(currentCwd)
+      const memory = [...u.items, ...p.items].map((it) => ({ text: it.text, slot: it.slot }))
+      log(`recall -> ${memory.length} facts (${u.size} user, ${p.size} project)`)
       return { memory }
     },
   }))
@@ -363,13 +376,14 @@ export function apply(ctx, config) {
       currentCwd = cwd
       log(`session cwd: ${cwd}`)
     }
-    const store = storeFor(cwd)
     const sectionName = 'igm-memory'
     const sections = Array.isArray(assembled?.sections) ? assembled.sections : []
     const filtered = sections.filter((s) => s?.name !== sectionName)
     // Build the fact list newest-first, cutting once the byte budget is hit,
     // so a large memory never blows up the agent's context window.
-    const ordered = [...store.items].sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    const u = userStore()
+    const p = projectStore(cwd)
+    const ordered = [...u.items, ...p.items].sort((a, b) => (b.ts || 0) - (a.ts || 0))
     const lines = []
     let budget = maxInjectionBytes
     for (const it of ordered) {
@@ -381,9 +395,10 @@ export function apply(ctx, config) {
     const parts = []
     parts.push(
       'IGM memory rules (follow proactively, do not wait for the user to say "remember"):\n' +
-      '1. When the user states any durable fact about themselves or the project (address, preference, role, decision, stack choice, etc.), immediately call remember_fact with the fact phrased as "我的{attr}是{value}".\n' +
-      '2. When the user changes a previously known fact, immediately call remember_fact with the new value phrased as "我的{attr}现在是{value}" — the old value is automatically replaced.\n' +
-      '3. Do not store questions, chit-chat, or one-off requests; the gate rejects them anyway.'
+      '1. When the user states any durable fact about themselves (address, preference, role, etc.), immediately call remember_fact with "我的{attr}是{value}".\n' +
+      '2. When the user states a durable fact about THIS project (stack, convention, decision, architecture), immediately call remember_fact with "这个项目{...}".\n' +
+      '3. When a previously known fact changes, immediately call remember_fact with the new value — the old value is automatically replaced.\n' +
+      '4. Do not store questions, chit-chat, or one-off requests; the gate rejects them anyway.'
     )
     if (lines.length > 0) {
       parts.push(
