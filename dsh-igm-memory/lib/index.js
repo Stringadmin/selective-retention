@@ -14,7 +14,9 @@ export const name = 'dsh-igm-memory'
 
 const FACT_MARKERS = ['我', '我的', '喜欢', '是', '在', '去过', '住', '工作', '现在', '叫', '名字', '来自', '出生', '毕业', '擅长',
   // project-scope facts (code development): "这个项目用 pnpm", "项目采用 X"
-  '这个项目', '项目用', '项目是', '项目采用', '项目', '仓库', '代码', '依赖', '技术栈', '构建', '部署', '约定', '架构']
+  '这个项目', '项目用', '项目是', '项目采用', '项目', '仓库', '代码', '依赖', '技术栈', '构建', '部署', '约定', '架构',
+  // high-value memory types: decisions, gotchas, root causes
+  '因为', '所以', '原因', '选择', '选了', '踩过', '坑', '坑是', '注意', '记住', '下次', '别再', '当时', '决定', '方案']
 const QUESTION_MARKERS = ['什么', '吗', '？', '?', '哪', '怎么', '如何', '为什么']
 const SLOT_PREFIXES = ['现在的', '目前的', '新的', '原来的', '以前的', '当前的']
 const SLOT_ANCHORS = ['我的', '我']
@@ -181,9 +183,10 @@ const TOOL_DESCRIPTION =
 
 const RECALL_NAME = 'recall_fact'
 const RECALL_DESCRIPTION =
-  'Retrieve the durable facts currently stored about the user or project. ' +
-  'Call this when asked about a preference, address, role, or decision that may have ' +
-  'been stated in a previous session. Returns the current memory (updated values only).'
+  'Retrieve the durable facts stored about the user or this project (preferences, decisions, conventions, gotchas). ' +
+  'Call this BEFORE answering when the user asks about something that may have been stated in a previous session, ' +
+  'or when you are about to rely on a preference/convention. When you use a fact from memory, tell the user its source ' +
+  '(e.g. "根据你之前说的..." / "按项目约定，之前记过..."). Returns current values only.'
 
 // Project-scope markers: facts about the codebase/conventions live in the
 // per-project store; everything else (user facts) lives in the shared store.
@@ -287,6 +290,16 @@ export function apply(ctx, config) {
       cwd: currentCwd,
       userItems: u.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
       projectItems: p.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
+    }
+  })
+
+  // Full listing with scope labels — lets the user inspect what is remembered.
+  ctx.provide('igm.memory.list', () => {
+    const u = userStore()
+    const p = projectStore(currentCwd)
+    return {
+      user: u.items.map((it) => ({ text: it.text, slot: it.slot || '' })),
+      project: p.items.map((it) => ({ text: it.text, slot: it.slot || '' })),
     }
   })
 
@@ -403,11 +416,15 @@ export function apply(ctx, config) {
     // so a large memory never blows up the agent's context window.
     const u = userStore()
     const p = projectStore(cwd)
-    const ordered = [...u.items, ...p.items].sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    const ordered = [
+      ...u.items.map((it) => ({ ...it, scope: 'user' })),
+      ...p.items.map((it) => ({ ...it, scope: 'project' })),
+    ].sort((a, b) => (b.ts || 0) - (a.ts || 0))
     const lines = []
     let budget = maxInjectionBytes
     for (const it of ordered) {
-      const line = `- ${it.text}`
+      const tag = it.scope === 'project' ? '[project]' : '[user]'
+      const line = `- ${tag} ${it.text}`
       if (line.length > budget) break
       lines.push(line)
       budget -= line.length
@@ -415,14 +432,16 @@ export function apply(ctx, config) {
     const parts = []
     parts.push(
       'IGM memory rules (follow proactively, do not wait for the user to say "remember"):\n' +
-      '1. When the user states any durable fact about themselves (address, preference, role, etc.), immediately call remember_fact with "我的{attr}是{value}".\n' +
+      '1. When the user states any durable fact about themselves (address, preference, role, stack, tooling, etc.), immediately call remember_fact with "我的{attr}是{value}".\n' +
       '2. When the user states a durable fact about THIS project (stack, convention, decision, architecture), immediately call remember_fact with "这个项目{...}".\n' +
-      '3. When a previously known fact changes, immediately call remember_fact with the new value — the old value is automatically replaced.\n' +
-      '4. Do not store questions, chit-chat, or one-off requests; the gate rejects them anyway.'
+      '3. When the user explains WHY a decision was made or reveals a gotcha/bug root cause, remember it as a durable fact too — these are the most valuable memories.\n' +
+      '4. When a previously known fact changes, immediately call remember_fact with the new value — the old value is automatically replaced.\n' +
+      '5. When answering from memory, mention the source: e.g. "根据你之前说的..." or "按项目约定(之前记过)...". Do not silently pretend you always knew.\n' +
+      '6. Do not store questions, chit-chat, or one-off requests; the gate rejects them anyway.'
     )
     if (lines.length > 0) {
       parts.push(
-        'Durable facts remembered in previous sessions (only current values remain):\n' + lines.join('\n')
+        'Durable facts remembered in previous sessions ([user]=你的偏好, [project]=本项目约定; only current values remain):\n' + lines.join('\n')
       )
     }
     filtered.push({
