@@ -109,6 +109,18 @@ export class IgmStore {
     if (score < threshold) return { kept: false, reason: 'gate', score }
     let slot = extractSlot(text, maxSlotLen)
     if (slot === null && isProjectFact(text)) slot = extractProjectSlot(text)
+    // Text-level dedup: identical or near-identical facts (even without a
+    // slot) update the existing entry instead of appending a duplicate.
+    const norm = text.replace(/\s+/g, '')
+    const existing = this.items.find((it) => it.slot !== null && it.slot === slot)
+      || this.items.find((it) => it.text.replace(/\s+/g, '') === norm)
+    if (existing) {
+      existing.text = text
+      existing.score = score
+      existing.ts = Date.now()
+      this.save()
+      return { kept: true, item: existing, score, deduped: true }
+    }
     if (slot !== null) {
       this.items = this.items.filter((it) => it.slot !== slot) // supersede
     }
@@ -227,6 +239,7 @@ export function apply(ctx, config) {
   // always go to the shared store. No configuration needed.
   const stores = new Map()          // cwd -> IgmStore (project facts)
   let sharedStore = null            // user facts (all projects)
+  let unknownProjectStore = null    // project facts with unknown cwd
   let currentCwd = null             // cwd of the most recent assembled session
 
   const projectStorePath = (cwd) => {
@@ -238,7 +251,10 @@ export function apply(ctx, config) {
 
   const projectStore = (cwd) => {
     if (!cwd) cwd = currentCwd
-    if (!cwd) return userStore()
+    if (!cwd) {
+      // Project fact but no session cwd yet: keep it OUT of the user store.
+      return unknownProjectStore || (unknownProjectStore = new IgmStore(path.join(dshHome, 'storages', 'igm-project-unknown.json')))
+    }
     let s = stores.get(cwd)
     if (!s) {
       s = new IgmStore(projectStorePath(cwd))
