@@ -22,6 +22,34 @@ const SLOT_PREFIXES = ['现在的', '目前的', '新的', '原来的', '以前�
 const SLOT_ANCHORS = ['我的', '我']
 const SLOT_STOPS = ['现在是', '是什么', '是', '了', '。', '，', ',', '？', '?']
 
+// Topic dictionary: maps keywords to canonical topics so experiences can be
+// matched ACROSS projects ("electron packaging gotcha" learned in project A
+// surfaces when project B works on electron).
+const TOPIC_KEYWORDS = {
+  'electron': ['electron', '桌面端', '主进程', '渲染进程'],
+  'packaging': ['打包', '构建', 'build', 'package', '安装器', '安装包'],
+  'package-manager': ['npm', 'pnpm', 'yarn', '包管理器', 'lockfile', 'package-lock', 'packageManager'],
+  'deploy': ['部署', 'deploy', '发布', 'release', '上线', 'ci', '流水线'],
+  'database': ['数据库', 'db', 'mysql', 'postgres', 'sqlite', 'redis', 'mongo'],
+  'backend': ['后端', 'server', 'api', '接口', 'express', 'koa', 'fastapi', 'flask'],
+  'frontend': ['前端', 'react', 'vue', 'component', '组件', 'css', 'tailwind', 'ui'],
+  'testing': ['测试', 'test', 'jest', 'vitest', 'pytest', '单测'],
+  'docker': ['docker', '容器', '镜像', 'k8s', 'kubernetes'],
+  'node': ['node', 'nodejs', 'vite', 'webpack', 'esbuild'],
+  'auth': ['登录', '鉴权', 'auth', 'token', 'session', 'jwt', 'oauth'],
+  'network': ['网络', '请求', 'http', 'https', '超时', '重试', 'proxy'],
+  'oss-storage': ['oss', '对象存储', '存储桶', 'bucket', 's3'],
+  'llm': ['llm', '模型', 'prompt', '推理', '生成', 'token', '上下文'],
+}
+
+export function extractTopics(text) {
+  const found = []
+  for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
+    if (keywords.some((kw) => text.toLowerCase().includes(kw))) found.push(topic)
+  }
+  return found
+}
+
 export function extractSlot(text, maxLen = 6) {
   for (const anchor of SLOT_ANCHORS) {
     const ai = text.indexOf(anchor)
@@ -84,7 +112,10 @@ export class IgmStore {
     try {
       const raw = fs.readFileSync(this.file, 'utf8')
       const data = JSON.parse(raw)
-      if (Array.isArray(data.items)) this.items = data.items
+      if (Array.isArray(data.items)) {
+        // Backfill topics for entries written by older versions.
+        this.items = data.items.map((it) => ({ topics: [], ...it }))
+      }
     } catch {
       this.items = [] // missing/corrupt file -> start fresh
     }
@@ -109,6 +140,7 @@ export class IgmStore {
     if (score < threshold) return { kept: false, reason: 'gate', score }
     let slot = extractSlot(text, maxSlotLen)
     if (slot === null && isProjectFact(text)) slot = extractProjectSlot(text)
+    const topics = extractTopics(text)
     // Text-level dedup: identical or near-identical facts (even without a
     // slot) update the existing entry instead of appending a duplicate.
     const norm = text.replace(/\s+/g, '')
@@ -118,13 +150,14 @@ export class IgmStore {
       existing.text = text
       existing.score = score
       existing.ts = Date.now()
+      existing.topics = topics.length ? topics : existing.topics
       this.save()
       return { kept: true, item: existing, score, deduped: true }
     }
     if (slot !== null) {
       this.items = this.items.filter((it) => it.slot !== slot) // supersede
     }
-    const item = { text, slot, score, ts: Date.now(), reuseCount: 0 }
+    const item = { text, slot, score, ts: Date.now(), reuseCount: 0, topics }
     this.items.push(item)
     this.save()
     return { kept: true, item, score }
@@ -261,6 +294,42 @@ export function apply(ctx, config) {
       stores.set(cwd, s)
     }
     return s
+  }
+
+  // Cross-project experience recall: given the current cwd, find experiences
+  // stored in OTHER projects that share a topic with the current context.
+  // Physical isolation stays (facts are scoped per project) but experiences
+  // become portable across projects — the "self-evolution" step.
+  const allProjectStores = () => {
+    const seen = new Set()
+    const result = []
+    for (const [cwd, s] of stores) {
+      if (s.size > 0 && !seen.has(cwd)) {
+        seen.add(cwd)
+        result.push({ cwd, store: s })
+      }
+    }
+    if (unknownProjectStore && unknownProjectStore.size > 0 && !seen.has('__unknown__')) {
+      result.push({ cwd: '__unknown__', store: unknownProjectStore })
+    }
+    return result
+  }
+
+  // Experiences from other projects matching the given topics.
+  const crossProjectExperiences = (topics, excludeCwd, limit = 4) => {
+    if (!topics || topics.length === 0) return []
+    const hits = []
+    for (const { cwd, store } of allProjectStores()) {
+      if (cwd === excludeCwd || cwd === '__unknown__') continue
+      for (const it of store.items) {
+        const its = it.topics || []
+        if (its.some((t) => topics.includes(t))) {
+          hits.push({ text: it.text, topics: its, project: cwd, ts: it.ts })
+        }
+      }
+    }
+    hits.sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    return hits.slice(0, limit)
   }
 
   // Route a candidate fact to the right store by its scope.
@@ -402,12 +471,16 @@ export function apply(ctx, config) {
       },
     },
     async execute() {
-      // Retrieve both scopes so user + project facts are visible together.
+      // Retrieve both scopes so user + project facts are visible together,
+      // plus cross-project experiences matching the current project's topics.
       const u = userStore()
       const p = projectStore(currentCwd)
       const memory = [...u.items, ...p.items].map((it) => ({ text: it.text, slot: it.slot || '' }))
-      log(`recall -> ${memory.length} facts (${u.size} user, ${p.size} project)`)
-      return { memory }
+      const ownTopics = new Set(p.items.flatMap((it) => it.topics || []))
+      const xp = crossProjectExperiences([...ownTopics], currentCwd, 4)
+        .map((e) => ({ text: e.text, project: e.project, experience: true }))
+      log(`recall -> ${memory.length} facts (${u.size} user, ${p.size} project) + ${xp.length} cross-project experiences`)
+      return { memory, experiences: xp }
     },
   }))
   log(`tool registered: ${RECALL_NAME}`)
@@ -458,6 +531,20 @@ export function apply(ctx, config) {
     if (lines.length > 0) {
       parts.push(
         'Durable facts remembered in previous sessions ([user]=你的偏好, [project]=本项目约定; only current values remain):\n' + lines.join('\n')
+      )
+    }
+    // Cross-project experience injection: experiences learned in OTHER
+    // projects that share a topic with this project. This is the
+    // "learn in project A, apply in project B" capability.
+    const ownTopics = new Set(p.items.flatMap((it) => it.topics || []))
+    const xp = crossProjectExperiences([...ownTopics], cwd, 3)
+    if (xp.length > 0) {
+      const xpLines = xp.map((e) => {
+        const proj = e.project.replace(/\\/g, '/').split('/').filter(Boolean).slice(-2).join('/')
+        return `- [experience from ${proj}] ${e.text}`
+      })
+      parts.push(
+        'Relevant experiences from OTHER projects (same topic — consider before repeating past mistakes):\n' + xpLines.join('\n')
       )
     }
     filtered.push({
