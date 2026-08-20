@@ -12,7 +12,9 @@
 
 export const name = 'dsh-igm-memory'
 
-const FACT_MARKERS = ['我', '我的', '喜欢', '是', '在', '去过', '住', '工作', '现在', '叫', '名字', '来自', '出生', '毕业', '擅长']
+const FACT_MARKERS = ['我', '我的', '喜欢', '是', '在', '去过', '住', '工作', '现在', '叫', '名字', '来自', '出生', '毕业', '擅长',
+  // project-scope facts (code development): "这个项目用 pnpm", "项目采用 X"
+  '这个项目', '项目用', '项目是', '项目采用', '项目', '仓库', '代码', '依赖', '技术栈', '构建', '部署', '约定', '架构']
 const QUESTION_MARKERS = ['什么', '吗', '？', '?', '哪', '怎么', '如何', '为什么']
 const SLOT_PREFIXES = ['现在的', '目前的', '新的', '原来的', '以前的', '当前的']
 const SLOT_ANCHORS = ['我的', '我']
@@ -67,6 +69,7 @@ export function importanceScore(text, maxSimToStore = 0) {
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import crypto from 'node:crypto'
 
 export class IgmStore {
   constructor(filePath = null) {
@@ -164,6 +167,10 @@ export const Config = z.object({
   // Optional explicit store file. Profiles can set this in their patch layer
   // to isolate memories per profile (e.g. web vs headless).
   storeFile: z.string().default(''),
+  // Per-project isolation: keep a separate memory file per working directory
+  // (keyed by session cwd), so project A's conventions never leak into
+  // project B. Default off (shared user memory).
+  perProject: z.boolean().default(false),
 })
 
 export const inject = ['tools', 'systemPrompt'] // model-facing tool + prompt injection
@@ -187,12 +194,34 @@ export function apply(ctx, config) {
   const slotMaxLen = config.slotMaxLen ?? 6
   const maxFactLen = config.maxFactLen ?? 200
   const maxInjectionBytes = config.maxInjectionBytes ?? 2048
+  const perProject = config.perProject ?? false
   const dshHome = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
-  const storeFile = config.storeFile
-    ? path.resolve(config.storeFile)
-    : path.join(dshHome, 'storages', 'igm-memory.json')
-  const store = new IgmStore(storeFile)
-  console.log(`[igm-memory] store file: ${store.file} (${store.size} persisted)`)
+
+  // Store manager: one store per cwd when perProject, else one shared store.
+  const stores = new Map()          // cwd -> IgmStore (per-project mode)
+  let sharedStore = null            // single store (default mode)
+  let currentCwd = null             // cwd of the most recent assembled session
+
+  const storePathFor = (cwd) => {
+    if (config.storeFile) return path.resolve(config.storeFile)
+    if (!perProject || !cwd) return path.join(dshHome, 'storages', 'igm-memory.json')
+    const hash = crypto.createHash('sha256').update(cwd).digest('hex').slice(0, 12)
+    return path.join(dshHome, 'storages', `igm-memory-${hash}.json`)
+  }
+
+  const storeFor = (cwd) => {
+    if (perProject) {
+      if (!cwd) cwd = currentCwd
+      if (!cwd) return sharedStore || (sharedStore = new IgmStore(storePathFor(null)))
+      let s = stores.get(cwd)
+      if (!s) {
+        s = new IgmStore(storePathFor(cwd))
+        stores.set(cwd, s)
+      }
+      return s
+    }
+    return sharedStore || (sharedStore = new IgmStore(storePathFor(null)))
+  }
 
   const log = (msg) => {
     // console.log is used deliberately: ctx.logger may not be injectable
@@ -205,24 +234,32 @@ export function apply(ctx, config) {
     return
   }
 
-  log(`enabled (threshold=${threshold}, slotMaxLen=${slotMaxLen})`)
+  log(`enabled (threshold=${threshold}, slotMaxLen=${slotMaxLen}, perProject=${perProject})`)
+  const bootStore = storeFor(null)
+  log(`store file: ${bootStore.file} (${bootStore.size} persisted)`)
 
   // Memory-write guard: expose a service so other plugins / the agent loop
   // can route memory candidates through the IGM gate.
   ctx.provide('igm.memory.write', (text) => {
+    const store = storeFor(currentCwd)
     const res = store.add(text, threshold, slotMaxLen, maxFactLen)
     log(res.kept ? `kept [${res.item.slot || 'none'}] ${text.slice(0, 40)}` : `filtered: ${text.slice(0, 40)}`)
     return res
   })
 
-  ctx.provide('igm.memory.query', (text) => store.query(text, 3, slotMaxLen))
+  ctx.provide('igm.memory.query', (text) => storeFor(currentCwd).query(text, 3, slotMaxLen))
 
-  ctx.provide('igm.memory.stats', () => ({
-    stored: store.size,
-    items: store.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
-  }))
+  ctx.provide('igm.memory.stats', () => {
+    const store = storeFor(currentCwd)
+    return {
+      stored: store.size,
+      cwd: currentCwd,
+      items: store.items.map((it) => ({ text: it.text, slot: it.slot, reuseCount: it.reuseCount || 0 })),
+    }
+  })
 
   ctx.provide('igm.memory.consolidate', (maxAgeDays = 30, minScore = 0.5) => {
+    const store = storeFor(currentCwd)
     const removed = store.consolidate(maxAgeDays, minScore)
     log(`consolidate removed ${removed} (${store.size} remain)`)
     return { removed, remaining: store.size }
@@ -258,6 +295,7 @@ export function apply(ctx, config) {
       },
     },
     async execute(args) {
+      const store = storeFor(currentCwd)
       const res = store.add(args.fact, threshold, slotMaxLen, maxFactLen)
       const memory = store.items.map((it) => ({ text: it.text, slot: it.slot }))
       if (res.kept) {
@@ -303,6 +341,7 @@ export function apply(ctx, config) {
     },
     async execute() {
       // Retrieve via query() so reused facts are tracked for consolidation.
+      const store = storeFor(currentCwd)
       const hits = store.query('', store.size, slotMaxLen)
       const memory = hits.map((it) => ({ text: it.text, slot: it.slot }))
       log(`recall -> ${memory.length} facts`)
@@ -317,6 +356,14 @@ export function apply(ctx, config) {
   ctx.on('system-prompt/assemble', async (assembly, context, next) => {
     const assembled = await next()
     if (!enabled) return assembled
+    // Resolve the session's working directory for per-project memory.
+    const session = context?.agent?.session
+    const cwd = session?.cwd || session?.meta?.cwd || null
+    if (cwd) {
+      currentCwd = cwd
+      log(`session cwd: ${cwd}`)
+    }
+    const store = storeFor(cwd)
     const sectionName = 'igm-memory'
     const sections = Array.isArray(assembled?.sections) ? assembled.sections : []
     const filtered = sections.filter((s) => s?.name !== sectionName)
