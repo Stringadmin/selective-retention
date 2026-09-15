@@ -7,8 +7,9 @@ IGM sits in front of a vector store and decides **what gets written** and
 
     mem = Memory()                                  # zero-dependency defaults
     mem.add("我的住址是北京。")
-    mem.add("更新一下，我的住址现在是深圳了。")        # supersedes the old value
+    mem.add("更新一下，我的住址现在是深圳了。")        # closes the Beijing event's interval
     mem.query("我现在的住址是什么？")                  # -> the Shenzhen fact only
+    mem.history("住址")                               # -> both events, Beijing then Shenzhen
 
 To use a real embedding model:
 
@@ -20,7 +21,7 @@ from __future__ import annotations
 
 from .embedders import Embedder, HashEmbedder, cosine
 from .gate import Scorer, WriteGate
-from .store import MemoryItem, MemoryStore
+from .store import SUPERSEDE_ARCHIVE, MemoryItem, MemoryStore
 
 
 class Memory:
@@ -34,8 +35,9 @@ class Memory:
         decay: float = 0.0,
         prune_threshold: float = 0.1,
         top_k: int = 5,
+        supersede: str = SUPERSEDE_ARCHIVE,
     ):
-        self.store = MemoryStore(embedder or HashEmbedder(), decay=decay)
+        self.store = MemoryStore(embedder or HashEmbedder(), decay=decay, supersede=supersede)
         self.gate = WriteGate(scorer, threshold=write_threshold)
         self.prune_threshold = prune_threshold
         self.top_k = top_k
@@ -45,7 +47,9 @@ class Memory:
     # ------------------------------------------------------------------ write
     def add(self, text: str, metadata: dict | None = None) -> MemoryItem | None:
         """Consider a candidate memory.  Returns the stored item, or None if
-        the gate rejected it.  Facts about the same attribute supersede."""
+        the gate rejected it.  A fact about the same attribute closes the
+        previous value's validity interval; the old event stays in the archive.
+        """
         self.n_considered += 1
         self.store.tick()
         max_sim = self._max_sim(text)
@@ -58,10 +62,14 @@ class Memory:
         return item
 
     def _max_sim(self, text: str) -> float:
-        if not self.store.items:
+        # Archived events are deliberately skipped: on the second and later
+        # update to one slot, the superseded predecessors would make the new
+        # update look already-known and the gate would drop it.
+        current = self.store.current()[-200:]
+        if not current:
             return 0.0
         emb = self.store.embedder.embed(text)
-        return max(cosine(emb, it.embedding) for it in self.store.items[-200:])
+        return max(cosine(emb, it.embedding) for it in current)
 
     # --------------------------------------------------------------- retrieve
     def query(self, text: str, top_k: int | None = None) -> list[MemoryItem]:
@@ -79,6 +87,14 @@ class Memory:
     def query_texts(self, text: str, top_k: int | None = None) -> list[str]:
         return [it.text for it in self.query(text, top_k)]
 
+    def history(self, slot: str) -> list[MemoryItem]:
+        """Every value ever stored for ``slot``, oldest first."""
+        return self.store.history(slot)
+
+    def previous(self, slot: str) -> MemoryItem | None:
+        """The value ``slot`` held before its current one, or None."""
+        return self.store.previous(slot)
+
     # --------------------------------------------------------------- lifecycle
     def consolidate(self) -> int:
         """Forget low-value memories.  Call at a session/day boundary."""
@@ -88,10 +104,12 @@ class Memory:
     def stats(self) -> dict:
         return {
             "stored": len(self.store),
+            "archived": self.store.event_count - len(self.store),
             "considered": self.n_considered,
             "written": self.n_written,
             "selectivity": (self.n_written / self.n_considered) if self.n_considered else 0.0,
         }
 
     def __len__(self) -> int:
+        """Size of the current projection.  ``store.event_count`` is the archive."""
         return len(self.store)

@@ -29,6 +29,9 @@ from igm import (
     ("我现在的最喜欢的食物是什么？", "最喜欢的食物"),
     ("我的宠物是什么？", "宠物"),
     ("user: 我想告诉你，我的最喜欢的颜色是蓝色。", "最喜欢的颜色"),
+    ("我之前的住址是什么？", "住址"),
+    ("我上一次的常用语言是什么", "常用语言"),
+    ("我上次的工位是什么？", "工位"),
 ])
 def test_extract_slot_matches_fact_and_query(text, expected):
     assert extract_slot(text) == expected
@@ -67,14 +70,52 @@ def test_learned_scorer_prefers_facts():
 # slot supersede (the headline behaviour)
 # ---------------------------------------------------------------------------
 
-def test_slot_supersede_replaces_old_value():
+def test_slot_supersede_archives_the_predecessor():
     store = MemoryStore(HashEmbedder())
     store.write("user: 我的住址是北京。", slot="住址")
     store.write("user: 我的宠物是一只猫。", slot="宠物")
     store.write("user: 我的住址现在是深圳了。", slot="住址")
     assert len(store) == 2
-    addr = [it for it in store.items if it.slot == "住址"]
+    # The current view carries only the new value...
+    addr = store.current("住址")
     assert len(addr) == 1 and "深圳" in addr[0].text and "北京" not in addr[0].text
+    # ...but the superseded value was closed, not destroyed.
+    assert [it.text for it in store.history("住址")] == [
+        "user: 我的住址是北京。",
+        "user: 我的住址现在是深圳了。",
+    ]
+    assert store.event_count == 3 and store.active_count == 2
+
+
+def test_closed_event_keeps_its_validity_interval():
+    store = MemoryStore(HashEmbedder())
+    store.clock = 1.0
+    first = store.write("user: 我的住址是北京。", slot="住址")
+    store.clock = 2.0
+    second = store.write("user: 我的住址现在是深圳了。", slot="住址")
+    assert first.valid_to == 2.0 and not first.is_current
+    assert second.valid_to is None and second.supersedes == first.event_id
+    assert store.previous("住址") is first
+
+
+def test_retrieve_hides_archived_versions_by_default():
+    store = MemoryStore(HashEmbedder())
+    store.write("user: 我的住址是北京。", slot="住址")
+    store.write("user: 我的住址现在是深圳了。", slot="住址")
+    assert len(store.retrieve("我现在的住址是什么？", top_k=5, slot="住址")) == 1
+    assert len(store.retrieve("我现在的住址是什么？", top_k=5, include_history=True)) == 2
+
+
+def test_delete_supersede_stays_destructive():
+    store = MemoryStore(HashEmbedder(), supersede="delete")
+    store.write("user: 我的住址是北京。", slot="住址")
+    store.write("user: 我的住址现在是深圳了。", slot="住址")
+    assert store.event_count == 1 and store.history("住址")[0].valid_to is None
+
+
+def test_unknown_supersede_policy_is_rejected():
+    with pytest.raises(ValueError):
+        MemoryStore(HashEmbedder(), supersede="merge")
 
 
 def test_memory_add_supersedes_via_gate():
@@ -84,6 +125,26 @@ def test_memory_add_supersedes_via_gate():
     results = mem.query_texts("我现在的住址是什么？")
     assert any("深圳" in r for r in results)
     assert not any("北京" in r for r in results)
+
+
+def test_memory_history_answers_the_previous_value():
+    mem = Memory(embedder=HashEmbedder())
+    mem.add("我的住址是北京。")
+    mem.add("更新一下，我的住址现在是深圳了。")
+    assert len(mem) == 1                      # current projection
+    assert mem.stats()["archived"] == 1       # cost of keeping the version
+    assert "北京" in mem.previous("住址").text
+
+
+def test_repeated_updates_do_not_gate_out_the_third_value():
+    # Archived predecessors must not count as "already known" when scoring the
+    # next update, or a chain of updates would stop after the second one.
+    mem = Memory(embedder=HashEmbedder())
+    mem.add("我的住址是北京。")
+    mem.add("更新一下，我的住址现在是深圳了。")
+    mem.add("再改一次，我的住址现在是杭州了。")
+    assert "杭州" in mem.store.current("住址")[0].text
+    assert len(mem.store.history("住址")) == 3
 
 
 # ---------------------------------------------------------------------------

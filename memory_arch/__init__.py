@@ -26,6 +26,10 @@ import os
 import time
 from dataclasses import dataclass, field
 
+from igm.embedders import cosine
+from igm.gate import extract_slot
+from igm.store import MemoryItem, MemoryStore
+
 # --------------------------------------------------------------------------
 # Data structures
 # --------------------------------------------------------------------------
@@ -91,80 +95,21 @@ class Embedder:
         norm = math.sqrt(sum(v * v for v in vec)) or 1.0
         return [v / norm for v in vec]
 
-
-def cosine(a: list[float], b: list[float]) -> float:
-    return sum(x * y for x, y in zip(a, b))
-
-
-@dataclass
-class MemoryItem:
-    text: str
-    embedding: list[float]
-    importance: float = 1.0      # consolidation strength
-    reuse_count: int = 0          # how often it was retrieved & used
-    created_at: float = 0.0
-    last_used: float = 0.0
-    slot: str | None = None       # attribute key (e.g. "住址"); same-slot writes supersede
+    def embed_many(self, texts: list[str], batch_size: int = 32) -> list[list[float]]:
+        """Embed a batch while preserving the scalar ``embed`` semantics."""
+        if self._st_model is not None:
+            vectors = self._st_model.encode(
+                texts,
+                normalize_embeddings=True,
+                batch_size=batch_size,
+                show_progress_bar=False,
+            )
+            return [[float(value) for value in vector] for vector in vectors]
+        return [self.embed(text) for text in texts]
 
 
-class MemoryStore:
-    """Vector memory with optional importance-based forgetting."""
-
-    def __init__(self, embedder: Embedder, decay: float = 0.0):
-        self.embedder = embedder
-        self.decay = decay        # forgetting rate per "time unit" (0 = never forget)
-        self.items: list[MemoryItem] = []
-        self.clock = 0.0
-
-    def write(self, text: str, importance: float = 1.0, slot: str | None = None) -> None:
-        # Knowledge-update semantics: a new fact for an existing slot
-        # supersedes the old one (the outdated value is forgotten).
-        if slot is not None:
-            self.items = [it for it in self.items if it.slot != slot]
-        self.items.append(MemoryItem(
-            text=text,
-            embedding=self.embedder.embed(text),
-            importance=importance,
-            created_at=self.clock,
-            last_used=self.clock,
-            slot=slot,
-        ))
-
-    def _effective_strength(self, item: MemoryItem) -> float:
-        """ACT-R-style: consolidation strength decays unless reused."""
-        age = self.clock - item.last_used
-        return item.importance * math.exp(-self.decay * age) * (1 + 0.1 * item.reuse_count)
-
-    def retrieve(self, query: str, top_k: int = 5, min_strength: float = 0.0,
-                 slot: str | None = None) -> list[MemoryItem]:
-        q = self.embedder.embed(query)
-        scored = []
-        for item in self.items:
-            strength = self._effective_strength(item)
-            if strength < min_strength:
-                continue  # forgotten
-            sim = cosine(q, item.embedding)
-            # Slot-aware routing: an exact attribute match is a strong,
-            # embedding-independent signal (fixes bag-of-words noise).
-            if slot is not None and item.slot == slot:
-                sim += 1.0
-            scored.append((sim * strength, item))
-        scored.sort(key=lambda x: x[0], reverse=True)
-        return [item for _, item in scored[:top_k]]
-
-    def mark_used(self, item: MemoryItem) -> None:
-        item.reuse_count += 1
-        item.last_used = self.clock
-        item.importance = min(item.importance * 1.05, 5.0)  # consolidation
-
-    def prune(self, threshold: float) -> int:
-        """Drop memories whose effective strength fell below threshold.  Returns count removed."""
-        before = len(self.items)
-        self.items = [it for it in self.items if self._effective_strength(it) >= threshold]
-        return before - len(self.items)
-
-    def __len__(self) -> int:
-        return len(self.items)
+# MemoryItem / MemoryStore / cosine come from igm so the experiment harness and
+# the shipped library cannot drift apart on supersede semantics.
 
 
 # --------------------------------------------------------------------------
@@ -310,9 +255,6 @@ class IGMMethod(BaseMethod):
     # Linguistic markers of a durable, self-referential fact about the user.
     _FACT_MARKERS = ("我", "我的", "喜欢", "是", "在", "去过", "住", "工作", "现在")
 
-    # Temporal/status prefixes that modify but are not part of the attribute.
-    _SLOT_PREFIXES = ("现在的", "目前的", "新的", "原来的", "以前的", "当前的")
-
     @staticmethod
     def _extract_slot(text: str) -> str | None:
         """Extract the attribute key from a self-referential fact of the form
@@ -320,25 +262,20 @@ class IGMMethod(BaseMethod):
         like '现在的' are stripped so a query '我现在的住址' and a fact
         '我的住址是...' map to the same slot.  Returns None if not an
         attribute-style statement/question."""
-        for anchor in ("我的", "我"):
-            if anchor in text:
-                rest = text.split(anchor, 1)[1]
-                for stop in ("现在是", "是什么", "是", "了", "。", "，", ",", "？", "?"):
-                    if stop in rest:
-                        attr = rest.split(stop, 1)[0].strip()
-                        for pref in IGMMethod._SLOT_PREFIXES:
-                            if attr.startswith(pref):
-                                attr = attr[len(pref):]
-                        if 0 < len(attr) <= 6:
-                            return attr
-        return None
+        return extract_slot(text)
 
     def _surprise(self, text: str) -> float:
-        """Novelty vs already-stored memories (1 = completely novel)."""
+        """Novelty vs the memories that are still current (1 = completely novel).
+
+        Archived predecessors are excluded on purpose: otherwise the second
+        update to one slot would look like a repeat of the first and the gate
+        would refuse it.
+        """
         emb = self.embedder.embed(text)
-        if not self.store.items:
+        current = self.store.current()[-200:]
+        if not current:
             return 1.0
-        sims = [cosine(emb, it.embedding) for it in self.store.items[-200:]]
+        sims = [cosine(emb, it.embedding) for it in current]
         return 1.0 - max(sims)
 
     def _importance(self, text: str) -> float:

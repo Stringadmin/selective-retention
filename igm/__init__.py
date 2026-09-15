@@ -3,7 +3,7 @@
 Public API:
     Memory                       the entry point
     WriteGate / Scorer           the write-side gate
-    MemoryStore / MemoryItem     the store with slot supersede + forgetting
+    MemoryStore / MemoryItem     event archive + current view: slot supersede, history, forgetting
     Embedder backends            HashEmbedder / SentenceTransformerEmbedder / CallableEmbedder
     LearnedScorer / HeuristicScorer
 """

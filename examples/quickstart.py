@@ -18,7 +18,7 @@ stream = [
     "我的住址是北京。",                        # fact — stored (slot: 住址)
     "最近在看一本书，挺有意思的。",            # filler — filtered out
     "我的职业是软件工程师。",                  # fact — stored (slot: 职业)
-    "更新一下，我的住址现在是深圳了。",        # update — supersedes 北京
+    "更新一下，我的住址现在是深圳了。",        # update — 北京 is closed, not destroyed
 ]
 
 for text in stream:
@@ -26,9 +26,13 @@ for text in stream:
     print(f"{'存' if kept else '滤'}  {text}")
 
 print()
-print("库存记忆:")
-for it in mem.store.items:
+print("当前记忆:")
+for it in mem.store.current():
     print(f"  [{it.slot or '-':6}] {it.text}")
+
+print()
+print(f"归档事件共 {mem.store.event_count} 条（含被取代的版本）")
+print("住址的历史:", [it.text for it in mem.history("住址")])
 
 print()
 print("查询: 我现在的住址是什么？")
