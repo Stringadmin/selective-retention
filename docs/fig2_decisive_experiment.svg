@@ -1,32 +1,65 @@
-<svg viewBox="0 0 680 400" width="680" height="400" xmlns="http://www.w3.org/2000/svg" font-family="SimHei, Microsoft YaHei, sans-serif">
-<title>决定性实验：连续更新场景下三种方法的准确率与记忆用量</title>
-<rect width="680" height="400" fill="#1a1a18"/>
+<svg viewBox="0 0 920 520" width="920" height="520" xmlns="http://www.w3.org/2000/svg" font-family="SimHei, Microsoft YaHei, sans-serif">
+  <title>受控连续更新机制示意：28 条容量条件下的更新与背景事实召回</title>
+  <rect width="920" height="520" fill="#1a1a18"/>
 
-<text x="40" y="50" font-size="14" font-weight="500" fill="#E8E6DF">连续 5 次更新后问"当前值"：准确率对比</text>
+  <text x="48" y="48" font-size="17" font-weight="500" fill="#E8E6DF">受控连续更新：28 条容量、24 条背景事实、5 条手工链</text>
+  <text x="48" y="74" font-size="12" fill="#A8A69F">BGE-small-zh；IGM 与 FIFO 均限制为 28 条；全量保留基线为 52 条</text>
 
-<line x1="70" y1="80" x2="70" y2="300" stroke="#5F5E5A" stroke-width="1"/>
-<line x1="70" y1="300" x2="650" y2="300" stroke="#5F5E5A" stroke-width="1"/>
-<text x="50" y="90" text-anchor="end" font-size="11" fill="#888780">100%</text>
-<text x="50" y="195" text-anchor="end" font-size="11" fill="#888780">50%</text>
-<text x="50" y="303" text-anchor="end" font-size="11" fill="#888780">0</text>
-<line x1="70" y1="86" x2="650" y2="86" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
-<line x1="70" y1="193" x2="650" y2="193" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
+  <text x="72" y="112" font-size="14" font-weight="500" fill="#E8E6DF">当前值准确率（5 条手工更新链）</text>
+  <line x1="72" y1="140" x2="72" y2="340" stroke="#5F5E5A" stroke-width="1"/>
+  <line x1="72" y1="340" x2="452" y2="340" stroke="#5F5E5A" stroke-width="1"/>
+  <text x="58" y="150" text-anchor="end" font-size="11" fill="#888780">100%</text>
+  <text x="58" y="250" text-anchor="end" font-size="11" fill="#888780">50%</text>
+  <text x="58" y="344" text-anchor="end" font-size="11" fill="#888780">0</text>
+  <line x1="72" y1="145" x2="452" y2="145" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
+  <line x1="72" y1="242" x2="452" y2="242" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
 
-<rect x="140" y="294" width="90" height="6" rx="2" fill="#A32D2D"/>
-<text x="185" y="282" text-anchor="middle" font-size="15" font-weight="500" fill="#F09595">0%</text>
-<text x="185" y="322" text-anchor="middle" font-size="12" fill="#B4B2A9">标准 RAG</text>
-<text x="185" y="340" text-anchor="middle" font-size="11" fill="#888780">信检索第一名</text>
+  <rect x="104" y="334" width="56" height="6" fill="#A32D2D"/>
+  <text x="132" y="323" text-anchor="middle" font-size="14" font-weight="500" fill="#F09595">0%</text>
+  <text x="132" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">FIFO</text>
+  <text x="132" y="380" text-anchor="middle" font-size="10" fill="#888780">语义 top-1</text>
 
-<rect x="330" y="171" width="90" height="129" fill="#BA7517"/>
-<text x="375" y="159" text-anchor="middle" font-size="15" font-weight="500" fill="#FAC775">60%</text>
-<text x="375" y="322" text-anchor="middle" font-size="12" fill="#B4B2A9">RAG + 时间排序</text>
-<text x="375" y="340" text-anchor="middle" font-size="11" fill="#888780">公平补救版</text>
+  <rect x="194" y="223" width="56" height="117" fill="#BA7517"/>
+  <text x="222" y="212" text-anchor="middle" font-size="14" font-weight="500" fill="#FAC775">60%</text>
+  <text x="222" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">FIFO</text>
+  <text x="222" y="380" text-anchor="middle" font-size="10" fill="#888780">top-3 + 时间</text>
 
-<rect x="520" y="86" width="90" height="214" fill="#0F6E56"/>
-<text x="565" y="74" text-anchor="middle" font-size="15" font-weight="500" fill="#5DCAA5">100%</text>
-<text x="565" y="322" text-anchor="middle" font-size="12" fill="#B4B2A9">RAG + IGM 写入层</text>
-<text x="565" y="340" text-anchor="middle" font-size="11" fill="#888780">slot 覆盖</text>
+  <rect x="284" y="145" width="56" height="195" fill="#0F6E56"/>
+  <text x="312" y="133" text-anchor="middle" font-size="14" font-weight="500" fill="#5DCAA5">100%</text>
+  <text x="312" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">IGM</text>
+  <text x="312" y="380" text-anchor="middle" font-size="10" fill="#888780">slot 覆盖</text>
 
-<rect x="40" y="352" width="600" height="40" rx="10" fill="#1C1C1A" stroke="#444441" stroke-width="0.5"/>
-<text x="60" y="376" font-size="12" fill="#B4B2A9">记忆用量：标准 RAG 28 条 / RAG+时间排序 28 条 / <tspan fill="#5DCAA5" font-weight="500">IGM 仅 4 条</tspan>　·　越少越准，因为根本不存旧值</text>
+  <rect x="374" y="145" width="56" height="195" fill="#378ADD"/>
+  <text x="402" y="133" text-anchor="middle" font-size="14" font-weight="500" fill="#85B7EB">100%</text>
+  <text x="402" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">全量 52 条</text>
+  <text x="402" y="380" text-anchor="middle" font-size="10" fill="#888780">属性 + 时间</text>
+
+  <text x="514" y="112" font-size="14" font-weight="500" fill="#E8E6DF">背景事实召回（24 条固定事实）</text>
+  <line x1="514" y1="140" x2="514" y2="340" stroke="#5F5E5A" stroke-width="1"/>
+  <line x1="514" y1="340" x2="870" y2="340" stroke="#5F5E5A" stroke-width="1"/>
+  <text x="500" y="150" text-anchor="end" font-size="11" fill="#888780">100%</text>
+  <text x="500" y="250" text-anchor="end" font-size="11" fill="#888780">50%</text>
+  <text x="500" y="344" text-anchor="end" font-size="11" fill="#888780">0</text>
+  <line x1="514" y1="145" x2="870" y2="145" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
+  <line x1="514" y1="242" x2="870" y2="242" stroke="#2C2C2A" stroke-width="0.5" stroke-dasharray="3 3"/>
+
+  <rect x="560" y="316" width="68" height="24" fill="#A32D2D"/>
+  <text x="594" y="305" text-anchor="middle" font-size="14" font-weight="500" fill="#F09595">12.5%</text>
+  <text x="594" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">FIFO 28 条</text>
+  <text x="594" y="380" text-anchor="middle" font-size="10" fill="#888780">语义 top-1</text>
+
+  <rect x="664" y="145" width="68" height="195" fill="#0F6E56"/>
+  <text x="698" y="133" text-anchor="middle" font-size="14" font-weight="500" fill="#5DCAA5">100%</text>
+  <text x="698" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">IGM 28 条</text>
+  <text x="698" y="380" text-anchor="middle" font-size="10" fill="#888780">slot 路由</text>
+
+  <rect x="768" y="145" width="68" height="195" fill="#378ADD"/>
+  <text x="802" y="133" text-anchor="middle" font-size="14" font-weight="500" fill="#85B7EB">100%</text>
+  <text x="802" y="363" text-anchor="middle" font-size="11" fill="#B4B2A9">全量 52 条</text>
+  <text x="802" y="380" text-anchor="middle" font-size="10" fill="#888780">语义 top-1</text>
+
+  <line x1="48" y1="416" x2="872" y2="416" stroke="#444441" stroke-width="0.5"/>
+  <text x="48" y="446" font-size="12" fill="#D0CEC6">结论：IGM 不是唯一的正确方案。全量记录配合显式属性与时间语义也能答对，但保留 52 条历史。</text>
+  <text x="48" y="472" font-size="12" fill="#D0CEC6">FIFO 可通过激进淘汰改善当前值，却会丢失早期长期事实；更新与遗忘策略决定取舍。</text>
+  <text x="48" y="500" font-size="10" fill="#888780">机制示意，5 条手工链；不代表随机化负载、LongMemEval 或所有 RAG 系统。</text>
 </svg>
