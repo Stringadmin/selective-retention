@@ -39,5 +39,8 @@
   "dependencies": {
     "schemastery": "3.18.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@deepseek-ai/dsh-tools": "0.0.1-rc.1"
+  }
 }

@@ -2,25 +2,50 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const pluginRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const mod = await import(path.join(pluginRoot, 'lib/index.js'))
-const { IgmStore, extractSlot, importanceScore, inferMemoryType } = mod
+// path.join() yields a Windows absolute path, which is not a valid file:// URL
+// for the ESM loader (ERR_UNSUPPORTED_ESM_URL_SCHEME).
+const mod = await import(pathToFileURL(path.join(pluginRoot, 'lib/index.js')).href)
+const { IgmStore, extractSlot, importanceScore, inferMemoryType, versionTimeline } = mod
 
 let pass = 0
+let xfailed = 0
+let registered = 0
+let finished = 0
 const tempDirs = []
 
-const test = async (name, fn) => {
+// `pin` marks a known defect, mirroring pytest.mark.xfail(strict=True) in
+// tests/test_slot_ood.py: the assertion describes the DESIRED behavior, stays
+// quiet while the defect stands, and fails the suite on XPASS so the pin gets
+// deleted once the rule is fixed. Only assertion failures count as expected — a
+// missing oracle or a TypeError is a real failure. Callers must await: an
+// unawaited test races the final process.exit() and can be skipped silently.
+const test = async (name, fn, pin = null) => {
+  registered++
   try {
     await fn()
-    pass++
-    console.log(`  ok  ${name}`)
+    if (pin) {
+      console.error(`FAIL XPASS ${name}: 缺陷已修复，删除这条 pin 让断言真正生效 — ${pin}`)
+      process.exitCode = 1
+    } else {
+      pass++
+      console.log(`  ok  ${name}`)
+    }
   } catch (error) {
-    console.error(`FAIL ${name}: ${error.stack || error.message}`)
-    process.exitCode = 1
+    if (pin && error?.code === 'ERR_ASSERTION') {
+      xfailed++
+      console.log(`  xfail  ${name} — ${pin}`)
+    } else {
+      console.error(`FAIL ${name}: ${error.stack || error.message}`)
+      process.exitCode = 1
+    }
   }
+  finished++
 }
+
+const xfail = (name, reason, fn) => test(name, fn, reason)
 
 const tempDir = () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'igm-test-'))
@@ -53,6 +78,7 @@ const createPlugin = (dshHome, rawConfig = {}) => {
     services,
     remember: tools.find((tool) => tool.name === 'remember_fact'),
     recall: tools.find((tool) => tool.name === 'recall_fact'),
+    history: tools.find((tool) => tool.name === 'recall_history'),
     toolNames: tools.map((tool) => tool.name).sort(),
   }
 }
@@ -77,24 +103,32 @@ await test('memory types distinguish facts, decisions, and experiences', () => {
   assert.equal(inferMemoryType('这个项目踩过一个打包路径的坑。'), 'experience')
 })
 
-await test('slot supersede removes the old value', () => {
+await test('slot supersede masks the old value and keeps it archived', () => {
   const store = new IgmStore()
   store.add('我的住址是北京。')
   store.add('我的住址现在是深圳了。')
   assert.equal(store.size, 1)
-  assert.match(store.items[0].text, /深圳/)
+  assert.equal(store.eventCount, 2)
+  assert.match(store.current()[0].text, /深圳/)
+  assert.deepEqual(store.history('住址').map((item) => item.text), [
+    '我的住址是北京。',
+    '我的住址现在是深圳了。',
+  ])
+  assert.equal(store.history('住址')[0].validTo !== null, true)
 })
 
-await test('identical project memories deduplicate and slot updates replace', () => {
+await test('identical project memories deduplicate and slot updates supersede', () => {
   const store = new IgmStore()
   const first = store.add('这个项目使用 pnpm 作为包管理器。')
   const duplicate = store.add('这个项目使用 pnpm 作为包管理器。')
   assert.equal(first.kept, true)
   assert.equal(duplicate.deduped, true)
   assert.equal(store.size, 1)
+  assert.equal(store.eventCount, 1)   // a verbatim restatement is not a new version
   store.add('这个项目使用 bun 作为包管理器。')
   assert.equal(store.size, 1)
-  assert.match(store.items[0].text, /bun/)
+  assert.equal(store.eventCount, 2)   // a changed value is
+  assert.match(store.current()[0].text, /bun/)
 })
 
 await test('store rejects invalid and oversized values', () => {
@@ -118,7 +152,11 @@ await test('persistence survives restart and corrupt files are tolerated', () =>
   first.add('我的住址现在是深圳了。')
   const restarted = new IgmStore(file)
   assert.equal(restarted.size, 1)
-  assert.match(restarted.items[0].text, /深圳/)
+  assert.match(restarted.current()[0].text, /深圳/)
+  // The superseded value must survive the round-trip too, still closed.
+  assert.equal(restarted.eventCount, 2)
+  assert.match(restarted.items[0].text, /北京/)
+  assert.ok(restarted.items[0].validTo !== null)
 
   const corrupt = path.join(dir, 'corrupt.json')
   fs.writeFileSync(corrupt, '{not valid json')
@@ -140,6 +178,42 @@ await test('legacy project items receive safe type and scope metadata', () => {
   assert.equal(store.items[0].type, 'fact')
   assert.equal(store.items[0].scope, 'project')
   assert.equal(store.items[0].projectId, 'legacy-id')
+})
+
+await test('a v1 store file upgrades to versioned supersede on first update', () => {
+  const file = path.join(tempDir(), 'v1-memory.json')
+  fs.writeFileSync(file, JSON.stringify({
+    items: [{ text: '我的住址是北京。', slot: '住址', score: 0.9, ts: Date.now() }],
+  }))
+  const store = new IgmStore(file)
+  assert.equal(store.size, 1)                       // no validTo -> current
+  assert.ok(store.items[0].eventId >= 1)
+  store.add('我的住址现在是深圳了。')
+  assert.equal(store.size, 1)
+  assert.equal(store.eventCount, 2)
+  assert.match(store.current()[0].text, /深圳/)
+  assert.equal(store.current()[0].supersedes, 1)
+})
+
+await test('versionTimeline routes a history question to the archived versions', () => {
+  const store = new IgmStore()
+  store.add('我的住址是北京。')
+  store.add('我的住址现在是深圳了。')
+  const { slot, versions } = versionTimeline(store, '我之前的住址是什么？')
+  assert.equal(slot, '住址')
+  assert.deepEqual(versions.map((v) => v.text), [
+    '我的住址是北京。',
+    '我的住址现在是深圳了。',
+  ])
+  assert.deepEqual(versions.map((v) => v.current), [false, true])
+  assert.ok(versions[0].archivedAt > 0)
+})
+
+await test('versionTimeline returns an empty timeline when no attribute matches', () => {
+  const store = new IgmStore()
+  store.add('我的住址是北京。')
+  assert.deepEqual(versionTimeline(store, '今天天气怎么样？'), { slot: null, versions: [] })
+  assert.deepEqual(versionTimeline(store, '我之前的宠物是什么？').versions, [])
 })
 
 await test('query persists reuse count and last-used time', () => {
@@ -175,7 +249,7 @@ await test('tool calls route by their own session under interleaving', async () 
   const projectA = path.join(home, 'project-a')
   const projectB = path.join(home, 'project-b')
   const plugin = createPlugin(home)
-  assert.deepEqual(plugin.toolNames, ['recall_fact', 'remember_fact'])
+  assert.deepEqual(plugin.toolNames, ['recall_fact', 'recall_history', 'remember_fact'])
 
   await plugin.events['system-prompt/assemble']({}, { agent: { session: { header: { cwd: projectB } } } }, async () => ({ sections: [] }))
   await Promise.all([
@@ -191,6 +265,26 @@ await test('tool calls route by their own session under interleaving', async () 
   assert.doesNotMatch(textA, /用 npm。/)
   assert.match(textB, /用 npm。/)
   assert.doesNotMatch(textB, /pnpm/)
+})
+
+await test('recall_history answers what a value used to be', async () => {
+  const home = tempDir()
+  const exec = execFor(path.join(home, 'project'))
+  const plugin = createPlugin(home)
+  await plugin.remember.execute({ fact: '我的住址是北京。' }, exec)
+  await plugin.remember.execute({ fact: '我的住址现在是深圳了。' }, exec)
+
+  const hit = await plugin.history.execute({ fact: '我之前的住址是什么？' }, exec)
+  assert.equal(hit.slot, '住址')
+  assert.deepEqual(hit.versions.map((v) => v.text), [
+    '我的住址是北京。',
+    '我的住址现在是深圳了。',
+  ])
+  assert.deepEqual(hit.versions.map((v) => v.current), [false, true])
+
+  const miss = await plugin.history.execute({ fact: '我之前的宠物是什么？' }, exec)
+  assert.equal(miss.slot, '宠物')
+  assert.deepEqual(miss.versions, [])
 })
 
 await test('cross-project recall survives restart and migrates only experiences', async () => {
@@ -250,7 +344,92 @@ await test('injection carries typed memories within a UTF-8 byte budget', async 
   assert.match(section.text, /cite it as previously stated/)
 })
 
+// The Python write gate owns the slot OOD oracle. This standalone JavaScript
+// fixture is held to the same oracle so the production-shaped copy cannot
+// drift silently.
+const oraclePath = path.join(pluginRoot, '..', 'reports', 'slot-ood-baseline.json')
+const slotOracle = fs.existsSync(oraclePath)
+  ? JSON.parse(fs.readFileSync(oraclePath, 'utf8')).oracle
+  : null
+
+// An empty oracle would make every parity assertion below pass vacuously, so
+// validate the structure first: the labelled sets must be non-empty and their
+// texts must be exactly the keys of `slots` and `write_pairs`. tests/test_slot_ood.py
+//::test_oracle_covers_every_corpus_text ties these label sets back to the live
+// corpus, which closes the chain from corpus -> labels -> compared texts.
+const requireOracle = () => {
+  assert.ok(slotOracle, `missing ${oraclePath}: run python -m memory_arch.run_slot_ood`)
+  const { slots, not_attribute: notAttribute, named_attribute: namedAttribute } = slotOracle
+  const { update_chains: updateChains, collisions, write_pairs: writePairs } = slotOracle
+  assert.ok(notAttribute.length > 0 && Object.keys(namedAttribute).length > 0, 'oracle 标签集为空')
+  const labelled = new Set([
+    ...notAttribute,
+    ...Object.keys(namedAttribute),
+    ...updateChains.flatMap((chain) => [chain.old, chain.new]),
+    ...collisions.flatMap((pair) => [pair.first, pair.second]),
+  ])
+  assert.ok(labelled.size > 0, 'oracle 没有任何用例')
+  assert.deepEqual(
+    Object.keys(slots).sort(), [...labelled].sort(),
+    'oracle.slots 未覆盖全部标注句（parity 断言会静默缩样）',
+  )
+  assert.equal(Object.keys(writePairs).length, updateChains.length + collisions.length,
+    'oracle.write_pairs 数量与用例数不符')
+  return slotOracle
+}
+
+const storedAfter = (texts) => {
+  const store = new IgmStore()
+  for (const text of texts) store.add(text)
+  return store.current().map((item) => item.text)
+}
+
+await test('extractSlot agrees with igm/gate.py on the labelled OOD corpus', () => {
+  const { slots } = requireOracle()
+  const diffs = Object.entries(slots)
+    .filter(([text, expected]) => extractSlot(text) !== expected)
+    .map(([text, expected]) => `${text} -> py=${JSON.stringify(expected)} js=${JSON.stringify(extractSlot(text))}`)
+  assert.deepEqual(diffs, [], `第三份规则与 Python 实现分歧（${diffs.length} 处）`)
+})
+
+await test('write-layer outcome matches igm/store.py on the labelled pairs', () => {
+  const { write_pairs: writePairs } = requireOracle()
+  const diffs = Object.entries(writePairs)
+    .filter(([pair, expected]) => JSON.stringify(storedAfter(pair.split('||'))) !== JSON.stringify(expected))
+    .map(([pair, expected]) => `${pair} -> py=${JSON.stringify(expected)} js=${JSON.stringify(storedAfter(pair.split('||')))}`)
+  assert.deepEqual(diffs, [], `覆盖/淘汰结果与 Python 存储层分歧（${diffs.length} 处）`)
+})
+
+await test('interjections and quoted stances yield no slot', () => {
+    const { not_attribute: notAttribute } = requireOracle()
+    for (const text of notAttribute) assert.equal(extractSlot(text), null, text)
+  })
+
+await test('an off-template update leaves exactly one current value', () => {
+    const { update_chains: updateChains } = requireOracle()
+    for (const chain of updateChains.filter((item) => item.defect)) {
+      assert.deepEqual(storedAfter([chain.old, chain.new]), [chain.new], `${chain.attribute}: ${chain.defect}`)
+    }
+  })
+
+await test('a tense modifier never splits one attribute into two keys', () => {
+    const { update_chains: updateChains } = requireOracle()
+    const chains = updateChains.filter((item) => item.defect && item.defect.includes('键不稳定'))
+    assert.ok(chains.length > 0, 'oracle 缺少时态修饰用例')
+    for (const chain of chains) {
+      assert.equal(extractSlot(chain.new), extractSlot(chain.old), chain.attribute)
+      assert.equal(extractSlot(chain.new), chain.attribute, chain.defect)
+    }
+  })
+
 for (const dir of tempDirs) fs.rmSync(dir, { recursive: true, force: true })
 
-console.log(`\n${pass} tests passed` + (process.exitCode ? ' (with failures)' : ''))
+// A test() call without await races the exit below and can be skipped silently.
+if (finished !== registered) {
+  console.error(`FAIL ${registered - finished} test(s) never finished: an await is missing`)
+  process.exitCode = 1
+}
+
+console.log(`\n${pass} tests passed` + (xfailed ? `, ${xfailed} xfailed` : '')
+  + (process.exitCode ? ' (with failures)' : ''))
 process.exit(process.exitCode || 0)

@@ -20,9 +20,9 @@ const FACT_MARKERS = ['我', '我的', '喜欢', '是', '在', '去过', '住', 
 const QUESTION_MARKERS = ['什么', '吗', '？', '?', '哪', '怎么', '如何', '为什么']
 const EXPERIENCE_MARKERS = ['踩过', '坑', '根因', '教训', '下次', '别再', '曾经失败', '修复后', '解决办法', '注意事项']
 const DECISION_MARKERS = ['决定', '选择', '选了', '方案', '采用']
-const SLOT_PREFIXES = ['现在的', '目前的', '新的', '原来的', '以前的', '当前的']
-const SLOT_ANCHORS = ['我的', '我']
-const SLOT_STOPS = ['现在是', '是什么', '是', '了', '。', '，', ',', '？', '?']
+const SLOT_PREFIXES = ['现在的', '目前的', '新的', '原来的', '以前的', '当前的', '之前的', '上一次的', '上次的']
+const NON_ATTRIBUTE_PREFIXES = new Set(['天', '天哪', '意思', '想法'])
+const NON_ATTRIBUTE_UTTERANCE_PREFIXES = ['我说的', '我让你', '我现在不', '我去过', '我在想', '我就知道']
 
 // Topic dictionary: maps keywords to canonical topics so experiences can be
 // matched ACROSS projects ("electron packaging gotcha" learned in project A
@@ -52,22 +52,36 @@ export function extractTopics(text) {
   return found
 }
 
-export function extractSlot(text, maxLen = 6) {
-  for (const anchor of SLOT_ANCHORS) {
-    const ai = text.indexOf(anchor)
-    if (ai < 0) continue
-    const rest = text.slice(ai + anchor.length)
-    for (const stop of SLOT_STOPS) {
-      const si = rest.indexOf(stop)
-      if (si >= 0) {
-        let attr = rest.slice(0, si).trim()
-        for (const pref of SLOT_PREFIXES) {
-          if (attr.startsWith(pref)) attr = attr.slice(pref.length)
-        }
-        if (attr.length > 0 && attr.length <= maxLen) return attr
+export function extractSlot(text, maxLen = 64) {
+  if (typeof text !== 'string' || !text.trim()) return null
+  const compact = text.replace(/\s+/g, '')
+  if (NON_ATTRIBUTE_UTTERANCE_PREFIXES.some((prefix) => compact.startsWith(prefix))) return null
+
+  const clean = (raw) => {
+    let attr = raw.trim().replace(/\s+/g, '')
+    for (const prefix of SLOT_PREFIXES) {
+      if (attr.startsWith(prefix)) {
+        attr = attr.slice(prefix.length)
+        break
       }
     }
+    return attr && !NON_ATTRIBUTE_PREFIXES.has(attr) && attr.length <= maxLen ? attr : null
   }
+
+  const patterns = [
+    /我在[^，,。！？?!]{1,16}的(?<attr>[^，,。！？?!]{1,16}?)(?:搬到|改成|换成)/,
+    /我把(?<attr>[^，,。！？?!]{1,16}?)(?:改成|换成|设为|设置为)/,
+    /我(?:用的|使用的)(?<attr>[^，,。！？?!]{1,16}?)(?:是|叫)/,
+    /我的(?:手机号|手机号码|账号)的(?<attr>[^，,。！？?!]{1,16}?)(?:从|是|改成|换成)/,
+    /我的(?<attr>[^，,。！？?!]{1,32}?)(?:现在是|目前是|是什么|是|叫|改成|换成|从)/,
+  ]
+  for (const pattern of patterns) {
+    const match = compact.match(pattern)
+    const slot = match ? clean(match.groups.attr) : null
+    if (slot !== null) return slot
+  }
+  const query = compact.match(/我(?<attr>[^，,。！？?!]{1,32}?)(?:是什么|现在是)/)
+  if (query) return clean(query.groups.attr)
   return null
 }
 
@@ -118,6 +132,7 @@ export class IgmStore {
     this.items = []
     this.file = filePath
     this.defaults = defaults
+    this._nextEventId = 1
     if (filePath) this.load()
   }
 
@@ -131,6 +146,12 @@ export class IgmStore {
         this.items = data.items
           .filter((it) => it && typeof it.text === 'string')
           .map((it) => this.normalizeItem(it))
+        let assigned = 0
+        for (const item of this.items) {
+          if (item.eventId === null) item.eventId = ++assigned
+          else assigned = Math.max(assigned, item.eventId)
+        }
+        this._nextEventId = assigned + 1
       }
     } catch {
       this.items = [] // missing/corrupt file -> start fresh
@@ -143,6 +164,11 @@ export class IgmStore {
     return {
       ...item,
       slot: typeof item.slot === 'string' ? item.slot : null,
+      // A record written before versioned supersede had no validTo; it is
+      // current unless something newer already closed it.
+      validTo: Number.isFinite(item.validTo) ? item.validTo : null,
+      eventId: Number.isFinite(item.eventId) ? item.eventId : null,
+      supersedes: Number.isFinite(item.supersedes) ? item.supersedes : null,
       score: Number.isFinite(item.score) ? item.score : 0,
       ts: Number.isFinite(item.ts) ? item.ts : 0,
       reuseCount: Number.isFinite(item.reuseCount) ? item.reuseCount : 0,
@@ -184,11 +210,12 @@ export class IgmStore {
       cwd: metadata.cwd || this.defaults.cwd || null,
       provenance: metadata.provenance || 'service',
     }
-    // Text-level dedup: identical or near-identical facts (even without a
-    // slot) update the existing entry instead of appending a duplicate.
+    // Text-level dedup: restating the identical fact refreshes the existing
+    // entry instead of appending a duplicate.  Only exact text counts here —
+    // a different sentence about the same attribute is an update, not a dupe.
+    const current = this.current()
     const norm = text.replace(/\s+/g, '')
-    const existing = this.items.find((it) => it.slot !== null && it.slot === slot)
-      || this.items.find((it) => it.text.replace(/\s+/g, '') === norm)
+    const existing = current.find((it) => it.text.replace(/\s+/g, '') === norm)
     if (existing) {
       existing.text = text
       existing.score = score
@@ -198,19 +225,35 @@ export class IgmStore {
       this.save()
       return { kept: true, item: existing, score, deduped: true }
     }
-    if (slot !== null) {
-      this.items = this.items.filter((it) => it.slot !== slot) // supersede
+    // Slot supersede, versioned: the previous event is closed rather than
+    // dropped, so a mis-extracted key masks the old value instead of destroying
+    // it, and history(slot) can still answer "what was it before?".
+    const previous = slot === null ? null : current.find((it) => it.slot === slot)
+    if (previous) previous.validTo = now
+    const item = {
+      text, slot, score, ts: now, reuseCount: 0, lastUsedAt: 0, topics,
+      validTo: null, eventId: this._nextEventId++,
+      supersedes: previous ? previous.eventId : null,
+      ...itemMetadata,
     }
-    const item = { text, slot, score, ts: now, reuseCount: 0, lastUsedAt: 0, topics, ...itemMetadata }
     this.items.push(item)
     this.save()
     return { kept: true, item, score }
   }
 
+  // The current-state projection: what retrieval, injection and the tools show.
+  current() {
+    return this.items.filter((item) => item.validTo === null)
+  }
+
+  history(slot) {
+    return this.items.filter((item) => item.slot === slot)
+  }
+
   query(text, topK = 3, maxSlotLen = 6) {
     if (typeof text !== 'string' || topK <= 0) return []
     const slot = extractSlot(text, maxSlotLen)
-    const scored = this.items.map((item) => {
+    const scored = this.current().map((item) => {
       let s = item.score
       if (slot !== null && item.slot === slot) s += 1 // slot-aware routing boost
       return { item, s }
@@ -222,7 +265,7 @@ export class IgmStore {
   }
 
   // Retrieval = use: update only items owned by this store and persist once.
-  touch(items = this.items) {
+  touch(items = this.current()) {
     const owned = new Set(this.items)
     const now = Date.now()
     let touched = 0
@@ -253,8 +296,26 @@ export class IgmStore {
   }
 
   get size() {
+    return this.current().length
+  }
+
+  get eventCount() {
     return this.items.length
   }
+}
+
+// Version timeline for one attribute, routed from a natural-language query
+// ("我之前的住址是什么").  Exported for tests; the recall_history tool wraps it.
+export function versionTimeline(store, query, maxSlotLen = 6) {
+  const slot = typeof query === 'string' ? extractSlot(query, maxSlotLen) : null
+  if (slot === null) return { slot: null, versions: [] }
+  const versions = store.history(slot).map((item) => ({
+    text: item.text,
+    storedAt: item.ts || 0,
+    archivedAt: item.validTo,
+    current: item.validTo === null,
+  }))
+  return { slot, versions }
 }
 
 // ---------------------------------------------------------------- dsh plugin
@@ -277,7 +338,7 @@ export const inject = ['tools', 'systemPrompt'] // model-facing tool + prompt in
 const TOOL_NAME = 'remember_fact'
 const TOOL_DESCRIPTION =
   'Store a durable fact, decision, or reusable experience about the user or current project. ' +
-  'Facts about the same attribute are replaced by the newest value. Questions and chit-chat are rejected. ' +
+  'Facts about the same attribute are replaced by the newest value, which stays the only current one; the superseded value is archived. Questions and chit-chat are rejected. ' +
   'Use memoryType=experience only for reusable lessons or root causes; only experiences may transfer across projects.'
 
 const RECALL_NAME = 'recall_fact'
@@ -286,6 +347,12 @@ const RECALL_DESCRIPTION =
   'Call this BEFORE answering when the user asks about something that may have been stated in a previous session, ' +
   'or when you are about to rely on a preference/convention. When you use a fact from memory, tell the user its source ' +
   '(e.g. "根据你之前说的..." / "按项目约定，之前记过..."). Returns current values only.'
+
+const HISTORY_NAME = 'recall_history'
+const HISTORY_DESCRIPTION =
+  "Retrieve the ARCHIVED previous values of one attribute — what it used to be before the latest update. " +
+  'Call this when the user asks "之前/上一次 X 是什么" or wants to see how a value changed over time. ' +
+  'For current values use recall_fact instead. Returns the version timeline for that attribute, oldest first.'
 
 // Project-scope markers: facts about the codebase/conventions live in the
 // per-project store; everything else (user facts) lives in the shared store.
@@ -433,7 +500,7 @@ export function apply(ctx, config) {
     const hits = []
     for (const { projectId, cwd, store } of allProjectStores()) {
       if (projectId === excludeId) continue
-      for (const item of store.items) {
+      for (const item of store.current()) {
         const itemTopics = item.topics || []
         if (item.scope === 'project' && item.type === 'experience' && itemTopics.some((topic) => topics.includes(topic))) {
           hits.push({ text: item.text, topics: itemTopics, project: cwd || `project:${projectId}`, ts: item.ts, item, store })
@@ -485,16 +552,17 @@ export function apply(ctx, config) {
     const p = projectStore(canonical)
     return {
       stored: u.size + p.size,
+      events: u.eventCount + p.eventCount,
       cwd: canonical,
-      userItems: u.items.map(memoryView),
-      projectItems: p.items.map(memoryView),
+      userItems: u.current().map(memoryView),
+      projectItems: p.current().map(memoryView),
     }
   })
 
   ctx.provide('igm.memory.list', (cwd = null) => {
     const u = userStore()
     const p = projectStore(cwd)
-    return { user: u.items.map(memoryView), project: p.items.map(memoryView) }
+    return { user: u.current().map(memoryView), project: p.current().map(memoryView) }
   })
 
   ctx.provide('igm.memory.consolidate', (maxAgeDays = 30, minScore = 1, cwd = null) => {
@@ -537,7 +605,7 @@ export function apply(ctx, config) {
     async execute(args, exec) {
       const cwd = cwdFromSession(exec?.agent?.session)
       const res = addMemory(args.fact, cwd, args.memoryType, 'remember_fact')
-      const memory = [...userStore().items, ...projectStore(cwd).items].map(memoryView)
+      const memory = [...userStore().current(), ...projectStore(cwd).current()].map(memoryView)
       if (res.kept) {
         log(`tool kept [${res.item.type}/${res.item.slot || 'none'}] ${args.fact.slice(0, 50)}`)
         return { stored: true, slot: res.item.slot || '', reason: 'stored', memory }
@@ -569,7 +637,7 @@ export function apply(ctx, config) {
       const cwd = cwdFromSession(exec?.agent?.session)
       const u = userStore()
       const p = projectStore(cwd)
-      const ownTopics = new Set(p.items.flatMap((item) => item.topics || []))
+      const ownTopics = new Set(p.current().flatMap((item) => item.topics || []))
       const experienceHits = crossProjectExperiences([...ownTopics], cwd, 4)
       // recall_fact is the model-facing retrieval path, so it must refresh
       // retention just like igm.memory.query does.
@@ -582,7 +650,7 @@ export function apply(ctx, config) {
         experienceItemsByStore.set(hit.store, items)
       }
       for (const [store, items] of experienceItemsByStore) store.touch(items)
-      const memory = [...u.items, ...p.items].map(memoryView)
+      const memory = [...u.current(), ...p.current()].map(memoryView)
       const experiences = experienceHits
         .map((item) => ({ text: item.text, project: item.project, type: 'experience' }))
       log(`recall -> ${memory.length} memories (${u.size} user, ${p.size} project) + ${experiences.length} cross-project experiences`)
@@ -590,6 +658,51 @@ export function apply(ctx, config) {
     },
   }))
   log(`tool registered: ${RECALL_NAME}`)
+
+  ctx.tools.register(defineTool({
+    name: HISTORY_NAME,
+    description: HISTORY_DESCRIPTION,
+    parameters: {
+      fact: {
+        type: 'string',
+        required: true,
+        description:
+          "The attribute to look up, phrased naturally, e.g. '我之前的住址是什么' or '上一次用的包管理器'.",
+      },
+    },
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          slot: { type: 'string' },
+          versions: { type: 'array', items: { type: 'object', additionalProperties: true } },
+          reason: { type: 'string' },
+        },
+      },
+      render(args, value) {
+        return [{ type: 'text', text: JSON.stringify(value) }]
+      },
+    },
+    async execute(args, exec) {
+      const cwd = cwdFromSession(exec?.agent?.session)
+      // Project facts live in the per-project store and user facts in the
+      // shared one; probe both (project first) so a mis-scoped question still
+      // finds its timeline.
+      const results = [
+        versionTimeline(projectStore(cwd), args.fact, slotMaxLen),
+        versionTimeline(userStore(), args.fact, slotMaxLen),
+      ]
+      const hit = results.find((r) => r.versions.length > 0) || results[0]
+      if (hit.slot === null) {
+        log(`history: no routable attribute in "${String(args.fact).slice(0, 40)}"`)
+        return { slot: '', versions: [], reason: 'no_attribute_found' }
+      }
+      log(`history [${hit.slot}] -> ${hit.versions.length} versions`)
+      return hit
+    },
+  }))
+  log(`tool registered: ${HISTORY_NAME}`)
 
   ctx.on('system-prompt/assemble', async (assembly, context, next) => {
     const assembled = await next()
@@ -601,7 +714,7 @@ export function apply(ctx, config) {
     const filtered = sections.filter((section) => section?.name !== sectionName)
     const u = userStore()
     const p = projectStore(cwd)
-    const ordered = [...u.items, ...p.items].sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    const ordered = [...u.current(), ...p.current()].sort((a, b) => (b.ts || 0) - (a.ts || 0))
     const lines = []
     let budget = maxInjectionBytes
     for (const item of ordered) {
@@ -617,15 +730,16 @@ export function apply(ctx, config) {
       '1. Store durable user facts with remember_fact; phrase them as "我的{attr}是{value}".\n' +
       '2. Store durable facts about THIS project with "这个项目{...}" so they remain project-scoped.\n' +
       '3. Classify stable state as fact, a chosen approach as decision, and a reusable lesson/root cause as experience.\n' +
-      '4. When a known value changes, store the new value so slot supersede removes the old one.\n' +
+      '4. When a known value changes, store the new value: it becomes the only current one, and the superseded value is archived rather than deleted.\n' +
       '5. When answering from memory, cite it as previously stated or as a project convention.\n' +
-      '6. Do not store questions, chit-chat, secrets, or one-off requests.',
+      '6. Do not store questions, chit-chat, secrets, or one-off requests.\n' +
+      '7. When the user asks what a value USED to be ("之前/上一次 X 是什么"), call recall_history; recall_fact returns current values only.',
     ]
     if (lines.length > 0) {
       parts.push('Durable memories from previous sessions ([scope/type]; current values only):\n' + lines.join('\n'))
     }
 
-    const ownTopics = new Set(p.items.flatMap((item) => item.topics || []))
+    const ownTopics = new Set(p.current().flatMap((item) => item.topics || []))
     const experienceLines = []
     for (const experience of crossProjectExperiences([...ownTopics], cwd, 3)) {
       const project = experience.project.replace(/\\/g, '/').split('/').filter(Boolean).slice(-2).join('/')
