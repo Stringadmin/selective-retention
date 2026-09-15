@@ -1,0 +1,455 @@
+{
+  "scope": {
+    "instances_total": 93,
+    "instances_scored": 88,
+    "skipped_abstention": 5,
+    "skipped_without_documents": 0,
+    "document_granularity": "session",
+    "include_assistant": true,
+    "role_aware": true,
+    "assistant_history_routes": 12,
+    "user_history_routes": 76,
+    "recency_weight": 0.0,
+    "top_ks": [
+      1,
+      3,
+      5,
+      10,
+      30,
+      50
+    ]
+  },
+  "overall": {
+    "recall_any@1": 0.6590909090909091,
+    "recall_all@1": 0.26136363636363635,
+    "ndcg@1": 0.6590909090909091,
+    "recall_any@3": 0.8068181818181818,
+    "recall_all@3": 0.5795454545454546,
+    "ndcg@3": 0.6864069634204746,
+    "recall_any@5": 0.8636363636363636,
+    "recall_all@5": 0.7045454545454546,
+    "ndcg@5": 0.7271177257823086,
+    "recall_any@10": 0.9318181818181818,
+    "recall_all@10": 0.8181818181818182,
+    "ndcg@10": 0.7613272285331759,
+    "recall_any@30": 1.0,
+    "recall_all@30": 0.9772727272727273,
+    "ndcg@30": 0.7915916279468965,
+    "recall_any@50": 1.0,
+    "recall_all@50": 1.0,
+    "ndcg@50": 0.7929699281275031
+  },
+  "by_question_type": {
+    "knowledge-update": {
+      "recall_any@1": 0.7692307692307693,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.7692307692307693,
+      "recall_any@3": 0.8461538461538461,
+      "recall_all@3": 0.5384615384615384,
+      "ndcg@3": 0.6923076923076923,
+      "recall_any@5": 0.9230769230769231,
+      "recall_all@5": 0.6923076923076923,
+      "ndcg@5": 0.7473337137720536,
+      "recall_any@10": 1.0,
+      "recall_all@10": 0.9230769230769231,
+      "ndcg@10": 0.7990007956100343,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.8097293704427702,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.8097293704427702
+    },
+    "multi-session": {
+      "recall_any@1": 0.5652173913043478,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.5652173913043478,
+      "recall_any@3": 0.8260869565217391,
+      "recall_all@3": 0.43478260869565216,
+      "ndcg@3": 0.62529416262726,
+      "recall_any@5": 0.9130434782608695,
+      "recall_all@5": 0.6956521739130435,
+      "ndcg@5": 0.703392638479096,
+      "recall_any@10": 1.0,
+      "recall_all@10": 0.782608695652174,
+      "ndcg@10": 0.7381700760538191,
+      "recall_any@30": 1.0,
+      "recall_all@30": 0.9565217391304348,
+      "ndcg@30": 0.7644366767474126,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7670828057476256
+    },
+    "single-session-assistant": {
+      "recall_any@1": 0.8461538461538461,
+      "recall_all@1": 0.8461538461538461,
+      "ndcg@1": 0.8461538461538461,
+      "recall_any@3": 1.0,
+      "recall_all@3": 1.0,
+      "ndcg@3": 0.9716099810439582,
+      "recall_any@5": 1.0,
+      "recall_all@5": 1.0,
+      "ndcg@5": 0.9716099810439582,
+      "recall_any@10": 1.0,
+      "recall_all@10": 1.0,
+      "ndcg@10": 0.9716099810439582,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.9716099810439582,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.9716099810439582
+    },
+    "single-session-preference": {
+      "recall_any@1": 0.375,
+      "recall_all@1": 0.375,
+      "ndcg@1": 0.375,
+      "recall_any@3": 0.625,
+      "recall_all@3": 0.625,
+      "ndcg@3": 0.625,
+      "recall_any@5": 0.625,
+      "recall_all@5": 0.625,
+      "ndcg@5": 0.625,
+      "recall_any@10": 0.875,
+      "recall_all@10": 0.875,
+      "ndcg@10": 0.7071546478465004,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.7326290287328137,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7326290287328137
+    },
+    "single-session-user": {
+      "recall_any@1": 0.6666666666666666,
+      "recall_all@1": 0.6666666666666666,
+      "ndcg@1": 0.6666666666666666,
+      "recall_any@3": 0.6666666666666666,
+      "recall_all@3": 0.6666666666666666,
+      "ndcg@3": 0.6666666666666666,
+      "recall_any@5": 0.6666666666666666,
+      "recall_all@5": 0.6666666666666666,
+      "ndcg@5": 0.6666666666666666,
+      "recall_any@10": 0.6666666666666666,
+      "recall_all@10": 0.6666666666666666,
+      "ndcg@10": 0.6666666666666666,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.7568700705684048,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7568700705684048
+    },
+    "temporal-reasoning": {
+      "recall_any@1": 0.6818181818181818,
+      "recall_all@1": 0.13636363636363635,
+      "ndcg@1": 0.6818181818181818,
+      "recall_any@3": 0.7727272727272727,
+      "recall_all@3": 0.45454545454545453,
+      "ndcg@3": 0.6086871494092421,
+      "recall_any@5": 0.8636363636363636,
+      "recall_all@5": 0.5909090909090909,
+      "ndcg@5": 0.6573664159643541,
+      "recall_any@10": 0.9090909090909091,
+      "recall_all@10": 0.7272727272727273,
+      "ndcg@10": 0.6974412310185334,
+      "recall_any@30": 1.0,
+      "recall_all@30": 0.9545454545454546,
+      "ndcg@30": 0.7385338754468534,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.741280668578148
+    }
+  },
+  "sampled_top1_failures": [
+    {
+      "question_id": "e47becba",
+      "question_type": "single-session-user",
+      "question": "What degree did I graduate with?",
+      "answer_session_ids": [
+        "answer_280352e9"
+      ],
+      "top_3_session_ids": [
+        "ec6ca9ef",
+        "sharegpt_PdnvIns_0",
+        "ultrachat_574556"
+      ]
+    },
+    {
+      "question_id": "dccbc061",
+      "question_type": "single-session-user",
+      "question": "What was my previous stance on spirituality?",
+      "answer_session_ids": [
+        "answer_8f276838"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_6lBVIXU_0",
+        "sharegpt_sZKME3y_0",
+        "5fc843cd"
+      ]
+    },
+    {
+      "question_id": "577d4d32",
+      "question_type": "single-session-user",
+      "question": "What time do I stop checking work emails and messages?",
+      "answer_session_ids": [
+        "answer_0dd4d99a"
+      ],
+      "top_3_session_ids": [
+        "50d28eb1_1",
+        "ultrachat_489067",
+        "sharegpt_1ByFFwm_0"
+      ]
+    },
+    {
+      "question_id": "3a704032",
+      "question_type": "multi-session",
+      "question": "How many plants did I acquire in the last month?",
+      "answer_session_ids": [
+        "answer_c2204106_2",
+        "answer_c2204106_3",
+        "answer_c2204106_1"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_RrdCPkt_0",
+        "answer_c2204106_3",
+        "answer_c2204106_1"
+      ]
+    },
+    {
+      "question_id": "d682f1a2",
+      "question_type": "multi-session",
+      "question": "How many different types of food delivery services have I used recently?",
+      "answer_session_ids": [
+        "answer_c008e5df_1",
+        "answer_c008e5df_2",
+        "answer_c008e5df_3"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_251558",
+        "answer_c008e5df_1",
+        "answer_c008e5df_3"
+      ]
+    },
+    {
+      "question_id": "b3c15d39",
+      "question_type": "multi-session",
+      "question": "How many days did it take for me to receive the new remote shutter release after I ordered it?",
+      "answer_session_ids": [
+        "answer_05d808e6_1",
+        "answer_05d808e6_2"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_mmw2BKO_0",
+        "7bb01253",
+        "answer_05d808e6_2"
+      ]
+    },
+    {
+      "question_id": "e3038f8c",
+      "question_type": "multi-session",
+      "question": "How many rare items do I have in total?",
+      "answer_session_ids": [
+        "answer_b6018747_2",
+        "answer_b6018747_4",
+        "answer_b6018747_1",
+        "answer_b6018747_3"
+      ],
+      "top_3_session_ids": [
+        "a3d8e134_2",
+        "sharegpt_ztAVMKy_0",
+        "answer_b6018747_3"
+      ]
+    },
+    {
+      "question_id": "1a8a66a6",
+      "question_type": "multi-session",
+      "question": "How many magazine subscriptions do I currently have?",
+      "answer_session_ids": [
+        "answer_2bd23659_3",
+        "answer_2bd23659_2",
+        "answer_2bd23659_4",
+        "answer_2bd23659_1"
+      ],
+      "top_3_session_ids": [
+        "5eed6833_2",
+        "answer_2bd23659_3",
+        "ebb5d262"
+      ]
+    },
+    {
+      "question_id": "81507db6",
+      "question_type": "multi-session",
+      "question": "How many graduation ceremonies have I attended in the past three months?",
+      "answer_session_ids": [
+        "answer_da3c1266_3",
+        "answer_da3c1266_4",
+        "answer_da3c1266_1",
+        "answer_da3c1266_5",
+        "answer_da3c1266_2"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_229430",
+        "ultrachat_254248",
+        "9071ba70_3"
+      ]
+    },
+    {
+      "question_id": "0edc2aef",
+      "question_type": "single-session-preference",
+      "question": "Can you suggest a hotel for my upcoming trip to Miami?",
+      "answer_session_ids": [
+        "answer_d586e9cd"
+      ],
+      "top_3_session_ids": [
+        "8464304d_2",
+        "answer_d586e9cd",
+        "08ca1f31_2"
+      ]
+    },
+    {
+      "question_id": "54026fce",
+      "question_type": "single-session-preference",
+      "question": "I've been thinking about ways to stay connected with my colleagues. Any suggestions?",
+      "answer_session_ids": [
+        "answer_f7b22c66"
+      ],
+      "top_3_session_ids": [
+        "7e0fa6a6",
+        "answer_f7b22c66",
+        "ba4db050_1"
+      ]
+    },
+    {
+      "question_id": "d24813b1",
+      "question_type": "single-session-preference",
+      "question": "I'm thinking of inviting my colleagues over for a small gathering. Any tips on what to bake?",
+      "answer_session_ids": [
+        "answer_7c0ade93"
+      ],
+      "top_3_session_ids": [
+        "22ce6625_2",
+        "3124bb28_1",
+        "cc380119_3"
+      ]
+    },
+    {
+      "question_id": "d6233ab6",
+      "question_type": "single-session-preference",
+      "question": "I've been feeling nostalgic lately. Do you think it would be a good idea to attend my high school reunion?",
+      "answer_session_ids": [
+        "answer_b0fac439"
+      ],
+      "top_3_session_ids": [
+        "32f28c7b_1",
+        "ebb84f5b",
+        "ultrachat_125013"
+      ]
+    },
+    {
+      "question_id": "a89d7624",
+      "question_type": "single-session-preference",
+      "question": "I'm planning a trip to Denver soon. Any suggestions on what to do there?",
+      "answer_session_ids": [
+        "answer_8f15ac24"
+      ],
+      "top_3_session_ids": [
+        "39a056ae",
+        "a479a7d6_4",
+        "99f2f5b1_1"
+      ]
+    },
+    {
+      "question_id": "d3ab962e",
+      "question_type": "multi-session",
+      "question": "What is the total distance of the hikes I did on two consecutive weekends?",
+      "answer_session_ids": [
+        "answer_5237bb0b_2",
+        "answer_5237bb0b_1"
+      ],
+      "top_3_session_ids": [
+        "92f1ea4d_1",
+        "3329e5e8_1",
+        "ultrachat_248741"
+      ]
+    },
+    {
+      "question_id": "720133ac",
+      "question_type": "multi-session",
+      "question": "What is the total cost of Lola's vet visit and flea medication?",
+      "answer_session_ids": [
+        "answer_c9dfeaea_1",
+        "answer_c9dfeaea_2"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_508711",
+        "10a598b1_1",
+        "6a4bafac_2"
+      ]
+    },
+    {
+      "question_id": "8979f9ec",
+      "question_type": "multi-session",
+      "question": "What is the total number of lunch meals I got from the chicken fajitas and lentil soup?",
+      "answer_session_ids": [
+        "answer_35e36341_1",
+        "answer_35e36341_2"
+      ],
+      "top_3_session_ids": [
+        "1064ed80_2",
+        "sharegpt_uO1NWA9_57",
+        "answer_35e36341_1"
+      ]
+    },
+    {
+      "question_id": "078150f1",
+      "question_type": "multi-session",
+      "question": "How much more money did I raise than my initial goal in the charity cycling event?",
+      "answer_session_ids": [
+        "answer_254d8b09_1",
+        "answer_254d8b09_2"
+      ],
+      "top_3_session_ids": [
+        "203a48bb_1",
+        "2655efcc_1",
+        "6ac43c5b_4"
+      ]
+    },
+    {
+      "question_id": "b46e15ed",
+      "question_type": "temporal-reasoning",
+      "question": "How many months have passed since I participated in two charity events in a row, on consecutive days?",
+      "answer_session_ids": [
+        "answer_4bfcc250_4",
+        "answer_4bfcc250_3",
+        "answer_4bfcc250_2",
+        "answer_4bfcc250_1"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_KCGdZJP_0",
+        "sharegpt_cXkL3cR_28",
+        "a410bab2_3"
+      ]
+    },
+    {
+      "question_id": "gpt4_468eb063",
+      "question_type": "temporal-reasoning",
+      "question": "How many days ago did I meet Emma?",
+      "answer_session_ids": [
+        "answer_9b09d95b_1"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_Sf51OjE_8",
+        "b3aa1a8c_1",
+        "c6a2e4cc"
+      ]
+    }
+  ],
+  "config": {
+    "input": "/mnt/f/benchmarks/longmemeval-cleaned/longmemeval_s_cleaned.json",
+    "instances_loaded": 93,
+    "embed_backend": "bge",
+    "partition": "development",
+    "recency_weight": 0.0
+  }
+}

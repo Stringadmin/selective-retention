@@ -1,0 +1,162 @@
+{
+  "config": {
+    "document_mode": "user-only session",
+    "candidate_recency_weights": [
+      0.0,
+      0.02
+    ],
+    "top_ks": [
+      1,
+      3,
+      5,
+      10
+    ],
+    "metric_note": "stale_above_new: superseded session ranks above the corrected one; new_missing: corrected session outside top-k; leak: either",
+    "input": "/mnt/f/benchmarks/longmemeval-cleaned/longmemeval_s_cleaned.json",
+    "partition": "all"
+  },
+  "results": {
+    "0.0": {
+      "overall": {
+        "mrr": 0.6487268518518519,
+        "stale_above_new@1": 0.5694444444444444,
+        "new_missing@1": 0.6388888888888888,
+        "leak@1": 0.6388888888888888,
+        "stale_above_new@3": 0.6111111111111112,
+        "new_missing@3": 0.041666666666666664,
+        "leak@3": 0.625,
+        "stale_above_new@5": 0.6111111111111112,
+        "new_missing@5": 0.013888888888888888,
+        "leak@5": 0.625,
+        "stale_above_new@10": 0.6111111111111112,
+        "new_missing@10": 0.013888888888888888,
+        "leak@10": 0.625
+      },
+      "n_scored": 72,
+      "identification": {
+        "answer_text": 45,
+        "date_order": 27
+      },
+      "by_identification": {
+        "answer_text": {
+          "mrr": 0.6342592592592593,
+          "stale_above_new@1": 0.5555555555555556,
+          "new_missing@1": 0.6444444444444445,
+          "leak@1": 0.6444444444444445,
+          "stale_above_new@3": 0.6222222222222222,
+          "new_missing@3": 0.06666666666666667,
+          "leak@3": 0.6444444444444445,
+          "stale_above_new@5": 0.6222222222222222,
+          "new_missing@5": 0.022222222222222223,
+          "leak@5": 0.6444444444444445,
+          "stale_above_new@10": 0.6222222222222222,
+          "new_missing@10": 0.022222222222222223,
+          "leak@10": 0.6444444444444445
+        },
+        "date_order": {
+          "mrr": 0.6728395061728395,
+          "stale_above_new@1": 0.5925925925925926,
+          "new_missing@1": 0.6296296296296297,
+          "leak@1": 0.6296296296296297,
+          "stale_above_new@3": 0.5925925925925926,
+          "new_missing@3": 0.0,
+          "leak@3": 0.5925925925925926,
+          "stale_above_new@5": 0.5925925925925926,
+          "new_missing@5": 0.0,
+          "leak@5": 0.5925925925925926,
+          "stale_above_new@10": 0.5925925925925926,
+          "new_missing@10": 0.0,
+          "leak@10": 0.5925925925925926
+        }
+      },
+      "by_question_type": {
+        "knowledge-update": {
+          "mrr": 0.6487268518518519,
+          "stale_above_new@1": 0.5694444444444444,
+          "new_missing@1": 0.6388888888888888,
+          "leak@1": 0.6388888888888888,
+          "stale_above_new@3": 0.6111111111111112,
+          "new_missing@3": 0.041666666666666664,
+          "leak@3": 0.625,
+          "stale_above_new@5": 0.6111111111111112,
+          "new_missing@5": 0.013888888888888888,
+          "leak@5": 0.625,
+          "stale_above_new@10": 0.6111111111111112,
+          "new_missing@10": 0.013888888888888888,
+          "leak@10": 0.625
+        }
+      }
+    },
+    "0.02": {
+      "overall": {
+        "mrr": 0.6927334943639292,
+        "stale_above_new@1": 0.4722222222222222,
+        "new_missing@1": 0.5555555555555556,
+        "leak@1": 0.5555555555555556,
+        "stale_above_new@3": 0.5277777777777778,
+        "new_missing@3": 0.041666666666666664,
+        "leak@3": 0.5416666666666666,
+        "stale_above_new@5": 0.5277777777777778,
+        "new_missing@5": 0.013888888888888888,
+        "leak@5": 0.5416666666666666,
+        "stale_above_new@10": 0.5277777777777778,
+        "new_missing@10": 0.013888888888888888,
+        "leak@10": 0.5416666666666666
+      },
+      "n_scored": 72,
+      "identification": {
+        "answer_text": 45,
+        "date_order": 27
+      },
+      "by_identification": {
+        "answer_text": {
+          "mrr": 0.6380032206119163,
+          "stale_above_new@1": 0.5333333333333333,
+          "new_missing@1": 0.6444444444444445,
+          "leak@1": 0.6444444444444445,
+          "stale_above_new@3": 0.6222222222222222,
+          "new_missing@3": 0.06666666666666667,
+          "leak@3": 0.6444444444444445,
+          "stale_above_new@5": 0.6222222222222222,
+          "new_missing@5": 0.022222222222222223,
+          "leak@5": 0.6444444444444445,
+          "stale_above_new@10": 0.6222222222222222,
+          "new_missing@10": 0.022222222222222223,
+          "leak@10": 0.6444444444444445
+        },
+        "date_order": {
+          "mrr": 0.7839506172839507,
+          "stale_above_new@1": 0.37037037037037035,
+          "new_missing@1": 0.4074074074074074,
+          "leak@1": 0.4074074074074074,
+          "stale_above_new@3": 0.37037037037037035,
+          "new_missing@3": 0.0,
+          "leak@3": 0.37037037037037035,
+          "stale_above_new@5": 0.37037037037037035,
+          "new_missing@5": 0.0,
+          "leak@5": 0.37037037037037035,
+          "stale_above_new@10": 0.37037037037037035,
+          "new_missing@10": 0.0,
+          "leak@10": 0.37037037037037035
+        }
+      },
+      "by_question_type": {
+        "knowledge-update": {
+          "mrr": 0.6927334943639292,
+          "stale_above_new@1": 0.4722222222222222,
+          "new_missing@1": 0.5555555555555556,
+          "leak@1": 0.5555555555555556,
+          "stale_above_new@3": 0.5277777777777778,
+          "new_missing@3": 0.041666666666666664,
+          "leak@3": 0.5416666666666666,
+          "stale_above_new@5": 0.5277777777777778,
+          "new_missing@5": 0.013888888888888888,
+          "leak@5": 0.5416666666666666,
+          "stale_above_new@10": 0.5277777777777778,
+          "new_missing@10": 0.013888888888888888,
+          "leak@10": 0.5416666666666666
+        }
+      }
+    }
+  }
+}

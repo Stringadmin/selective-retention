@@ -1,0 +1,53 @@
+{
+  "config": {
+    "seeds": 400,
+    "contexts_per_seed": 32,
+    "stationary_rounds": 20,
+    "drift_rounds": 20,
+    "success_probability": 0.85,
+    "decay_rate": 0.28,
+    "exploration_rate": 0.1,
+    "corruption_rate": 0.3,
+    "untrusted_weight": 0.05,
+    "feedback": "partial; corrupted reports are explicitly labeled unverified, and only source-weighted methods consume that label"
+  },
+  "summary": {
+    "random_no_memory": {
+      "stationary_action_accuracy": 0.49969140625,
+      "stationary_true_success_rate": 0.49960546875,
+      "post_drift_mean_action_accuracy": 0.4999296875,
+      "post_drift_final_action_accuracy": 0.49734375,
+      "post_drift_final_true_success_rate": 0.497109375,
+      "recovery_round_at_80pct": null
+    },
+    "unweighted_decayed_evidence": {
+      "stationary_action_accuracy": 0.71331640625,
+      "stationary_true_success_rate": 0.64780859375,
+      "post_drift_mean_action_accuracy": 0.6505156249999999,
+      "post_drift_final_action_accuracy": 0.754140625,
+      "post_drift_final_true_success_rate": 0.68171875,
+      "recovery_round_at_80pct": null
+    },
+    "source_weighted_evidence_baseline": {
+      "stationary_action_accuracy": 0.85643359375,
+      "stationary_true_success_rate": 0.748265625,
+      "post_drift_mean_action_accuracy": 0.7659374999999999,
+      "post_drift_final_action_accuracy": 0.91109375,
+      "post_drift_final_true_success_rate": 0.789453125,
+      "recovery_round_at_80pct": 7
+    },
+    "source_weighted_outcome_memory": {
+      "stationary_action_accuracy": 0.85643359375,
+      "stationary_true_success_rate": 0.748265625,
+      "post_drift_mean_action_accuracy": 0.7659374999999999,
+      "post_drift_final_action_accuracy": 0.91109375,
+      "post_drift_final_true_success_rate": 0.789453125,
+      "recovery_round_at_80pct": 7
+    }
+  },
+  "resources": {
+    "source_weighted_outcome_memory_mean_event_records": 1280.0,
+    "source_weighted_outcome_memory_mean_evidence_keys": 64.0,
+    "source_weighted_evidence_baseline_event_archive": false
+  }
+}

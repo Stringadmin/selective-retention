@@ -1,0 +1,80 @@
+{
+  "scope": {
+    "instances_total": 1,
+    "instances_scored": 1,
+    "skipped_abstention": 0,
+    "skipped_without_documents": 0,
+    "document_granularity": "session",
+    "include_assistant": true,
+    "top_ks": [
+      1,
+      3,
+      5,
+      10,
+      30,
+      50
+    ]
+  },
+  "overall": {
+    "recall_any@1": 0.0,
+    "recall_all@1": 0.0,
+    "ndcg@1": 0.0,
+    "recall_any@3": 0.0,
+    "recall_all@3": 0.0,
+    "ndcg@3": 0.0,
+    "recall_any@5": 0.0,
+    "recall_all@5": 0.0,
+    "ndcg@5": 0.0,
+    "recall_any@10": 0.0,
+    "recall_all@10": 0.0,
+    "ndcg@10": 0.0,
+    "recall_any@30": 0.0,
+    "recall_all@30": 0.0,
+    "ndcg@30": 0.0,
+    "recall_any@50": 1.0,
+    "recall_all@50": 1.0,
+    "ndcg@50": 0.18790182470910757
+  },
+  "by_question_type": {
+    "single-session-user": {
+      "recall_any@1": 0.0,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.0,
+      "recall_any@3": 0.0,
+      "recall_all@3": 0.0,
+      "ndcg@3": 0.0,
+      "recall_any@5": 0.0,
+      "recall_all@5": 0.0,
+      "ndcg@5": 0.0,
+      "recall_any@10": 0.0,
+      "recall_all@10": 0.0,
+      "ndcg@10": 0.0,
+      "recall_any@30": 0.0,
+      "recall_all@30": 0.0,
+      "ndcg@30": 0.0,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.18790182470910757
+    }
+  },
+  "sampled_top1_failures": [
+    {
+      "question_id": "e47becba",
+      "question_type": "single-session-user",
+      "question": "What degree did I graduate with?",
+      "answer_session_ids": [
+        "answer_280352e9"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_BvwQVCO_0",
+        "ec6ca9ef",
+        "sharegpt_PdnvIns_0"
+      ]
+    }
+  ],
+  "config": {
+    "input": "/mnt/f/benchmarks/longmemeval-cleaned/longmemeval_s_cleaned.json",
+    "instances_loaded": 1,
+    "embed_backend": "bge"
+  }
+}

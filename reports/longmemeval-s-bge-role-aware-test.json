@@ -1,0 +1,433 @@
+{
+  "scope": {
+    "instances_total": 407,
+    "instances_scored": 382,
+    "skipped_abstention": 25,
+    "skipped_without_documents": 0,
+    "document_granularity": "session",
+    "include_assistant": true,
+    "role_aware": true,
+    "assistant_history_routes": 38,
+    "user_history_routes": 344,
+    "recency_weight": 0.0,
+    "top_ks": [
+      1,
+      3,
+      5,
+      10,
+      30,
+      50
+    ]
+  },
+  "overall": {
+    "recall_any@1": 0.6989528795811518,
+    "recall_all@1": 0.2094240837696335,
+    "ndcg@1": 0.6989528795811518,
+    "recall_any@3": 0.837696335078534,
+    "recall_all@3": 0.5968586387434555,
+    "ndcg@3": 0.7160045248692196,
+    "recall_any@5": 0.887434554973822,
+    "recall_all@5": 0.7225130890052356,
+    "ndcg@5": 0.7530409362900998,
+    "recall_any@10": 0.9267015706806283,
+    "recall_all@10": 0.8743455497382199,
+    "ndcg@10": 0.7859700698920691,
+    "recall_any@30": 0.9895287958115183,
+    "recall_all@30": 0.9764397905759162,
+    "ndcg@30": 0.8064155062022552,
+    "recall_any@50": 1.0,
+    "recall_all@50": 1.0,
+    "ndcg@50": 0.8096689204945501
+  },
+  "by_question_type": {
+    "knowledge-update": {
+      "recall_any@1": 0.7796610169491526,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.7796610169491526,
+      "recall_any@3": 0.9322033898305084,
+      "recall_all@3": 0.6440677966101694,
+      "ndcg@3": 0.7568584536924964,
+      "recall_any@5": 0.9491525423728814,
+      "recall_all@5": 0.7966101694915254,
+      "ndcg@5": 0.7968813878644758,
+      "recall_any@10": 0.9830508474576272,
+      "recall_all@10": 0.9491525423728814,
+      "ndcg@10": 0.8287813051088218,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.838076941251661,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.838076941251661
+    },
+    "multi-session": {
+      "recall_any@1": 0.7755102040816326,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.7755102040816326,
+      "recall_any@3": 0.8775510204081632,
+      "recall_all@3": 0.4387755102040816,
+      "ndcg@3": 0.6866472079455724,
+      "recall_any@5": 0.9081632653061225,
+      "recall_all@5": 0.6224489795918368,
+      "ndcg@5": 0.7181707359668664,
+      "recall_any@10": 0.9387755102040817,
+      "recall_all@10": 0.8673469387755102,
+      "ndcg@10": 0.7699778512599981,
+      "recall_any@30": 1.0,
+      "recall_all@30": 0.9693877551020408,
+      "ndcg@30": 0.7924357944991676,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7957577496769082
+    },
+    "single-session-assistant": {
+      "recall_any@1": 0.7209302325581395,
+      "recall_all@1": 0.7209302325581395,
+      "ndcg@1": 0.7209302325581395,
+      "recall_any@3": 0.8604651162790697,
+      "recall_all@3": 0.8604651162790697,
+      "ndcg@3": 0.8518820872923595,
+      "recall_any@5": 0.8837209302325582,
+      "recall_all@5": 0.8837209302325582,
+      "ndcg@5": 0.8635099942691037,
+      "recall_any@10": 0.8837209302325582,
+      "recall_all@10": 0.8837209302325582,
+      "ndcg@10": 0.8635099942691037,
+      "recall_any@30": 0.9767441860465116,
+      "recall_all@30": 0.9767441860465116,
+      "ndcg@30": 0.8851582782562667,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.8896224345354891
+    },
+    "single-session-preference": {
+      "recall_any@1": 0.36363636363636365,
+      "recall_all@1": 0.36363636363636365,
+      "ndcg@1": 0.36363636363636365,
+      "recall_any@3": 0.5,
+      "recall_all@3": 0.5,
+      "ndcg@3": 0.4832240797077935,
+      "recall_any@5": 0.5909090909090909,
+      "recall_all@5": 0.5909090909090909,
+      "ndcg@5": 0.5255275596202205,
+      "recall_any@10": 0.7272727272727273,
+      "recall_all@10": 0.7272727272727273,
+      "ndcg@10": 0.5720218257008881,
+      "recall_any@30": 0.9545454545454546,
+      "recall_all@30": 0.9545454545454546,
+      "ndcg@30": 0.6260572356605062,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.6345414361713672
+    },
+    "single-session-user": {
+      "recall_any@1": 0.6181818181818182,
+      "recall_all@1": 0.6181818181818182,
+      "ndcg@1": 0.6181818181818182,
+      "recall_any@3": 0.8181818181818182,
+      "recall_all@3": 0.8181818181818182,
+      "ndcg@3": 0.7980507138311704,
+      "recall_any@5": 0.8727272727272727,
+      "recall_all@5": 0.8727272727272727,
+      "ndcg@5": 0.8215421624533555,
+      "recall_any@10": 0.9454545454545454,
+      "recall_all@10": 0.9454545454545454,
+      "ndcg@10": 0.8448723722554714,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.8587253913394648,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.8587253913394648
+    },
+    "temporal-reasoning": {
+      "recall_any@1": 0.6857142857142857,
+      "recall_all@1": 0.06666666666666667,
+      "ndcg@1": 0.6857142857142857,
+      "recall_any@3": 0.819047619047619,
+      "recall_all@3": 0.5142857142857142,
+      "ndcg@3": 0.6706000436729639,
+      "recall_any@5": 0.9047619047619048,
+      "recall_all@5": 0.6571428571428571,
+      "ndcg@5": 0.7275004633705743,
+      "recall_any@10": 0.9333333333333333,
+      "recall_all@10": 0.8285714285714286,
+      "ndcg@10": 0.7590595226745541,
+      "recall_any@30": 0.9809523809523809,
+      "recall_all@30": 0.9619047619047619,
+      "ndcg@30": 0.7798144219168943,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7849443411644424
+    }
+  },
+  "sampled_top1_failures": [
+    {
+      "question_id": "118b2229",
+      "question_type": "single-session-user",
+      "question": "How long is my daily commute to work?",
+      "answer_session_ids": [
+        "answer_40a90d51"
+      ],
+      "top_3_session_ids": [
+        "5dce60dd",
+        "7d8b5834_1",
+        "db73b7e4_4"
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "question_type": "single-session-user",
+      "question": "Where did I redeem a $5 coupon on coffee creamer?",
+      "answer_session_ids": [
+        "answer_d61669c7"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_105249",
+        "answer_d61669c7",
+        "07d1915d_1"
+      ]
+    },
+    {
+      "question_id": "58bf7951",
+      "question_type": "single-session-user",
+      "question": "What play did I attend at the local community theater?",
+      "answer_session_ids": [
+        "answer_355c48bb"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_71618",
+        "sharegpt_53zErgw_0",
+        "ultrachat_377566"
+      ]
+    },
+    {
+      "question_id": "58ef2f1c",
+      "question_type": "single-session-user",
+      "question": "When did I volunteer at the local animal shelter's fundraising dinner?",
+      "answer_session_ids": [
+        "answer_59547700"
+      ],
+      "top_3_session_ids": [
+        "97220361",
+        "answer_59547700",
+        "b17c7f18"
+      ]
+    },
+    {
+      "question_id": "5d3d2817",
+      "question_type": "single-session-user",
+      "question": "What was my previous occupation?",
+      "answer_session_ids": [
+        "answer_235eb6fb"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_bTDMt3m_64",
+        "e00298a6_1",
+        "670ca40e"
+      ]
+    },
+    {
+      "question_id": "3b6f954b",
+      "question_type": "single-session-user",
+      "question": "Where did I attend for my study abroad program?",
+      "answer_session_ids": [
+        "answer_94030872"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_294369",
+        "ultrachat_466603",
+        "ultrachat_64326"
+      ]
+    },
+    {
+      "question_id": "726462e0",
+      "question_type": "single-session-user",
+      "question": "What was the discount I got on my first purchase from the new clothing brand?",
+      "answer_session_ids": [
+        "answer_f38f679b"
+      ],
+      "top_3_session_ids": [
+        "29e76903_1",
+        "ee7f5084_2",
+        "ultrachat_527342"
+      ]
+    },
+    {
+      "question_id": "ad7109d1",
+      "question_type": "single-session-user",
+      "question": "What speed is my new internet plan?",
+      "answer_session_ids": [
+        "answer_679840f8"
+      ],
+      "top_3_session_ids": [
+        "22aa7cca_3",
+        "3dc02d26_2",
+        "answer_679840f8"
+      ]
+    },
+    {
+      "question_id": "8ebdbe50",
+      "question_type": "single-session-user",
+      "question": "What certification did I complete last month?",
+      "answer_session_ids": [
+        "answer_8ad8a34f"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_mWFmQxk_36",
+        "ultrachat_226431",
+        "answer_8ad8a34f"
+      ]
+    },
+    {
+      "question_id": "95bcc1c8",
+      "question_type": "single-session-user",
+      "question": "How many amateur comedians did I watch perform at the open mic night?",
+      "answer_session_ids": [
+        "answer_cb742a61"
+      ],
+      "top_3_session_ids": [
+        "99e5e380",
+        "c9763bff",
+        "d59a335d"
+      ]
+    },
+    {
+      "question_id": "60d45044",
+      "question_type": "single-session-user",
+      "question": "What type of rice is my favorite?",
+      "answer_session_ids": [
+        "answer_9cddca88"
+      ],
+      "top_3_session_ids": [
+        "af4d4ecd_2",
+        "answer_9cddca88",
+        "025c9e24_1"
+      ]
+    },
+    {
+      "question_id": "3f1e9474",
+      "question_type": "single-session-user",
+      "question": "Who did I have a conversation with about destiny?",
+      "answer_session_ids": [
+        "answer_57fc1954"
+      ],
+      "top_3_session_ids": [
+        "205f348b_2",
+        "answer_57fc1954",
+        "ultrachat_477598"
+      ]
+    },
+    {
+      "question_id": "e01b8e2f",
+      "question_type": "single-session-user",
+      "question": "Where did I go on a week-long trip with my family?",
+      "answer_session_ids": [
+        "answer_5ca6cd28"
+      ],
+      "top_3_session_ids": [
+        "86c5d31d",
+        "answer_5ca6cd28",
+        "8be2c3f1"
+      ]
+    },
+    {
+      "question_id": "bc8a6e93",
+      "question_type": "single-session-user",
+      "question": "What did I bake for my niece's birthday party?",
+      "answer_session_ids": [
+        "answer_e6143162"
+      ],
+      "top_3_session_ids": [
+        "a6c41826_3",
+        "bc53dae7",
+        "a1b3dd27_1"
+      ]
+    },
+    {
+      "question_id": "001be529",
+      "question_type": "single-session-user",
+      "question": "How long did I wait for the decision on my asylum application?",
+      "answer_session_ids": [
+        "answer_530960c1"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_45520",
+        "dffe8d2d_2",
+        "answer_530960c1"
+      ]
+    },
+    {
+      "question_id": "b320f3f8",
+      "question_type": "single-session-user",
+      "question": "What type of action figure did I buy from a thrift store?",
+      "answer_session_ids": [
+        "answer_5cc9b056"
+      ],
+      "top_3_session_ids": [
+        "e28f75f4",
+        "answer_5cc9b056",
+        "b89f68c4_4"
+      ]
+    },
+    {
+      "question_id": "8a137a7f",
+      "question_type": "single-session-user",
+      "question": "What type of bulb did I replace in my bedside lamp?",
+      "answer_session_ids": [
+        "answer_15d63a22"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_293136",
+        "answer_15d63a22",
+        "6bb37368"
+      ]
+    },
+    {
+      "question_id": "311778f1",
+      "question_type": "single-session-user",
+      "question": "How many hours did I spend watching documentaries on Netflix last month?",
+      "answer_session_ids": [
+        "answer_e40b054e"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_vXNQZ2I_0",
+        "95cec590_1",
+        "sharegpt_a4rfTHu_19"
+      ]
+    },
+    {
+      "question_id": "f4f1d8a4",
+      "question_type": "single-session-user",
+      "question": "Who gave me a new stand mixer as a birthday gift?",
+      "answer_session_ids": [
+        "answer_f5b33470"
+      ],
+      "top_3_session_ids": [
+        "76ea88ba_2",
+        "3aac691d_2",
+        "9614d065_1"
+      ]
+    },
+    {
+      "question_id": "c14c00dd",
+      "question_type": "single-session-user",
+      "question": "What brand of shampoo do I currently use?",
+      "answer_session_ids": [
+        "answer_304511ce"
+      ],
+      "top_3_session_ids": [
+        "c77250d2",
+        "35f052f9_1",
+        "ultrachat_451453"
+      ]
+    }
+  ],
+  "config": {
+    "input": "/mnt/f/benchmarks/longmemeval-cleaned/longmemeval_s_cleaned.json",
+    "instances_loaded": 407,
+    "embed_backend": "bge",
+    "partition": "test",
+    "recency_weight": 0.0
+  }
+}

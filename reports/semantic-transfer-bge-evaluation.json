@@ -1,0 +1,364 @@
+{
+  "config": {
+    "seeds": 500,
+    "embed_backend": "bge",
+    "probe_set": "evaluation",
+    "contexts": 8,
+    "held_out_queries_per_context": 4,
+    "feedback_per_context_action": 8,
+    "feedback": "verified simulated outcomes before held-out routing queries",
+    "min_margin": 0.02
+  },
+  "routing": {
+    "correct": 24,
+    "total": 32,
+    "accuracy": 0.75,
+    "selective": {
+      "min_margin": 0.02,
+      "accepted": 24,
+      "abstained": 8,
+      "automatic_coverage": 0.75,
+      "accepted_precision": 0.9166666666666666,
+      "abstained_incorrect": 6,
+      "abstained_examples": [
+        {
+          "query": "新功能部署到生产后服务异常中断。",
+          "expected_context_id": "release_failure",
+          "context_id": "disk_exhaustion",
+          "runner_up_context_id": "latency_incident",
+          "margin": 0.0003557374349114628,
+          "correct": false
+        },
+        {
+          "query": "回滚前需要确认本次上线导致的故障。",
+          "expected_context_id": "release_failure",
+          "context_id": "release_failure",
+          "runner_up_context_id": "latency_incident",
+          "margin": 0.017582627161876863,
+          "correct": true
+        },
+        {
+          "query": "DDL 执行中断，需要核验数据是否一致。",
+          "expected_context_id": "schema_migration",
+          "context_id": "cache_inconsistency",
+          "runner_up_context_id": "schema_migration",
+          "margin": 0.013062078506646091,
+          "correct": false
+        },
+        {
+          "query": "需要轮换一个被怀疑暴露的服务凭证。",
+          "expected_context_id": "secret_exposure",
+          "context_id": "release_failure",
+          "runner_up_context_id": "secret_exposure",
+          "margin": 0.0007600634764902692,
+          "correct": false
+        },
+        {
+          "query": "修改数据后客户端依然拿到旧结果。",
+          "expected_context_id": "cache_inconsistency",
+          "context_id": "schema_migration",
+          "runner_up_context_id": "cache_inconsistency",
+          "margin": 0.001065511527031049,
+          "correct": false
+        },
+        {
+          "query": "数据库已更新但读接口返回旧值。",
+          "expected_context_id": "cache_inconsistency",
+          "context_id": "schema_migration",
+          "runner_up_context_id": "cache_inconsistency",
+          "margin": 0.006241199954641119,
+          "correct": false
+        },
+        {
+          "query": "节点存储空间告警，写入操作失败。",
+          "expected_context_id": "disk_exhaustion",
+          "context_id": "disk_exhaustion",
+          "runner_up_context_id": "schema_migration",
+          "margin": 0.009547322177426154,
+          "correct": true
+        },
+        {
+          "query": "pod 文件系统已满导致服务写日志失败。",
+          "expected_context_id": "disk_exhaustion",
+          "context_id": "schema_migration",
+          "runner_up_context_id": "release_failure",
+          "margin": 0.004040910791922925,
+          "correct": false
+        }
+      ]
+    },
+    "routes": {
+      "线上版本切换后 API 大量报错。": {
+        "expected_context_id": "release_failure",
+        "context_id": "release_failure",
+        "similarity": 0.7474119705946927,
+        "runner_up_context_id": "latency_incident",
+        "runner_up_similarity": 0.6504907629546295,
+        "margin": 0.09692120764006318
+      },
+      "新功能部署到生产后服务异常中断。": {
+        "expected_context_id": "release_failure",
+        "context_id": "disk_exhaustion",
+        "similarity": 0.6511834448253494,
+        "runner_up_context_id": "latency_incident",
+        "runner_up_similarity": 0.6508277073904379,
+        "margin": 0.0003557374349114628
+      },
+      "发布操作完成后用户请求失败。": {
+        "expected_context_id": "release_failure",
+        "context_id": "release_failure",
+        "similarity": 0.7152666332581085,
+        "runner_up_context_id": "schema_migration",
+        "runner_up_similarity": 0.667494141423872,
+        "margin": 0.047772491834236486
+      },
+      "回滚前需要确认本次上线导致的故障。": {
+        "expected_context_id": "release_failure",
+        "context_id": "release_failure",
+        "similarity": 0.7003151442983171,
+        "runner_up_context_id": "latency_incident",
+        "runner_up_similarity": 0.6827325171364402,
+        "margin": 0.017582627161876863
+      },
+      "数据库迁移任务失败，部分表没有更新。": {
+        "expected_context_id": "schema_migration",
+        "context_id": "schema_migration",
+        "similarity": 0.7668594969424053,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.638568795689391,
+        "margin": 0.12829070125301434
+      },
+      "DDL 执行中断，需要核验数据是否一致。": {
+        "expected_context_id": "schema_migration",
+        "context_id": "cache_inconsistency",
+        "similarity": 0.6914173218529381,
+        "runner_up_context_id": "schema_migration",
+        "runner_up_similarity": 0.678355243346292,
+        "margin": 0.013062078506646091
+      },
+      "升级表字段后发现迁移没有完成。": {
+        "expected_context_id": "schema_migration",
+        "context_id": "schema_migration",
+        "similarity": 0.6748774805490501,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.61406555645719,
+        "margin": 0.06081192409186009
+      },
+      "数据库版本变更留下了不一致的记录。": {
+        "expected_context_id": "schema_migration",
+        "context_id": "schema_migration",
+        "similarity": 0.7410247511049518,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.7032787299944473,
+        "margin": 0.03774602111050451
+      },
+      "订单支付成功但后台没有更新状态。": {
+        "expected_context_id": "payment_anomaly",
+        "context_id": "payment_anomaly",
+        "similarity": 0.6384285515947984,
+        "runner_up_context_id": "release_failure",
+        "runner_up_similarity": 0.60027550765228,
+        "margin": 0.038153043942518394
+      },
+      "用户反馈信用卡被扣了两次。": {
+        "expected_context_id": "payment_anomaly",
+        "context_id": "payment_anomaly",
+        "similarity": 0.6488868460763707,
+        "runner_up_context_id": "release_failure",
+        "runner_up_similarity": 0.5621405129229333,
+        "margin": 0.08674633315343738
+      },
+      "交易通知没有处理，付款和订单不一致。": {
+        "expected_context_id": "payment_anomaly",
+        "context_id": "payment_anomaly",
+        "similarity": 0.6601179695940019,
+        "runner_up_context_id": "release_failure",
+        "runner_up_similarity": 0.6053651572924528,
+        "margin": 0.05475281230154916
+      },
+      "对账发现支付结果与订单状态冲突。": {
+        "expected_context_id": "payment_anomaly",
+        "context_id": "payment_anomaly",
+        "similarity": 0.746827967043697,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.6022851854513896,
+        "margin": 0.14454278159230738
+      },
+      "配置文件误传了云服务访问凭证。": {
+        "expected_context_id": "secret_exposure",
+        "context_id": "release_failure",
+        "similarity": 0.7323357917455309,
+        "runner_up_context_id": "login_failure",
+        "runner_up_similarity": 0.6491692878206486,
+        "margin": 0.08316650392488223
+      },
+      "Git 提交中出现疑似私钥内容。": {
+        "expected_context_id": "secret_exposure",
+        "context_id": "secret_exposure",
+        "similarity": 0.6916511843425659,
+        "runner_up_context_id": "release_failure",
+        "runner_up_similarity": 0.5778091455037024,
+        "margin": 0.11384203883886346
+      },
+      "生产密钥可能已被泄露到公开日志。": {
+        "expected_context_id": "secret_exposure",
+        "context_id": "secret_exposure",
+        "similarity": 0.7649063041669046,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.5523687556159464,
+        "margin": 0.2125375485509582
+      },
+      "需要轮换一个被怀疑暴露的服务凭证。": {
+        "expected_context_id": "secret_exposure",
+        "context_id": "release_failure",
+        "similarity": 0.6762977084566218,
+        "runner_up_context_id": "secret_exposure",
+        "runner_up_similarity": 0.6755376449801316,
+        "margin": 0.0007600634764902692
+      },
+      "服务响应越来越慢，很多请求超时。": {
+        "expected_context_id": "latency_incident",
+        "context_id": "latency_incident",
+        "similarity": 0.71864950299107,
+        "runner_up_context_id": "disk_exhaustion",
+        "runner_up_similarity": 0.6548537079614138,
+        "margin": 0.06379579502965615
+      },
+      "API 的 99 分位耗时异常升高。": {
+        "expected_context_id": "latency_incident",
+        "context_id": "latency_incident",
+        "similarity": 0.6281620219817156,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.5559109500859984,
+        "margin": 0.07225107189571711
+      },
+      "高峰期页面打开缓慢且请求堆积。": {
+        "expected_context_id": "latency_incident",
+        "context_id": "cache_inconsistency",
+        "similarity": 0.6397074273599719,
+        "runner_up_context_id": "disk_exhaustion",
+        "runner_up_similarity": 0.612335632109121,
+        "margin": 0.027371795250850872
+      },
+      "应用处理请求的延迟显著变大。": {
+        "expected_context_id": "latency_incident",
+        "context_id": "latency_incident",
+        "similarity": 0.748718051510889,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.6785504602953891,
+        "margin": 0.07016759121549987
+      },
+      "修改数据后客户端依然拿到旧结果。": {
+        "expected_context_id": "cache_inconsistency",
+        "context_id": "schema_migration",
+        "similarity": 0.6652434705234719,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.6641779589964408,
+        "margin": 0.001065511527031049
+      },
+      "缓存没有失效，页面显示陈旧内容。": {
+        "expected_context_id": "cache_inconsistency",
+        "context_id": "cache_inconsistency",
+        "similarity": 0.8154001399740498,
+        "runner_up_context_id": "disk_exhaustion",
+        "runner_up_similarity": 0.6563736731990644,
+        "margin": 0.15902646677498544
+      },
+      "数据库已更新但读接口返回旧值。": {
+        "expected_context_id": "cache_inconsistency",
+        "context_id": "schema_migration",
+        "similarity": 0.6444300277967243,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.6381888278420832,
+        "margin": 0.006241199954641119
+      },
+      "用户看到的内容和最新记录不同，像是缓存问题。": {
+        "expected_context_id": "cache_inconsistency",
+        "context_id": "cache_inconsistency",
+        "similarity": 0.7302083316512009,
+        "runner_up_context_id": "disk_exhaustion",
+        "runner_up_similarity": 0.6233807423873454,
+        "margin": 0.1068275892638555
+      },
+      "节点存储空间告警，写入操作失败。": {
+        "expected_context_id": "disk_exhaustion",
+        "context_id": "disk_exhaustion",
+        "similarity": 0.6575485918906467,
+        "runner_up_context_id": "schema_migration",
+        "runner_up_similarity": 0.6480012697132206,
+        "margin": 0.009547322177426154
+      },
+      "磁盘占用达到上限，需要清理容量。": {
+        "expected_context_id": "disk_exhaustion",
+        "context_id": "disk_exhaustion",
+        "similarity": 0.8221986980236705,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.6979549500256027,
+        "margin": 0.12424374799806781
+      },
+      "应用无法落盘，系统提示空间不足。": {
+        "expected_context_id": "disk_exhaustion",
+        "context_id": "disk_exhaustion",
+        "similarity": 0.7070216856090363,
+        "runner_up_context_id": "cache_inconsistency",
+        "runner_up_similarity": 0.6658892278093215,
+        "margin": 0.04113245779971486
+      },
+      "pod 文件系统已满导致服务写日志失败。": {
+        "expected_context_id": "disk_exhaustion",
+        "context_id": "schema_migration",
+        "similarity": 0.655667585576614,
+        "runner_up_context_id": "release_failure",
+        "runner_up_similarity": 0.651626674784691,
+        "margin": 0.004040910791922925
+      },
+      "正常用户凭据无法通过登录验证。": {
+        "expected_context_id": "login_failure",
+        "context_id": "login_failure",
+        "similarity": 0.8217482095656194,
+        "runner_up_context_id": "schema_migration",
+        "runner_up_similarity": 0.5825916091114809,
+        "margin": 0.23915660045413856
+      },
+      "身份认证请求持续失败，无法创建会话。": {
+        "expected_context_id": "login_failure",
+        "context_id": "login_failure",
+        "similarity": 0.7252411979983825,
+        "runner_up_context_id": "schema_migration",
+        "runner_up_similarity": 0.6008564799937945,
+        "margin": 0.12438471800458795
+      },
+      "登录页面接受密码却不让用户进入。": {
+        "expected_context_id": "login_failure",
+        "context_id": "login_failure",
+        "similarity": 0.701970518590917,
+        "runner_up_context_id": "secret_exposure",
+        "runner_up_similarity": 0.5837797255040973,
+        "margin": 0.11819079308681968
+      },
+      "大量账号突然不能登录平台。": {
+        "expected_context_id": "login_failure",
+        "context_id": "login_failure",
+        "similarity": 0.7444610690128256,
+        "runner_up_context_id": "release_failure",
+        "runner_up_similarity": 0.5849034893422096,
+        "margin": 0.159557579670616
+      }
+    }
+  },
+  "summary": {
+    "exact_context_key": 0.5045,
+    "semantic_rag_route_plus_outcome_memory": 0.8766875,
+    "oracle_context_route_plus_outcome_memory": 0.999,
+    "selective_semantic_route_plus_outcome_memory": {
+      "automatic_action_accuracy": 0.9598333333333333,
+      "automatic_correct_share_of_all_queries": 0.719875,
+      "abstentions_require_fallback": 8
+    }
+  },
+  "resources": {
+    "mean_outcome_events": 128.0,
+    "router_prototypes": 8,
+    "held_out_queries": 32
+  }
+}

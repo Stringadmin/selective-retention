@@ -1,0 +1,145 @@
+{
+  "scope": {
+    "instances_total": 10,
+    "instances_scored": 10,
+    "skipped_abstention": 0,
+    "skipped_without_documents": 0,
+    "document_granularity": "session",
+    "include_assistant": true,
+    "top_ks": [
+      1,
+      3,
+      5,
+      10,
+      30,
+      50
+    ]
+  },
+  "overall": {
+    "recall_any@1": 0.4,
+    "recall_all@1": 0.4,
+    "ndcg@1": 0.4,
+    "recall_any@3": 0.5,
+    "recall_all@3": 0.5,
+    "ndcg@3": 0.5,
+    "recall_any@5": 0.5,
+    "recall_all@5": 0.5,
+    "ndcg@5": 0.5,
+    "recall_any@10": 0.6,
+    "recall_all@10": 0.6,
+    "ndcg@10": 0.5315464876785729,
+    "recall_any@30": 0.9,
+    "recall_all@30": 0.9,
+    "ndcg@30": 0.6071316829630014,
+    "recall_any@50": 1.0,
+    "recall_all@50": 1.0,
+    "ndcg@50": 0.6259218654339122
+  },
+  "by_question_type": {
+    "single-session-user": {
+      "recall_any@1": 0.4,
+      "recall_all@1": 0.4,
+      "ndcg@1": 0.4,
+      "recall_any@3": 0.5,
+      "recall_all@3": 0.5,
+      "ndcg@3": 0.5,
+      "recall_any@5": 0.5,
+      "recall_all@5": 0.5,
+      "ndcg@5": 0.5,
+      "recall_any@10": 0.6,
+      "recall_all@10": 0.6,
+      "ndcg@10": 0.5315464876785729,
+      "recall_any@30": 0.9,
+      "recall_all@30": 0.9,
+      "ndcg@30": 0.6071316829630014,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.6259218654339122
+    }
+  },
+  "sampled_top1_failures": [
+    {
+      "question_id": "e47becba",
+      "question_type": "single-session-user",
+      "question": "What degree did I graduate with?",
+      "answer_session_ids": [
+        "answer_280352e9"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_BvwQVCO_0",
+        "ec6ca9ef",
+        "sharegpt_PdnvIns_0"
+      ]
+    },
+    {
+      "question_id": "118b2229",
+      "question_type": "single-session-user",
+      "question": "How long is my daily commute to work?",
+      "answer_session_ids": [
+        "answer_40a90d51"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_dabXXRO_10",
+        "sharegpt_ltGQxlc_0",
+        "628c958c_7"
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "question_type": "single-session-user",
+      "question": "Where did I redeem a $5 coupon on coffee creamer?",
+      "answer_session_ids": [
+        "answer_d61669c7"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_105249",
+        "83addb61_4",
+        "55e0c6db_2"
+      ]
+    },
+    {
+      "question_id": "58bf7951",
+      "question_type": "single-session-user",
+      "question": "What play did I attend at the local community theater?",
+      "answer_session_ids": [
+        "answer_355c48bb"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_71618",
+        "sharegpt_M84blrA_53",
+        "ultrachat_155546"
+      ]
+    },
+    {
+      "question_id": "1e043500",
+      "question_type": "single-session-user",
+      "question": "What is the name of the playlist I created on Spotify?",
+      "answer_session_ids": [
+        "answer_3e012175"
+      ],
+      "top_3_session_ids": [
+        "8020d945_2",
+        "answer_3e012175",
+        "sharegpt_DWaO0BY_0"
+      ]
+    },
+    {
+      "question_id": "58ef2f1c",
+      "question_type": "single-session-user",
+      "question": "When did I volunteer at the local animal shelter's fundraising dinner?",
+      "answer_session_ids": [
+        "answer_59547700"
+      ],
+      "top_3_session_ids": [
+        "403ee298_1",
+        "e82ce7cd_1",
+        "e6ab6a7b_2"
+      ]
+    }
+  ],
+  "config": {
+    "input": "/mnt/f/benchmarks/longmemeval-cleaned/longmemeval_s_cleaned.json",
+    "instances_loaded": 10,
+    "embed_backend": "bge"
+  }
+}

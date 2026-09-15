@@ -1,0 +1,427 @@
+{
+  "scope": {
+    "instances_total": 500,
+    "instances_scored": 470,
+    "skipped_abstention": 30,
+    "skipped_without_documents": 0,
+    "document_granularity": "session",
+    "include_assistant": true,
+    "top_ks": [
+      1,
+      3,
+      5,
+      10,
+      30,
+      50
+    ]
+  },
+  "overall": {
+    "recall_any@1": 0.5914893617021276,
+    "recall_all@1": 0.1702127659574468,
+    "ndcg@1": 0.5914893617021276,
+    "recall_any@3": 0.7531914893617021,
+    "recall_all@3": 0.4829787234042553,
+    "ndcg@3": 0.6111251707963895,
+    "recall_any@5": 0.8106382978723404,
+    "recall_all@5": 0.5808510638297872,
+    "ndcg@5": 0.6461165277302797,
+    "recall_any@10": 0.874468085106383,
+    "recall_all@10": 0.725531914893617,
+    "ndcg@10": 0.6830500372687909,
+    "recall_any@30": 0.9829787234042553,
+    "recall_all@30": 0.951063829787234,
+    "ndcg@30": 0.7247000192286108,
+    "recall_any@50": 1.0,
+    "recall_all@50": 1.0,
+    "ndcg@50": 0.7306486561525886
+  },
+  "by_question_type": {
+    "knowledge-update": {
+      "recall_any@1": 0.6805555555555556,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.6805555555555556,
+      "recall_any@3": 0.8055555555555556,
+      "recall_all@3": 0.4305555555555556,
+      "ndcg@3": 0.5847367138640899,
+      "recall_any@5": 0.8333333333333334,
+      "recall_all@5": 0.5,
+      "ndcg@5": 0.6080794438373315,
+      "recall_any@10": 0.9444444444444444,
+      "recall_all@10": 0.6527777777777778,
+      "ndcg@10": 0.6533852929952457,
+      "recall_any@30": 0.9861111111111112,
+      "recall_all@30": 0.9722222222222222,
+      "ndcg@30": 0.6982681293279402,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7022561631404319
+    },
+    "multi-session": {
+      "recall_any@1": 0.6611570247933884,
+      "recall_all@1": 0.0,
+      "ndcg@1": 0.6611570247933884,
+      "recall_any@3": 0.8429752066115702,
+      "recall_all@3": 0.371900826446281,
+      "ndcg@3": 0.6193130854699499,
+      "recall_any@5": 0.8925619834710744,
+      "recall_all@5": 0.5289256198347108,
+      "ndcg@5": 0.6625690316084822,
+      "recall_any@10": 0.9338842975206612,
+      "recall_all@10": 0.7355371900826446,
+      "ndcg@10": 0.7085586104719434,
+      "recall_any@30": 1.0,
+      "recall_all@30": 0.9256198347107438,
+      "ndcg@30": 0.7438454055291103,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7501595568398406
+    },
+    "single-session-assistant": {
+      "recall_any@1": 0.7678571428571429,
+      "recall_all@1": 0.7678571428571429,
+      "ndcg@1": 0.7678571428571429,
+      "recall_any@3": 0.8928571428571429,
+      "recall_all@3": 0.8928571428571429,
+      "ndcg@3": 0.8730855225127566,
+      "recall_any@5": 0.9285714285714286,
+      "recall_all@5": 0.9285714285714286,
+      "ndcg@5": 0.8909426653698995,
+      "recall_any@10": 0.9285714285714286,
+      "recall_all@10": 0.9285714285714286,
+      "ndcg@10": 0.8909426653698995,
+      "recall_any@30": 1.0,
+      "recall_all@30": 1.0,
+      "ndcg@30": 0.9075654548600426,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.9075654548600426
+    },
+    "single-session-preference": {
+      "recall_any@1": 0.26666666666666666,
+      "recall_all@1": 0.26666666666666666,
+      "ndcg@1": 0.26666666666666666,
+      "recall_any@3": 0.4,
+      "recall_all@3": 0.4,
+      "ndcg@3": 0.4,
+      "recall_any@5": 0.5333333333333333,
+      "recall_all@5": 0.5333333333333333,
+      "ndcg@5": 0.46435588526911314,
+      "recall_any@10": 0.6333333333333333,
+      "recall_all@10": 0.6333333333333333,
+      "ndcg@10": 0.49828197062931306,
+      "recall_any@30": 0.9333333333333333,
+      "recall_all@30": 0.9333333333333333,
+      "ndcg@30": 0.5700402502936747,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.5830957925199358
+    },
+    "single-session-user": {
+      "recall_any@1": 0.34375,
+      "recall_all@1": 0.34375,
+      "ndcg@1": 0.34375,
+      "recall_any@3": 0.5625,
+      "recall_all@3": 0.5625,
+      "ndcg@3": 0.5336663869977701,
+      "recall_any@5": 0.609375,
+      "recall_all@5": 0.609375,
+      "ndcg@5": 0.5549375294375637,
+      "recall_any@10": 0.703125,
+      "recall_all@10": 0.703125,
+      "ndcg@10": 0.5865972408978596,
+      "recall_any@30": 0.9375,
+      "recall_all@30": 0.9375,
+      "ndcg@30": 0.6453967272750973,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.6574537916844758
+    },
+    "temporal-reasoning": {
+      "recall_any@1": 0.5984251968503937,
+      "recall_all@1": 0.05511811023622047,
+      "ndcg@1": 0.5984251968503937,
+      "recall_any@3": 0.7559055118110236,
+      "recall_all@3": 0.41732283464566927,
+      "ndcg@3": 0.5916808307531732,
+      "recall_any@5": 0.8346456692913385,
+      "recall_all@5": 0.5196850393700787,
+      "ndcg@5": 0.6329348625946882,
+      "recall_any@10": 0.8976377952755905,
+      "recall_all@10": 0.7007874015748031,
+      "ndcg@10": 0.676147344539465,
+      "recall_any@30": 0.9921259842519685,
+      "recall_all@30": 0.952755905511811,
+      "ndcg@30": 0.717308237245939,
+      "recall_any@50": 1.0,
+      "recall_all@50": 1.0,
+      "ndcg@50": 0.7218861130111643
+    }
+  },
+  "sampled_top1_failures": [
+    {
+      "question_id": "e47becba",
+      "question_type": "single-session-user",
+      "question": "What degree did I graduate with?",
+      "answer_session_ids": [
+        "answer_280352e9"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_BvwQVCO_0",
+        "ec6ca9ef",
+        "sharegpt_PdnvIns_0"
+      ]
+    },
+    {
+      "question_id": "118b2229",
+      "question_type": "single-session-user",
+      "question": "How long is my daily commute to work?",
+      "answer_session_ids": [
+        "answer_40a90d51"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_dabXXRO_10",
+        "sharegpt_ltGQxlc_0",
+        "628c958c_7"
+      ]
+    },
+    {
+      "question_id": "51a45a95",
+      "question_type": "single-session-user",
+      "question": "Where did I redeem a $5 coupon on coffee creamer?",
+      "answer_session_ids": [
+        "answer_d61669c7"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_105249",
+        "83addb61_4",
+        "55e0c6db_2"
+      ]
+    },
+    {
+      "question_id": "58bf7951",
+      "question_type": "single-session-user",
+      "question": "What play did I attend at the local community theater?",
+      "answer_session_ids": [
+        "answer_355c48bb"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_71618",
+        "sharegpt_M84blrA_53",
+        "ultrachat_155546"
+      ]
+    },
+    {
+      "question_id": "1e043500",
+      "question_type": "single-session-user",
+      "question": "What is the name of the playlist I created on Spotify?",
+      "answer_session_ids": [
+        "answer_3e012175"
+      ],
+      "top_3_session_ids": [
+        "8020d945_2",
+        "answer_3e012175",
+        "sharegpt_DWaO0BY_0"
+      ]
+    },
+    {
+      "question_id": "58ef2f1c",
+      "question_type": "single-session-user",
+      "question": "When did I volunteer at the local animal shelter's fundraising dinner?",
+      "answer_session_ids": [
+        "answer_59547700"
+      ],
+      "top_3_session_ids": [
+        "403ee298_1",
+        "e82ce7cd_1",
+        "e6ab6a7b_2"
+      ]
+    },
+    {
+      "question_id": "5d3d2817",
+      "question_type": "single-session-user",
+      "question": "What was my previous occupation?",
+      "answer_session_ids": [
+        "answer_235eb6fb"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_bTDMt3m_64",
+        "e93efd9a_1",
+        "sharegpt_ebWP6Hz_0"
+      ]
+    },
+    {
+      "question_id": "7527f7e2",
+      "question_type": "single-session-user",
+      "question": "How much did I spend on a designer handbag?",
+      "answer_session_ids": [
+        "answer_7cb94507"
+      ],
+      "top_3_session_ids": [
+        "88fed3ed_2",
+        "44bbd8cd_2",
+        "bee872da_2"
+      ]
+    },
+    {
+      "question_id": "3b6f954b",
+      "question_type": "single-session-user",
+      "question": "Where did I attend for my study abroad program?",
+      "answer_session_ids": [
+        "answer_94030872"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_294369",
+        "ultrachat_466603",
+        "1f0c62de"
+      ]
+    },
+    {
+      "question_id": "726462e0",
+      "question_type": "single-session-user",
+      "question": "What was the discount I got on my first purchase from the new clothing brand?",
+      "answer_session_ids": [
+        "answer_f38f679b"
+      ],
+      "top_3_session_ids": [
+        "29e76903_1",
+        "ce144f08",
+        "082889ba_1"
+      ]
+    },
+    {
+      "question_id": "ad7109d1",
+      "question_type": "single-session-user",
+      "question": "What speed is my new internet plan?",
+      "answer_session_ids": [
+        "answer_679840f8"
+      ],
+      "top_3_session_ids": [
+        "3e5fea0e_abs_1",
+        "3030efec_2",
+        "0982a1fa_5"
+      ]
+    },
+    {
+      "question_id": "dccbc061",
+      "question_type": "single-session-user",
+      "question": "What was my previous stance on spirituality?",
+      "answer_session_ids": [
+        "answer_8f276838"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_6lBVIXU_0",
+        "answer_8f276838",
+        "657ab20c_1"
+      ]
+    },
+    {
+      "question_id": "c8c3f81d",
+      "question_type": "single-session-user",
+      "question": "What brand are my favorite running shoes?",
+      "answer_session_ids": [
+        "answer_761acef8"
+      ],
+      "top_3_session_ids": [
+        "eb403c80_2",
+        "answer_761acef8",
+        "9c5f1314_1"
+      ]
+    },
+    {
+      "question_id": "8ebdbe50",
+      "question_type": "single-session-user",
+      "question": "What certification did I complete last month?",
+      "answer_session_ids": [
+        "answer_8ad8a34f"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_mWFmQxk_36",
+        "ultrachat_226431",
+        "sharegpt_QxC97cL_0"
+      ]
+    },
+    {
+      "question_id": "95bcc1c8",
+      "question_type": "single-session-user",
+      "question": "How many amateur comedians did I watch perform at the open mic night?",
+      "answer_session_ids": [
+        "answer_cb742a61"
+      ],
+      "top_3_session_ids": [
+        "99e5e380",
+        "c00077f5_2",
+        "abeda028"
+      ]
+    },
+    {
+      "question_id": "0862e8bf",
+      "question_type": "single-session-user",
+      "question": "What is the name of my cat?",
+      "answer_session_ids": [
+        "answer_c6fd8ebd"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_WhKs0Le_0",
+        "answer_c6fd8ebd",
+        "ultrachat_88749"
+      ]
+    },
+    {
+      "question_id": "853b0a1d",
+      "question_type": "single-session-user",
+      "question": "How old was I when my grandma gave me the silver necklace?",
+      "answer_session_ids": [
+        "answer_69811d4a"
+      ],
+      "top_3_session_ids": [
+        "ultrachat_97719",
+        "f71bf532_1",
+        "f7a61595_4"
+      ]
+    },
+    {
+      "question_id": "a06e4cfe",
+      "question_type": "single-session-user",
+      "question": "What is my preferred gin-to-vermouth ratio for a classic gin martini?",
+      "answer_session_ids": [
+        "answer_6fe9fb49"
+      ],
+      "top_3_session_ids": [
+        "sharegpt_2LOQFZX_0",
+        "answer_6fe9fb49",
+        "sharegpt_x7qWsS9_23"
+      ]
+    },
+    {
+      "question_id": "b86304ba",
+      "question_type": "single-session-user",
+      "question": "How much is the painting of a sunset worth in terms of the amount I paid for it?",
+      "answer_session_ids": [
+        "answer_645b0329"
+      ],
+      "top_3_session_ids": [
+        "091aa510_1",
+        "65f3c006_1",
+        "fe1e4351_1"
+      ]
+    },
+    {
+      "question_id": "d52b4f67",
+      "question_type": "single-session-user",
+      "question": "Where did I attend my cousin's wedding?",
+      "answer_session_ids": [
+        "answer_0df6aa4b"
+      ],
+      "top_3_session_ids": [
+        "380a9d4d_1",
+        "sharegpt_n6Ej34Y_75",
+        "answer_0df6aa4b"
+      ]
+    }
+  ],
+  "config": {
+    "input": "/mnt/f/benchmarks/longmemeval-cleaned/longmemeval_s_cleaned.json",
+    "instances_loaded": 500,
+    "embed_backend": "bge"
+  }
+}

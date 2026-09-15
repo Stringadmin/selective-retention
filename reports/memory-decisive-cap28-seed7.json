@@ -1,0 +1,165 @@
+{
+  "summary": {
+    "full_top1": 0.0,
+    "full_recency": 0.6,
+    "full_slot_recency": 1.0,
+    "igm": 1.0,
+    "background_full_top1": 1.0,
+    "background_full_slot_recency": 1.0,
+    "background_igm": 1.0,
+    "full_fifo_top1": 0.0,
+    "full_fifo_recency": 0.6,
+    "full_fifo_slot_recency": 1.0,
+    "background_full_fifo_top1": 0.125,
+    "background_full_fifo_slot_recency": 0.125
+  },
+  "details": [
+    {
+      "attr": "住址",
+      "chain": [
+        "北京",
+        "上海",
+        "广州",
+        "深圳",
+        "珠海"
+      ],
+      "gold": "珠海",
+      "full_top1": "上海",
+      "full_recency": "深圳",
+      "full_slot_recency": "珠海",
+      "igm": "珠海",
+      "full_mem": 52,
+      "igm_mem": 28,
+      "full_fifo_top1": "上海",
+      "full_fifo_recency": "深圳",
+      "full_fifo_slot_recency": "珠海",
+      "full_fifo_mem": 28,
+      "background_accuracy": {
+        "full_top1": 1.0,
+        "full_slot_recency": 1.0,
+        "igm": 1.0,
+        "full_fifo_top1": 0.125,
+        "full_fifo_slot_recency": 0.125
+      }
+    },
+    {
+      "attr": "工作",
+      "chain": [
+        "教师",
+        "助教",
+        "讲师",
+        "教授",
+        "医生"
+      ],
+      "gold": "医生",
+      "full_top1": "教师",
+      "full_recency": "医生",
+      "full_slot_recency": "医生",
+      "igm": "医生",
+      "full_mem": 52,
+      "igm_mem": 28,
+      "full_fifo_top1": "教师",
+      "full_fifo_recency": "医生",
+      "full_fifo_slot_recency": "医生",
+      "full_fifo_mem": 28,
+      "background_accuracy": {
+        "full_top1": 1.0,
+        "full_slot_recency": 1.0,
+        "igm": 1.0,
+        "full_fifo_top1": 0.125,
+        "full_fifo_slot_recency": 0.125
+      }
+    },
+    {
+      "attr": "最喜欢的颜色",
+      "chain": [
+        "蓝色",
+        "青色",
+        "蓝绿色",
+        "绿色",
+        "紫色"
+      ],
+      "gold": "紫色",
+      "full_top1": "绿色",
+      "full_recency": "紫色",
+      "full_slot_recency": "紫色",
+      "igm": "紫色",
+      "full_mem": 52,
+      "igm_mem": 28,
+      "full_fifo_top1": "绿色",
+      "full_fifo_recency": "紫色",
+      "full_fifo_slot_recency": "紫色",
+      "full_fifo_mem": 28,
+      "background_accuracy": {
+        "full_top1": 1.0,
+        "full_slot_recency": 1.0,
+        "igm": 1.0,
+        "full_fifo_top1": 0.125,
+        "full_fifo_slot_recency": 0.125
+      }
+    },
+    {
+      "attr": "座驾",
+      "chain": [
+        "自行车",
+        "电动车",
+        "摩托车",
+        "汽车",
+        "越野车"
+      ],
+      "gold": "越野车",
+      "full_top1": "汽车",
+      "full_recency": "汽车",
+      "full_slot_recency": "越野车",
+      "igm": "越野车",
+      "full_mem": 52,
+      "igm_mem": 28,
+      "full_fifo_top1": "汽车",
+      "full_fifo_recency": "汽车",
+      "full_fifo_slot_recency": "越野车",
+      "full_fifo_mem": 28,
+      "background_accuracy": {
+        "full_top1": 1.0,
+        "full_slot_recency": 1.0,
+        "igm": 1.0,
+        "full_fifo_top1": 0.125,
+        "full_fifo_slot_recency": 0.125
+      }
+    },
+    {
+      "attr": "最喜欢的食物",
+      "chain": [
+        "火锅",
+        "麻辣烫",
+        "串串香",
+        "冒菜",
+        "寿司"
+      ],
+      "gold": "寿司",
+      "full_top1": "冒菜",
+      "full_recency": "寿司",
+      "full_slot_recency": "寿司",
+      "igm": "寿司",
+      "full_mem": 52,
+      "igm_mem": 28,
+      "full_fifo_top1": "冒菜",
+      "full_fifo_recency": "寿司",
+      "full_fifo_slot_recency": "寿司",
+      "full_fifo_mem": 28,
+      "background_accuracy": {
+        "full_top1": 1.0,
+        "full_slot_recency": 1.0,
+        "igm": 1.0,
+        "full_fifo_top1": 0.125,
+        "full_fifo_slot_recency": 0.125
+      }
+    }
+  ],
+  "config": {
+    "embed_backend": "bge",
+    "scorer": true,
+    "seed": 7,
+    "background_facts": 24,
+    "full_capacity": 28
+  }
+}

@@ -1,0 +1,273 @@
+{
+  "config": {
+    "input": "F:\\benchmarks\\longmemeval-cleaned\\longmemeval_s_cleaned.json",
+    "patterns": [
+      "\\bI (?:changed|switched|upgraded|moved) my (?P<attr>[A-Za-z][A-Za-z '\\-]{1,30}?) (?:to|over to)\\b",
+      "\\bmy (?:new |current |updated )?(?P<attr>[A-Za-z][A-Za-z '\\-]{1,30}?) is (?:now )?(?=[A-Z0-9$])",
+      "\\bthe (?P<attr>[A-Za-z][A-Za-z '\\-]{1,30}?) I(?:'m| am)? us(?:e|ing) is\\b",
+      "\\bI (?:set|reset) (?:a |my |the )?(?P<attr>[A-Za-z][A-Za-z '\\-]{1,30}?) to\\b"
+    ]
+  },
+  "fire_rate": {
+    "user_turns": 122416,
+    "shipped_rule_fired": 0,
+    "shipped_rule_rate": 0.0,
+    "english_translation_fired": 61,
+    "english_translation_rate": 0.0004983008757025226
+  },
+  "key_stability_knowledge_update": {
+    "n_pairs": 72,
+    "n_shared_key": 0,
+    "key_stability_rate": 0.0,
+    "n_new_side_only": 2,
+    "examples": [
+      {
+        "question_id": "6a1eabeb",
+        "identification": "date_order",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "6aeb4375",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "830ce83f",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "852ce960",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "945e3d21",
+        "identification": "date_order",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "d7c942c3",
+        "identification": "date_order",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "71315a70",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "89941a93",
+        "identification": "date_order",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "ce6d2d27",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "9ea5eabc",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "07741c44",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      },
+      {
+        "question_id": "a1eacc2a",
+        "identification": "answer_text",
+        "old_keys": [],
+        "new_keys": [],
+        "shared_key": null
+      }
+    ]
+  },
+  "audit_top_keys": [
+    {
+      "key": "cat's name",
+      "count": 3
+    },
+    {
+      "key": "out",
+      "count": 3
+    },
+    {
+      "key": "mom",
+      "count": 3
+    },
+    {
+      "key": "supervisor's name",
+      "count": 3
+    },
+    {
+      "key": "mind",
+      "count": 2
+    },
+    {
+      "key": "son",
+      "count": 2
+    },
+    {
+      "key": "reminder on my fitbit",
+      "count": 2
+    },
+    {
+      "key": "it in js",
+      "count": 2
+    },
+    {
+      "key": "favorite instructor",
+      "count": 2
+    },
+    {
+      "key": "home to san francisco",
+      "count": 2
+    },
+    {
+      "key": "phone's ringtone",
+      "count": 2
+    },
+    {
+      "key": "specific objective in daylio",
+      "count": 2
+    },
+    {
+      "key": "friend",
+      "count": 1
+    },
+    {
+      "key": "it",
+      "count": 1
+    },
+    {
+      "key": "grandpa",
+      "count": 1
+    },
+    {
+      "key": "colleague",
+      "count": 1
+    },
+    {
+      "key": "rate",
+      "count": 1
+    },
+    {
+      "key": "one",
+      "count": 1
+    },
+    {
+      "key": "for myself",
+      "count": 1
+    },
+    {
+      "key": "destination",
+      "count": 1
+    },
+    {
+      "key": "microwave",
+      "count": 1
+    },
+    {
+      "key": "department",
+      "count": 1
+    },
+    {
+      "key": "sister",
+      "count": 1
+    },
+    {
+      "key": "younger sister",
+      "count": 1
+    },
+    {
+      "key": "personal best",
+      "count": 1
+    },
+    {
+      "key": "resume my name",
+      "count": 1
+    },
+    {
+      "key": "favorites",
+      "count": 1
+    },
+    {
+      "key": "headline",
+      "count": 1
+    },
+    {
+      "key": "annual salary",
+      "count": 1
+    },
+    {
+      "key": "salary",
+      "count": 1
+    },
+    {
+      "key": "up habitica",
+      "count": 1
+    },
+    {
+      "key": "reminder",
+      "count": 1
+    },
+    {
+      "key": "up a zap",
+      "count": 1
+    },
+    {
+      "key": "zip code",
+      "count": 1
+    },
+    {
+      "key": "favorite authors",
+      "count": 1
+    },
+    {
+      "key": "ancestry",
+      "count": 1
+    },
+    {
+      "key": "favourite",
+      "count": 1
+    },
+    {
+      "key": "up rescuetime",
+      "count": 1
+    },
+    {
+      "key": "highest score so far",
+      "count": 1
+    },
+    {
+      "key": "up my laptop",
+      "count": 1
+    }
+  ],
+  "distinct_keys": 45
+}

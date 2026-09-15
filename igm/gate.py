@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 from typing import Protocol, runtime_checkable
 
 
@@ -27,30 +28,57 @@ class Scorer(Protocol):
 # Slot extraction (knowledge-update routing)
 # ---------------------------------------------------------------------------
 
-_SLOT_PREFIXES = ("现在的", "目前的", "新的", "原来的", "以前的", "当前的")
-_SLOT_ANCHORS = ("我的", "我")
-_SLOT_STOPS = ("现在是", "是什么", "是", "了", "。", "，", ",", "？", "?")
+_SLOT_PREFIXES = ("现在的", "目前的", "新的", "原来的", "以前的", "当前的",
+                  "之前的", "上一次的", "上次的")
+_NON_ATTRIBUTE_PREFIXES = ("天", "天哪", "意思", "想法")
+_NON_ATTRIBUTE_UTTERANCE_PREFIXES = (
+    "我说的", "我让你", "我现在不", "我去过", "我在想", "我就知道",
+)
 
 
-def extract_slot(text: str, max_len: int = 6) -> str | None:
-    """Extract the attribute key from a fact or question of the form
-    '我的{ATTR}是...' / '我现在的{ATTR}是什么'.
+def extract_slot(text: str, max_len: int = 64) -> str | None:
+    """Extract an attribute key from natural fact/update phrasing.
 
-    Temporal/status prefixes ("现在的") are stripped so a query and its fact
-    map to the same slot.  Returns None for non-attribute text.
+    The old implementation treated any ``我...是`` substring as a slot. This
+    version requires an attribute-shaped relation and handles common update
+    verbs (``改成``/``换成``/``搬到``), naming (``叫``), and disposal syntax
+    (``把主分支改成``). It remains conservative for speech acts and
+    transient/event clauses, returning ``None`` rather than arming destructive
+    supersede on a guessed key.
     """
-    for anchor in _SLOT_ANCHORS:
-        if anchor not in text:
-            continue
-        rest = text.split(anchor, 1)[1]
-        for stop in _SLOT_STOPS:
-            if stop in rest:
-                attr = rest.split(stop, 1)[0].strip()
-                for pref in _SLOT_PREFIXES:
-                    if attr.startswith(pref):
-                        attr = attr[len(pref):]
-                if 0 < len(attr) <= max_len:
-                    return attr
+    if not isinstance(text, str) or not text.strip():
+        return None
+    compact = re.sub(r"\s+", "", text)
+    if compact.startswith(_NON_ATTRIBUTE_UTTERANCE_PREFIXES):
+        return None
+
+    def clean(raw: str) -> str | None:
+        attr = re.sub(r"\s+", "", raw.strip())
+        for prefix in _SLOT_PREFIXES:
+            if attr.startswith(prefix):
+                attr = attr[len(prefix):]
+                break
+        if not attr or attr in _NON_ATTRIBUTE_PREFIXES:
+            return None
+        return attr if len(attr) <= max_len else None
+
+    patterns = (
+        r"我在[^，,。！？?!]{1,16}的(?P<attr>[^，,。！？?!]{1,16}?)(?:搬到|改成|换成)",
+        r"我把(?P<attr>[^，,。！？?!]{1,16}?)(?:改成|换成|设为|设置为)",
+        r"我(?:用的|使用的)(?P<attr>[^，,。！？?!]{1,16}?)(?:是|叫)",
+        r"我的(?:手机号|手机号码|账号)的(?P<attr>[^，,。！？?!]{1,16}?)(?:从|是|改成|换成)",
+        r"我的(?P<attr>[^，,。！？?!]{1,32}?)(?:现在是|目前是|是什么|是|叫|改成|换成|从)",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, compact)
+        if match:
+            slot = clean(match.group("attr"))
+            if slot is not None:
+                return slot
+
+    match = re.search(r"我(?P<attr>[^，,。！？?!]{1,32}?)(?:是什么|现在是)", compact)
+    if match:
+        return clean(match.group("attr"))
     return None
 
 
