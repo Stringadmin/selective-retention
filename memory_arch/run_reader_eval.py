@@ -308,12 +308,117 @@ def run(entries: list[dict[str, Any]], embedder: Any, reader: Any, k: int = 8,
     }
 
 
+def analyze_discourse_order(entries: list[dict[str, Any]], embedder: Any, report: dict[str, Any],
+                            arms: Sequence[str], k: int = 8) -> dict[str, Any]:
+    """Does the reader treat discourse order as temporal order?
+
+    No dates are shown to the reader, so the only ordering signal is position:
+    in normal prose the later-mentioned statement is the more recent one.  This
+    analysis asks whether the shown order agrees with the true temporal order of
+    the two conflicting excerpts, and cross-tabs accuracy against that.
+
+    Contexts are rebuilt deterministically (same code path that produced the
+    report); a row is correct iff it is absent from ``report["errors"]``.
+    """
+    failures = {(row["question_id"], row["arm"]) for row in report["errors"]["knowledge_update"]}
+    rows: list[dict[str, Any]] = []
+    for entry in entries:
+        new_id, how, gold_ids = identify_new_session(entry)
+        if new_id is None:
+            continue
+        old_ids = [session_id for session_id in gold_ids if session_id != new_id]
+        ranked = rank_turns(entry["question"], turn_documents(entry), embedder)
+        for arm in arms:
+            if arm in ("current_only", "stale_only") and not old_ids:
+                continue
+            turns = select_evidence(entry, arm, ranked, k, new_id=new_id, old_ids=old_ids)
+            new_positions = [i for i, (sid, _, _) in enumerate(turns) if sid == new_id]
+            old_positions = [i for i, (sid, _, _) in enumerate(turns) if sid in old_ids]
+            if not new_positions or not old_positions:
+                continue  # only one side is visible; the case cannot discriminate
+            rows.append({
+                "arm": arm,
+                "identification": how,
+                "new_after_old": max(new_positions) > min(old_positions),
+                "gap": max(new_positions) - min(old_positions),
+                "correct": (entry["question_id"], arm) not in failures,
+            })
+
+    def rate(group: list[dict[str, Any]]) -> dict[str, Any]:
+        return {"n": len(group), "accuracy": (sum(r["correct"] for r in group) / len(group)
+                                              if group else 0.0)}
+
+    def split(group: list[dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "new_after_old": rate([r for r in group if r["new_after_old"]]),
+            "new_before_old": rate([r for r in group if not r["new_after_old"]]),
+        }
+
+    answer_text_only = [r for r in rows if r["identification"] == "answer_text"]
+    return {
+        "n_rows_both_visible": len(rows),
+        "pooled": split(rows),
+        "pooled_answer_text_only": split(answer_text_only),
+        "per_arm": {arm: split([r for r in rows if r["arm"] == arm]) for arm in arms},
+    }
+
+
+def analyze_gold_position(entries: list[dict[str, Any]], embedder: Any, report: dict[str, Any],
+                          arms: Sequence[str], k: int = 8) -> dict[str, Any]:
+    """Accuracy as a function of where the answer-bearing excerpt sits.
+
+    Position 1 = first excerpt shown, k = last.  Falling accuracy with position
+    means primacy anchoring; rising accuracy means recency.  Only pairs whose
+    gold string is verbatim present in some excerpt can be scored, so this uses
+    the ``answer_text`` subset of the knowledge-update questions.
+    """
+    failures = {(row["question_id"], row["arm"]) for row in report["errors"]["knowledge_update"]}
+    normalize = lambda value: re.sub(r"[^0-9a-z]+", "", str(value).lower())
+    buckets: dict[str, dict[int, list[bool]]] = defaultdict(lambda: defaultdict(list))
+    for entry in entries:
+        new_id, _, gold_ids = identify_new_session(entry)
+        if new_id is None:
+            continue
+        old_ids = [session_id for session_id in gold_ids if session_id != new_id]
+        gold = normalize(entry["answer"])
+        if not gold:
+            continue
+        ranked = rank_turns(entry["question"], turn_documents(entry), embedder)
+        for arm in arms:
+            if arm in ("current_only", "stale_only") and not old_ids:
+                continue
+            turns = select_evidence(entry, arm, ranked, k, new_id=new_id, old_ids=old_ids)
+            positions = [i + 1 for i, (_, _, text) in enumerate(turns) if gold in normalize(text)]
+            if not positions:
+                continue
+            buckets[arm][min(positions)].append(
+                (entry["question_id"], arm) not in failures)
+
+    def summarize(by_position: dict[int, list[bool]]) -> dict[str, Any]:
+        total = [value for values in by_position.values() for value in values]
+        return {
+            "n": len(total),
+            "accuracy": sum(total) / len(total) if total else 0.0,
+            "by_position": {
+                str(position): {"n": len(values), "accuracy": sum(values) / len(values)}
+                for position, values in sorted(by_position.items())
+            },
+        }
+
+    return {arm: summarize(buckets[arm]) for arm in arms if buckets[arm]}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", default="reports/longmemeval-s-reader-eval.json")
     parser.add_argument("--embed-model", required=True)
-    parser.add_argument("--model", required=True, help="HF checkpoint directory of the reader")
+    parser.add_argument("--model", required=False, default=None,
+                        help="HF checkpoint directory of the reader (generation mode)")
+    parser.add_argument("--analyze-report", default=None,
+                        help="skip generation: rebuild this report's contexts and print the "
+                             "mechanism analyses")
+    parser.add_argument("--analysis", choices=("discourse", "gold-position"), default="discourse")
     parser.add_argument("--partition", choices=["all", "development", "test"], default="all")
     parser.add_argument("--k", type=int, default=8)
     parser.add_argument("--control-limit", type=int, default=60)
@@ -328,8 +433,23 @@ def main() -> None:
     args = parser.parse_args()
 
     entries = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    entries = select_partition(entries, args.partition)
+    entries = list(select_partition(entries, args.partition))
     embedder = Embedder(backend="bge", model_path=args.embed_model)
+
+    if args.analyze_report:
+        report = json.loads(Path(args.analyze_report).read_text(encoding="utf-8"))
+        knowledge_update = [e for e in entries
+                            if e["question_type"] == "knowledge-update"
+                            and not e["question_id"].endswith("_abs")]
+        analyze = (analyze_discourse_order if args.analysis == "discourse"
+                   else analyze_gold_position)
+        result = analyze(knowledge_update, embedder, report,
+                         report["config"]["arms"], k=report["config"]["k"])
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+
+    if not args.model:
+        parser.error("--model is required to generate; use --analyze-report to analyse an existing report")
     print("loading reader...", flush=True)
     reader = TransformersReader(args.model)
     print("reader ready", flush=True)
