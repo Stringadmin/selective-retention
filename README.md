@@ -135,7 +135,7 @@ igm/                    # 可安装的 RAG 写入层库（零依赖核心）
 dsh-igm-memory/         # DeepSeek Harness 插件（cordis bundle）
   lib/index.js          #   remember_fact / recall_fact / recall_history / 注入 / 持久化 / 遗忘
   cordis.patch.yml      #   插件注册层
-  test/test_igm_plugin.mjs #  25 个插件回归测试，含 slot 规则跳语言 parity（npm test）
+  test/test_igm_plugin.mjs #  27 个插件回归测试，含 slot 规则跳语言 parity（npm test）
 memory_arch/            # Agent 记忆研究代码（IGM 的实验负载）
   scorer.py             #   可学习的 importance 打分器
   outcome.py            #   结果事件归档 + 衰减证据视图

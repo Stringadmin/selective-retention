@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Session-start injection now lists memories oldest first, so the injected list
+  reads as a timeline whose newest statement is last - the assembly the reader
+  experiments scored best. Injected memories are all current values today, so
+  this is convention-setting rather than a fix.
+- `remember_fact` returns a `hint` when a fact is stored without an attribute
+  key, suggesting the `我的{属性}是{值}` restatement: measured key yield on
+  natural phrasing is ~15%, and the template shape is the one reliable path.
 - Add a `recall_history` tool: given a natural-language question
   ("我之前的住址是什么"), it routes to the attribute's slot and returns the
   archived version timeline (text, storedAt, archivedAt, current flag), oldest

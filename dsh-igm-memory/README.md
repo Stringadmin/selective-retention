@@ -101,13 +101,14 @@ This also runs on Windows and outside a DSH checkout: `schemastery` and
 symlinked `node_modules`.
 
 The suite uses unique temporary directories and never reads or writes the real
-`~/.dsh/storages`: 25 tests pass, with no `xfail` pins left — the three
+`~/.dsh/storages`: 27 tests pass, with no `xfail` pins left — the three
 `extractSlot` defects they used to hold open were fixed and are now ordinary
 regression assertions. It covers gating, versioned supersede, dedup versus
-update, history routing via `versionTimeline` and `recall_history`, persistence,
-corrupt files, v1 store upgrade, typed migration, concurrent session routing,
-restart discovery, project-fact isolation, reuse persistence through both query
-and `recall_fact`, practical forgetting, `storeFile`, and prompt injection.
+update, history routing via `versionTimeline` and `recall_history`, oldest-first
+injection order, the no-slot rephrase hint, persistence, corrupt files, v1 store
+upgrade, typed migration, concurrent session routing, restart discovery,
+project-fact isolation, reuse persistence through both query and `recall_fact`,
+practical forgetting, `storeFile`, and prompt injection.
 
 ### Slot-rule parity with Python
 

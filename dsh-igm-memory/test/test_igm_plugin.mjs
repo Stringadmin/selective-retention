@@ -344,6 +344,45 @@ await test('injection carries typed memories within a UTF-8 byte budget', async 
   assert.match(section.text, /cite it as previously stated/)
 })
 
+await test('session-start injection lists memories oldest first', async () => {
+  const home = tempDir()
+  // A v1 store file with two distinct timestamps: the older fact must be
+  // injected before the newer one so the list reads as a timeline.
+  fs.mkdirSync(path.join(home, 'storages'), { recursive: true })
+  fs.writeFileSync(path.join(home, 'storages', 'igm-user.json'), JSON.stringify({
+    items: [
+      { text: '我的常用语言是Python。', slot: '常用语言', score: 0.9, ts: 2000 },
+      { text: '我的住址是北京。', slot: '住址', score: 0.9, ts: 1000 },
+    ],
+  }))
+  const plugin = createPlugin(home)
+  const assembled = await plugin.events['system-prompt/assemble'](
+    {},
+    { agent: { session: { header: { cwd: path.join(home, 'project') } } } },
+    async () => ({ sections: [] }),
+  )
+  const section = assembled.sections.find((item) => item.name === 'igm-memory')
+  assert.ok(section)
+  const older = section.text.indexOf('住址')
+  const newer = section.text.indexOf('常用语言')
+  assert.ok(older >= 0 && newer >= 0, 'both memories should be injected')
+  assert.ok(older < newer, 'older memory must come first')
+})
+
+await test('remember_fact hints a rephrase when a fact gets no attribute key', async () => {
+  const home = tempDir()
+  const cwd = path.join(home, 'project')
+  const plugin = createPlugin(home)
+  const keyless = await plugin.remember.execute({ fact: '我喜欢在早上跑步。' }, execFor(cwd))
+  assert.equal(keyless.stored, true)
+  assert.equal(keyless.slot, '')
+  assert.match(keyless.hint, /我的\{属性\}是\{值\}/)
+  const keyed = await plugin.remember.execute({ fact: '我的住址是北京。' }, execFor(cwd))
+  assert.equal(keyed.stored, true)
+  assert.equal(keyed.slot, '住址')
+  assert.equal(keyed.hint, undefined)
+})
+
 // The Python write gate owns the slot OOD oracle. This standalone JavaScript
 // fixture is held to the same oracle so the production-shaped copy cannot
 // drift silently.

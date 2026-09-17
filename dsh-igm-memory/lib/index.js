@@ -608,7 +608,13 @@ export function apply(ctx, config) {
       const memory = [...userStore().current(), ...projectStore(cwd).current()].map(memoryView)
       if (res.kept) {
         log(`tool kept [${res.item.type}/${res.item.slot || 'none'}] ${args.fact.slice(0, 50)}`)
-        return { stored: true, slot: res.item.slot || '', reason: 'stored', memory }
+        // Natural phrasings rarely yield an attribute key (measured at 15% with
+        // an LLM extractor); the template shape is the one path that reliably
+        // does, so nudge the model to restate rather than stay keyless.
+        const hint = (!res.item.slot && res.item.type === 'fact')
+          ? 'No attribute key was extracted, so a later update will not supersede this fact. If it is a durable state, restate it as 我的{属性}是{值}.'
+          : undefined
+        return { stored: true, slot: res.item.slot || '', reason: 'stored', memory, ...(hint && { hint }) }
       }
       log(`tool filtered: ${args.fact.slice(0, 50)}`)
       return { stored: false, slot: '', reason: res.reason, memory }
@@ -714,7 +720,11 @@ export function apply(ctx, config) {
     const filtered = sections.filter((section) => section?.name !== sectionName)
     const u = userStore()
     const p = projectStore(cwd)
-    const ordered = [...u.current(), ...p.current()].sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    // Oldest first: the injected list then reads as a timeline whose newest
+    // statement is last, the assembly the reader experiments scored best.
+    // Injected memories are all current values, so no stale/new conflicts exist
+    // today; this keeps the convention right if any ever appear.
+    const ordered = [...u.current(), ...p.current()].sort((a, b) => (a.ts || 0) - (b.ts || 0))
     const lines = []
     let budget = maxInjectionBytes
     for (const item of ordered) {
