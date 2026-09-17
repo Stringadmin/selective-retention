@@ -69,11 +69,17 @@ class TransformersReader:
     def __init__(self, path: str, device: str = "cuda"):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers.integrations import hub_kernels
 
+        # The FP8 checkpoint loads its kernel lazily from a hub kernel repo on
+        # the first forward pass, and transformers gates that behind a module
+        # global that no public argument reaches.  This is a local research run
+        # against the official Qwen checkpoint, so allow it explicitly here.
+        hub_kernels.ALLOW_ALL_KERNELS = True
         self.torch = torch
-        self.tokenizer = AutoTokenizer.from_pretrained(path)
+        self.tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(
-            path, dtype=torch.bfloat16, device_map=device)
+            path, dtype=torch.bfloat16, device_map=device, trust_remote_code=True)
         self.model.eval()
 
     def count_tokens(self, text: str) -> int:
@@ -105,6 +111,44 @@ def is_truncated(pred: str) -> bool:
     """
     text = str(pred).strip()
     return not text or "<think>" in text
+
+
+class LlamaCppReader:
+    """GGUF reader via llama.cpp, fully offloaded to the GPU.
+
+    Used for the stronger-reader robustness run: a Q6_K quant of the same
+    model family fits the 12 GB card in full, which bf16 weights do not.
+    Qwen3's GGUF chat template has no enable_thinking switch, so the thinking
+    preface is always generated and stripped here; ``always_thinks`` tells the
+    runner to budget for it.
+    """
+
+    always_thinks = True
+
+    def __init__(self, path: str, n_ctx: int = 8192, n_gpu_layers: int = -1):
+        from llama_cpp import Llama
+
+        self.llm = Llama(model_path=path, n_ctx=n_ctx, n_gpu_layers=n_gpu_layers,
+                         n_batch=512, verbose=False)
+
+    def count_tokens(self, text: str) -> int:
+        return len(self.llm.tokenize(text.encode("utf-8"), add_bos=False))
+
+    def answer(self, system: str, user: str, max_new_tokens: int = 768,
+               thinking: bool = True) -> tuple[str, int]:
+        out = self.llm.create_chat_completion(
+            messages=[{"role": "system", "content": system},
+                      {"role": "user", "content": user}],
+            max_tokens=max_new_tokens,
+            temperature=0.0,
+        )
+        raw = out["choices"][0]["message"]["content"].strip()
+        if "</think>" in raw:
+            answer = raw.split("</think>", 1)[1].strip()
+        else:
+            lines = [line.strip() for line in raw.splitlines() if line.strip()]
+            answer = lines[-1] if lines else ""
+        return answer, len(self.llm.tokenize(raw.encode("utf-8"), add_bos=False))
 
 
 def user_turns(entry: dict[str, Any], session_id: str) -> list[str]:
@@ -176,8 +220,8 @@ def run(entries: list[dict[str, Any]], embedder: Any, reader: Any, k: int = 8,
         thinking: bool = False, arms: Sequence[str] = ARMS,
         run_control: bool = True) -> dict[str, Any]:
     def ask(prompt: str) -> tuple[str, int]:
-        return reader.answer(SYSTEM_PROMPT, prompt,
-                             max_new_tokens=768 if thinking else 64,
+        budget = 768 if (thinking or getattr(reader, "always_thinks", False)) else 64
+        return reader.answer(SYSTEM_PROMPT, prompt, max_new_tokens=budget,
                              thinking=thinking)
 
     knowledge_update = [e for e in entries if e["question_type"] == "knowledge-update"
@@ -428,6 +472,8 @@ def main() -> None:
                         help="knowledge-update questions to run (smoke testing)")
     parser.add_argument("--arms", nargs="+", choices=ARMS, default=list(ARMS),
                         help="subset of arms to run (default: all)")
+    parser.add_argument("--reader-backend", choices=("hf", "llama"), default="hf",
+                        help="hf = HF checkpoint (TransformersReader); llama = GGUF file (LlamaCppReader)")
     parser.add_argument("--no-control", action="store_true",
                         help="skip the other-question-type control group")
     args = parser.parse_args()
@@ -451,8 +497,9 @@ def main() -> None:
     if not args.model:
         parser.error("--model is required to generate; use --analyze-report to analyse an existing report")
     print("loading reader...", flush=True)
-    reader = TransformersReader(args.model)
-    print("reader ready", flush=True)
+    reader = (TransformersReader(args.model) if args.reader_backend == "hf"
+              else LlamaCppReader(args.model))
+    print(f"reader ready ({args.reader_backend})", flush=True)
 
     report = run(entries, embedder, reader, k=args.k,
                  control_limit=args.control_limit, limit=args.limit, thinking=args.thinking,
@@ -466,7 +513,8 @@ def main() -> None:
     print(json.dumps({
         "knowledge_update": {arm: round(summary["accuracy"], 3)
                              for arm, summary in report["knowledge_update"]["overall"].items()},
-        "control": round(report["control"]["by_arm"]["ranked_k8"]["accuracy"], 3),
+        "control": (round(report["control"]["by_arm"]["ranked_k8"]["accuracy"], 3)
+                    if report["control"]["by_arm"] else None),
         "saved": str(path),
     }, indent=2))
 
