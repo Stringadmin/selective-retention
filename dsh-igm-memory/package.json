@@ -1,7 +1,7 @@
 {
   "name": "dsh-igm-memory",
-  "version": "0.2.0",
-  "description": "Typed, importance-gated memory tools for DeepSeek Harness with project isolation and slot supersede",
+  "version": "0.3.0",
+  "description": "Typed, importance-gated memory tools for DeepSeek Harness with project isolation, versioned slot supersede and recall_history",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -13,6 +13,7 @@
     "test",
     "cordis.patch.yml",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "keywords": [

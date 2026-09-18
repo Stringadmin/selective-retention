@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-09-17
+
+这次发布的重点：**slot 覆盖从"删除旧值"改成"版本化归档"**——抽取失误不再销毁数据，最多是把旧值遮住；历史通过新工具 `recall_history` 对模型可见；所有读路径（召回、注入、跨项目匹配、list/stats）统一走当前投影，被取代的值再也到不了模型上下文。测试 21→27，且能在 Windows 与脱离 DSH checkout 的环境里跑。
 
 - Session-start injection now lists memories oldest first, so the injected list
   reads as a timeline whose newest statement is last - the assembly the reader
