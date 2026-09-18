@@ -1,7 +1,7 @@
 {
   "name": "dsh-igm-memory",
-  "version": "0.3.0",
-  "description": "Typed, importance-gated memory tools for DeepSeek Harness with project isolation, versioned slot supersede and recall_history",
+  "version": "0.5.0",
+  "description": "Typed, importance-gated and guarded memory tools for DeepSeek Harness with project isolation, versioned slot supersede, recall_history and a write-time trust boundary",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -10,6 +10,8 @@
   },
   "files": [
     "lib",
+    "docs",
+    "scripts",
     "test",
     "cordis.patch.yml",
     "README.md",
@@ -32,7 +34,8 @@
     }
   },
   "scripts": {
-    "test": "node test/test_igm_plugin.mjs"
+    "test": "node test/test_igm_plugin.mjs",
+    "benchmark": "node --expose-gc scripts/benchmark_igm_store.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -40,8 +43,8 @@
   "dependencies": {
     "schemastery": "3.18.0"
   },
-  "license": "MIT",
   "devDependencies": {
-    "@deepseek-ai/dsh-tools": "0.0.1-rc.1"
-  }
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.6"
+  },
+  "license": "MIT"
 }

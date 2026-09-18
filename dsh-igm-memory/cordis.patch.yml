@@ -8,3 +8,4 @@
         slotMaxLen: 6
         maxFactLen: 200
         maxInjectionBytes: 2048
+        securityEnabled: true
