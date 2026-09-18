@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Local CI: python suite, plugin suite, and the cross-language oracle check.
+# Local CI: python suite, plugin suite, and the cross-language oracle checks.
 # The parity tests read reports/slot-ood-baseline.json; the third step fails the
 # build if that committed oracle no longer matches a fresh regeneration, which
-# is how cross-language drift of the slot rule gets caught.
+# is how cross-language drift of the slot rule gets caught. The plugin also
+# vendors a copy for the standalone layout, so the fourth step compares the two
+# committed copies byte for byte.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -25,4 +27,8 @@ if fresh != committed:
              "run python -m memory_arch.run_slot_ood and review the diff")
 print("oracle matches the committed baseline")
 EOF
+
+echo "== vendored oracle copy (plugin vs reports) =="
+cmp reports/slot-ood-baseline.json dsh-igm-memory/test/fixtures/slot-ood-baseline.json
+echo "vendored copy matches reports/slot-ood-baseline.json"
 echo "all checks passed"
