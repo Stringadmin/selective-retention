@@ -103,11 +103,12 @@ mem.previous("住址").text                       # -> 北京（历史仍可答�
 
 ## 作为 DeepSeek Harness 插件用（dsh-igm-memory）
 
-同一套机制做成了 DSH 插件，给 agent 加“闸门 + 覆盖 + 分域持久记忆”：
+同一套机制做成了 DSH 插件，给 agent 加“闸门 + 覆盖 + 信任边界 + 分域持久记忆”：
 
-- `remember_fact`：agent 记事实走 IGM 闸门，同属性新值覆盖旧值
+- `remember_fact`：agent 记事实走 IGM 闸门，同属性新值取代旧值（旧值归档不删）
 - `recall_fact` + 会话启动注入：新会话开局能看到此前记住的事实；每次召回都会更新复用计数
 - `recall_history`：问"之前/上一次 X 是什么"时返回该属性的归档版本时间线
+- **写入信任边界**：命中高信号提示控制指令的写入被隔离待审，不覆盖已接受的 slot、不进任何读路径；凭证形态的写入直接拒绝且只留指纹审计。审计与复核是 host-only 服务，故意不注册成模型可见工具。规则是确定性的，抓不住包装成事实陈述的软性注入
 - `fact / decision / experience` 显式分类；只有经验能按主题跨项目复用
 - 按工具调用自己的 session cwd 路由，跨进程重启仍能发现项目存储
 - JSON 持久化 + 基于最后使用时间的 consolidate 遗忘
@@ -121,7 +122,7 @@ dsh web   # 重启加载
 #          再问"那之前住哪？" → recall_history 答北京
 ```
 
-代码在 `dsh-igm-memory/`，详见 [dsh-igm-memory/README.md](dsh-igm-memory/README.md)。
+代码在 `dsh-igm-memory/`，详见 [dsh-igm-memory/README.md](dsh-igm-memory/README.md)。它同时是独立仓库 [Stringadmin/dsh-igm-memory](https://github.com/Stringadmin/dsh-igm-memory) 的内容：0.5.0 把两边的分叉合流（独立仓库的写入信任边界 + 这一侧的归档式覆盖默认），之后本前缀是权威开发副本，发布时用 `git subtree split -P dsh-igm-memory` 导出推到那个仓库，两边跑同一套 36 个测试。
 
 ## 仓库结构
 
@@ -133,9 +134,10 @@ igm/                    # 可安装的 RAG 写入层库（零依赖核心）
   embedders.py          #   可插拔嵌入（hash / BGE / 自定义 callable）
   test_igm.py           #   26 个单元测试
 dsh-igm-memory/         # DeepSeek Harness 插件（cordis bundle）
-  lib/index.js          #   remember_fact / recall_fact / recall_history / 注入 / 持久化 / 遗忘
+  lib/index.js          #   remember_fact / recall_fact / recall_history / 注入 / 持久化 / 遗忘 / 写入信任边界
   cordis.patch.yml      #   插件注册层
-  test/test_igm_plugin.mjs #  27 个插件回归测试，含 slot 规则跳语言 parity（npm test）
+  test/test_igm_plugin.mjs #  36 个插件回归测试，含 slot 规则跳语言 parity（npm test）
+  test/fixtures/slot-ood-baseline.json # 跨语言 oracle 的第二份副本（CI 与 reports/ 逐字节比对）
 memory_arch/            # Agent 记忆研究代码（IGM 的实验负载）
   scorer.py             #   可学习的 importance 打分器
   outcome.py            #   结果事件归档 + 衰减证据视图

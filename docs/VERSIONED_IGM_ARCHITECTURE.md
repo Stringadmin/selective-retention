@@ -87,3 +87,11 @@ Versioned IGM 的工程价值只在于把以下策略统一成明确接口：门
 配套地，两侧的 slot 剥离清单加入了"之前的 / 上一次的 / 上次的"，让历史问句与事实路由到同一个键。
 跨语言 parity 测试（`write-layer outcome matches igm/store.py`）的对照量随之改为当前投影，
 `reports/slot-ood-baseline.json` 已按新语义重生成。
+
+0.5.0（2026-09-18）把独立仓库那条线上的 `0.4.0-experimental` 写入信任边界合并进来，两侧成为同一个
+store：不再有 `VersionedIgmStore`，归档还是破坏性覆盖由 `supersede`（`archive` 默认 / `delete`）决定，
+配置键 `versioned: false` 仍映射到后者。`load()` 因此要认两种历史布局——本仓库的"`items` 即归档"，
+以及 0.4 实验版的"`items` 当前快照 + `events` 归档"——后者读 `events`、下次写入落到前者。
+`current()` 现在是唯一的读出口，它同时过滤 `validTo === null` 与 `trust.state === 'accepted'`，
+所以归档值和被隔离的写入都到不了模型上下文。parity 测试改读 `test/fixtures/slot-ood-baseline.json`
+（独立仓库布局下没有同级的 `reports/`），`scripts/ci.sh` 用 `cmp` 保证这两份 oracle 逐字节一致。
