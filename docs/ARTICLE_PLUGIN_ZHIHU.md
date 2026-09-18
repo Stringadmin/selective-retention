@@ -58,7 +58,7 @@ IGM 的答案是：**记忆不该全存，也不该只增不减。** 它由三�
 
 结论不是“IGM 比全量 RAG 准”。只要有显式属性和时间语义，版本库也能答对当前值，并且还能回答“上一次是什么”。破坏性 IGM 选择删除旧版本，用 4 条更少的常驻记录换取只表达当前状态。
 
-为验证这个损失是否必须，我又做了 Versioned IGM 原型：门控后的事实写入不可变事件库，`current_by_slot` 只是指向最新事件的当前状态视图。它在两个 500 条 BGE seed 上当前值和历史值均为 100%，但仍持久化 32 个事件，不能把"28 个当前引用"宣传成总存储。更关键的是，门控版本库的准确率也相同，一个正常的带二级索引版本库也能直达当前事件。因此它是把状态视图和版本归档封装到同一个接口的工程架构，不是算法胜利。这套语义现在已下沉为 `igm` 库和 DSH 插件的**默认覆盖行为**（旧值关闭有效期进归档，要旧的破坏性覆盖就显式设 `supersede="delete"`），插件另外加了写入信任边界。完整配置和限制在研究仓库的 `docs/MEMORY_DECISIVE_LOAD_SWEEP.md` 与 `docs/VERSIONED_IGM_ARCHITECTURE.md`：500 条仍是模板化合成链，不能外推为真实 Agent 或通用 RAG 结果。
+为验证这个损失是否必须，我又做了 Versioned IGM 原型：门控后的事实写入不可变事件库，当前投影由 `valid_to is None` 的事件派生，并通过 `supersedes` 保留版本关系。它在两个 500 条 BGE seed 上当前值和历史值均为 100%，但仍持久化 32 个事件，不能把"28 个当前引用"宣传成总存储。更关键的是，门控版本库的准确率也相同，一个正常的带二级索引版本库也能直达当前事件。因此它是把状态视图和版本归档封装到同一个接口的工程架构，不是算法胜利。这套语义现在已下沉为 `igm` 库和 DSH 插件的**默认覆盖行为**（旧值关闭有效期进归档，要旧的破坏性覆盖就显式设 `supersede="delete"`），插件另外加了写入信任边界。完整配置和限制在研究仓库的 `docs/MEMORY_DECISIVE_LOAD_SWEEP.md` 与 `docs/VERSIONED_IGM_ARCHITECTURE.md`：500 条仍是模板化合成链，不能外推为真实 Agent 或通用 RAG 结果。
 
 ## 在 DeepSeek Harness 里落地
 
@@ -111,7 +111,7 @@ dsh web    # 重启加载
 ## 仓库
 
 - **插件**（本文主角）：[Stringadmin/dsh-igm-memory](https://github.com/Stringadmin/dsh-igm-memory) —— MIT，ESM JavaScript，1 个运行时依赖（`schemastery`），36 个回归测试
-- **研究报告**（IGM 机制背景与完整实验）：[Stringadmin/selective-retention](https://github.com/Stringadmin/selective-retention) —— 含文章《我试图让 AI 学会"不遗忘"》、决定性实验数据、可安装的 Python 版 IGM 库（`igm/`）、持续学习参数保护（FIP/GPP）
+- **研究报告**（IGM 机制背景与完整实验）：[Stringadmin/selective-retention](https://github.com/Stringadmin/selective-retention) —— 含文章《RAG 找到了新事实，为什么 AI 还是回答旧值？》、决定性实验数据、可安装的 Python 版 IGM 库（`igm/`）、持续学习参数保护（FIP/GPP）
 
 > 插件是研究报告的 DSH 落地实现：受控实验表明写入层的更新与遗忘语义会改变连续更新任务的取舍，插件把这套机制变成了真实 agent 能用的工具。
 

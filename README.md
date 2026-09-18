@@ -206,7 +206,7 @@ docs/                   # 研究报告、长文和架构说明
 - [语义情境路由](docs/SEMANTIC_CONTEXT_ROUTING.md)
 - [FIP Phase 0 终局决策](docs/FIP_PHASE0_FINAL_DECISION.md)
 - [GPP M0 报告](docs/GPP_M0_REPORT.md)
-- [配套长文：我试图让 AI 学会“不遗忘”](docs/ARTICLE_DRAFT.md)
+- [配套长文：RAG 找到了新事实，为什么 AI 还是回答旧值？](docs/ARTICLE_DRAFT.md)
 
 ### 为什么保留失败结果
 
